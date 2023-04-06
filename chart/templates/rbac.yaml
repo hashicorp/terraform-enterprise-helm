@@ -1,0 +1,47 @@
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Namespace }}
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Release.Namespace }}-agents
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Namespace }}
+  namespace: {{ .Release.Namespace }}-agents
+rules:
+- apiGroups:
+  - ""
+  - "batch"
+  - "app"
+  resources:
+  - jobs
+  - pods
+  - configmaps
+  verbs:
+  - list
+  - watch
+  - create
+  - update
+  - get
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Release.Namespace }}-agents
+  namespace: {{ .Release.Namespace }}-agents
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Release.Namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Release.Namespace }}
+  namespace: {{ .Release.Namespace }}
