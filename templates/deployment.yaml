@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: terraform-enterprise 
+  labels:
+    app: terraform-enterprise
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: terraform-enterprise
+  template:
+    metadata:
+      labels:
+        app: terraform-enterprise
+    spec:
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      volumes:
+        - name: certificates
+          secret:
+            secretName: {{ .Values.tls.certificateSecret }}
+        {{- if .Values.tls.caCertData }}
+        - name: ca-certificates
+          secret:
+            secretName: terraform-enterprise-ca-certificates
+        {{- end }}
+      imagePullSecrets:
+       - name: {{ .Values.image.pullSecret }}
+      serviceAccountName: {{ .Release.Namespace }} 
+      containers: 
+      - name: terraform-enterprise
+        image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: IfNotPresent
+        env:
+        {{- include "helpers.list-env-variables" . | indent 8 }}
+        - name: TFE_RUN_PIPELINE_KUBERNETES_NAMESPACE
+          value: {{ .Release.Namespace }}-agents
+        - name: TFE_RUN_PIPELINE_DRIVER
+          value: kubernetes
+        - name: TFE_VAULT_DISABLE_MLOCK
+          value: "true"
+        {{- if .Values.tls.caCertData }}
+        - name: TFE_TLS_CA_BUNDLE_FILE
+          value: /etc/ssl/certs/custom_ca_cert.pem
+        {{- end }}
+        readinessProbe:
+          httpGet:
+            path: /_health_check
+            port: 80
+        resources:
+          requests:
+            memory: {{ .Values.resources.requests.memory }}
+            cpu: {{ .Values.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.resources.limits.memory }}
+            cpu: {{ .Values.resources.limits.cpu }}
+        volumeMounts:
+          - name: certificates
+            mountPath: /etc/ssl/private/terraform-enterprise/cert.pem
+            subPath: tls.crt
+          - name: certificates
+            mountPath: /etc/ssl/private/terraform-enterprise/key.pem
+            subPath: tls.key
+          {{- if .Values.tls.caCertData }}
+          - name: ca-certificates
+            mountPath: {{ .Values.tls.caCertBaseDir }}/{{ .Values.tls.caCertFileName }}
+            subPath: {{ .Values.tls.caCertFileName }}
+          {{- end }}
