@@ -1,0 +1,64 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: terraform-enterprise
+  namespace: {{ .Release.Namespace }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.service.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: https-port
+      port: {{ .Values.service.port }}
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
+      targetPort: {{ .Values.tfe.privateHttpsPort }}
+      appProtocol: {{ .Values.service.appProtocol }}
+  selector:
+    app: terraform-enterprise
+---
+{{- if .Values.env.variables.TFE_HOSTNAME_SECONDARY }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: terraform-enterprise-secondary
+  namespace: {{ .Release.Namespace }}
+  {{- with .Values.serviceSecondary.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.serviceSecondary.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.serviceSecondary.type }}
+  {{- if and (eq .Values.serviceSecondary.type "LoadBalancer") .Values.serviceSecondary.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.serviceSecondary.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: https-port
+      port: {{ .Values.serviceSecondary.port }}
+      {{- if eq .Values.serviceSecondary.type "NodePort" }}
+      nodePort: {{ .Values.serviceSecondary.nodePort }}
+      {{- end }}
+      targetPort: {{ .Values.tfe.privateHttpsPort }}
+      appProtocol: {{ .Values.serviceSecondary.appProtocol }}
+  selector:
+    app: terraform-enterprise    
+{{- end}}

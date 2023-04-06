@@ -1,0 +1,10 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+apiVersion: v2
+name: terraform-enterprise
+kubeVersion: ">=1.21.0-0"
+description: Official HashiCorp Terraform-Enterprise Chart
+type: application
+version: 1.6.2
+appVersion: "v202505-1"

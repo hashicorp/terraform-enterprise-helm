@@ -1,0 +1,64 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- if .Values.agents.rbac.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Namespace }}
+  namespace: {{ include "helpers.agent-namespace" . }}
+  {{- with .Values.agents.rbac.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.agents.rbac.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+rules:
+- apiGroups:
+  - ""
+  - "batch"
+  - "app"
+  resources:
+  - jobs
+  - pods
+  - configmaps
+  - "pods/log"
+  verbs:
+  - list
+  - watch
+  - create
+  - update
+  - get
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "helpers.agent-namespace" . }}
+  namespace: {{ include "helpers.agent-namespace" . }}
+  {{- with .Values.agents.rbac.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.agents.rbac.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Release.Namespace }}
+subjects:
+- kind: ServiceAccount
+  {{- if .Values.serviceAccount.name}}
+  name: {{ .Values.serviceAccount.name }}
+  {{- else }}
+  name: {{ .Release.Namespace }}
+  {{- end }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}

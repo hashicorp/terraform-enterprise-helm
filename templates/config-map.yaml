@@ -1,0 +1,37 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: terraform-enterprise-env-config
+  namespace: {{ .Release.Namespace }}
+data:
+  {{- include "helpers.list-env-variables" . | indent 2 }}
+  TFE_RUN_PIPELINE_DRIVER: kubernetes
+  TFE_RUN_PIPELINE_KUBERNETES_NAMESPACE: {{ include "helpers.agent-namespace" . }}
+  {{- if or .Values.agentWorkerPodTemplate .Values.openshift.enabled }}
+  TFE_RUN_PIPELINE_KUBERNETES_POD_TEMPLATE: {{ include "k8s.addSecurityContext" . }}
+  {{- end }}
+  {{- if .Values.openshift.enabled }}
+  TFE_RUN_PIPELINE_KUBERNETES_OPEN_SHIFT_ENABLED: "true"
+  {{- end }}
+  TFE_VAULT_DISABLE_MLOCK: "true"
+  TFE_HTTP_PORT: "{{ .Values.tfe.privateHttpPort }}"
+  TFE_HTTPS_PORT: "{{ .Values.tfe.privateHttpsPort }}"
+  TFE_TLS_CERT_FILE_SECONDARY: "{{ .Values.tlsSecondary.certMountPath }}"
+  TFE_TLS_KEY_FILE_SECONDARY:  "{{ .Values.tlsSecondary.keyMountPath }}"
+  TFE_TLS_CERT_FILE: "{{ .Values.tls.certMountPath }}"
+  TFE_TLS_KEY_FILE:  "{{ .Values.tls.keyMountPath }}"
+  {{- if .Values.tls.caCertData }}
+  TFE_TLS_CA_BUNDLE_FILE: {{ include "cacert.path" . }}
+  {{- end }}
+  {{- if .Values.tfe.metrics.enable }}
+  TFE_METRICS_ENABLE: "{{ .Values.tfe.metrics.enable }}"
+  TFE_METRICS_HTTP_PORT: "{{ .Values.tfe.metrics.httpPort }}"
+  TFE_METRICS_HTTPS_PORT: "{{ .Values.tfe.metrics.httpsPort }}"
+  {{- end }}
+{{- if .Values.env.configFilePath }}
+{{ .Files.Get .Values.env.configFilePath | indent 2 }}
+{{- end }}

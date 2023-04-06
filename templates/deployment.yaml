@@ -1,0 +1,169 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: terraform-enterprise
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: terraform-enterprise
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: terraform-enterprise
+  {{- with .Values.strategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        checksum/env-config: {{ include (print $.Template.BasePath "/config-map.yaml") . | sha256sum }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- if .Values.pod.annotations }}
+        {{- toYaml .Values.pod.annotations | nindent 8 }}
+        {{- end }}
+        {{- if .Values.tfe.metrics.enable }}
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "{{ .Values.tfe.metrics.httpPort }}"
+        prometheus.io/scrape: "true"
+        {{- end }}
+      labels:
+        app: terraform-enterprise
+        {{- if .Values.pod.labels }}
+        {{- toYaml .Values.pod.labels | nindent 8 }}
+        {{- end }}
+    spec:
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      volumes:
+        - name: certificates
+          secret:
+            secretName: {{ .Values.tls.certificateSecret }}
+        {{- if and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData }}
+        - name: certificates-secondary
+          secret:
+            secretName: {{ .Values.tlsSecondary.certificateSecret }}  
+        {{- end }}
+        {{- if .Values.tls.caCertData }}
+        - name: ca-certificates
+          secret:
+            secretName: terraform-enterprise-ca-certificates
+        {{- end }}
+        {{- if .Values.csi.enabled }}
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "{{ .Values.csi.secretProviderClass }}"
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serviceAccount.enabled }}
+      {{- if .Values.serviceAccount.name}}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- else }}
+      serviceAccountName: {{ .Release.Namespace }}
+      {{- end }}
+      {{- end }}
+      initContainers:
+        {{ toYaml .Values.initContainers | nindent 8}}
+      containers:
+      - name: terraform-enterprise
+        image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+        {{- if and .Values.openshift.enabled (not .Values.container.securityContext) }}
+          seccompProfile:
+            type: RuntimeDefault
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+        {{- else }}
+        {{- toYaml .Values.container.securityContext | nindent 10 }}
+        {{- end }}
+        {{- with (include "helpers.list-valueFrom-variables" .) }}
+        env:
+          {{- . | indent 10 }}
+        {{- end }}
+        envFrom:
+          - configMapRef:
+              name: terraform-enterprise-env-config
+        {{- if .Values.env.configMapRefs }}
+          {{- range .Values.env.configMapRefs }}
+          - configMapRef:
+              name: {{ .name }}
+          {{- end }}
+        {{- end }}
+          - secretRef:
+              name: terraform-enterprise-env-secrets
+        {{- if .Values.env.secretRefs }}
+          {{- range .Values.env.secretRefs }}
+          - secretRef:
+              name: {{ .name }}
+          {{- end }}
+        {{- end }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.tfe.readinessProbePath | default "/_health_check" }}
+            port: {{ .Values.tfe.privateHttpPort }}
+            scheme: {{ .Values.tfe.readinessProbeScheme | default "HTTP"  }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        volumeMounts:
+          {{- if and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData }}
+          - name: certificates-secondary
+            mountPath: {{ .Values.tlsSecondary.certMountPath }}
+            subPath: tls.crt
+          - name: certificates-secondary
+            mountPath: {{ .Values.tlsSecondary.keyMountPath }}
+            subPath: tls.key        
+          {{- end }}  
+          - name: certificates
+            mountPath: {{ .Values.tls.certMountPath }}
+            subPath: tls.crt
+          - name: certificates
+            mountPath: {{ .Values.tls.keyMountPath }}
+            subPath: tls.key
+          {{- if .Values.tls.caCertData }}
+          - name: ca-certificates
+            mountPath: {{ include "cacert.path" . }}
+            subPath: {{ .Values.tls.caCertFileName }}
+          {{- end }}
+          {{- if .Values.csi.enabled }}
+          - name: secrets-store
+            mountPath: "{{ .Values.csi.mountPath }}"
+            readOnly: true
+          {{- end }}
+          {{- with .Values.extraVolumeMounts }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+        ports:
+        - containerPort: {{ .Values.tfe.privateHttpPort }}
+        - containerPort: {{ .Values.tfe.privateHttpsPort }}
+        {{- if .Values.tfe.metrics.enable }}
+        - containerPort: {{.Values.tfe.metrics.httpPort}}
+        - containerPort: {{.Values.tfe.metrics.httpsPort}}
+        {{- end }}

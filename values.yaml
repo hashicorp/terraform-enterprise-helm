@@ -1,0 +1,410 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+# Default values for Terraform Enterprise on Kubernetes.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+# Image pull secret to use for registry authentication.
+imagePullSecrets:
+- name: terraform-enterprise
+
+# Image sets the repo, name and tag of the Terraform Enterprise image to use.
+image:
+ repository: images.releases.hashicorp.com
+ name: hashicorp/terraform-enterprise
+ tag: <vYYYYMM-#>
+ pullPolicy: Always
+
+serviceAccount:
+  enabled: true
+  name: null
+  annotations: {}
+  labels: {}
+
+pod:
+# Configure pod annotations
+  annotations: {}
+  labels: {}
+container:
+# Configure pod specific security context settings
+  securityContext: {}
+
+# The deployment's strategy is not set by default. This should be a YAML map corresponding to a
+# Kubernetes [DeploymentStrategy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#deploymentstrategy-v1-apps) object.
+# strategy:
+#   type: RollingUpdate
+#   rollingUpdate:
+#     maxSurge: 1
+#     maxUnavailable: 0
+
+# Resource limits are not set by default, to give the user the ability to set specific resource limits.
+# If you do want to specify resource limits, uncomment the following lines and adjust them as necessary.
+resources:
+  requests:
+    memory: "2500Mi"
+    cpu: "750m"
+  # limits:
+  #   memory: ""
+  #   cpu: ""
+
+# TLS for end-to-end encrypted transport
+# Including secrets in Helm charts can expose sensitive data if the charts are
+# stored in a version control system like Git, where they might be accessible
+# to unauthorized users. It is recommended to manage secrets through a secure
+# secrets management system. The values given below are for testing purposes only.
+tls:
+  certificateSecret: terraform-enterprise-certificates
+  caCertBaseDir: /etc/ssl/certs
+  caCertFileName: custom_ca_certs.pem
+  certMountPath: /etc/ssl/private/terraform-enterprise/cert.pem
+  keyMountPath: /etc/ssl/private/terraform-enterprise/key.pem
+  # certData:
+  # keyData:
+  # caCertData:
+
+
+tlsSecondary:
+  certificateSecret: terraform-enterprise-certificates-secondary
+  certMountPath: /etc/ssl/private/terraform-enterprise-secondary/cert.pem
+  keyMountPath: /etc/ssl/private/terraform-enterprise-secondary/key.pem
+  # certData:
+  # keyData:
+
+tfe:
+  metrics:
+    enable: false
+    httpPort: 9090
+    httpsPort: 9091
+  privateHttpPort: 8080
+  privateHttpsPort: 8443
+  ## Readiness probe settings customize the terraform-enterprise health check path, eg: to use the full service dependency check
+  # readinessProbePath: "/_health_check?full"
+  # readinessProbeScheme: "HTTP"
+
+# nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
+nodeSelector: {}
+
+# Toleration Settings
+# This should be either a multi-line string or YAML matching
+# the Toleration array in a PodSpec.
+tolerations: []
+# tolerations:
+# - key: "key"
+#   operator: "Equal"
+#   value: "value"
+#   effect: "NoSchedule"
+
+# Affinity Settings
+# Commenting out or setting as empty the affinity variable, will allow
+# deployment to single node services such as Minikube
+# This should be either a multi-line string or YAML matching the PodSpec's affinity field.
+affinity: {}
+#
+## Example:
+#
+#  affinity: |
+#    podAntiAffinity:
+#      requiredDuringSchedulingIgnoredDuringExecution:
+#        - labelSelector:
+#            matchExpressions:
+#             - key: foo
+#               operator: In
+#               values:
+#               - bar
+#          topologyKey: "kubernetes.io/hostname
+#    podAffinity:
+#      preferredDuringSchedulingIgnoredDuringExecution:
+#        - weight: 50
+#        podAffinityTerm:
+#          labelSelector:
+#            matchExpressions:
+#            - key: foo
+#              operator: In
+#              values:
+#                - bar
+#          topologyKey: "kubernetes.io/hostname"
+
+# Topology Spread Constraints
+# This should be either a multi-line string or YAML matching the PodSpec's typologySpreadConstraints field.
+topologySpreadConstraints: []
+
+## Example:
+#  - maxSkew: 1
+#    topologyKey: topology.kubernetes.io/zone
+#    whenUnsatisfiable: DoNotSchedule
+#    labelSelector:
+#      matchLabels:
+#        app: terraform-enterprise
+
+# Security context for the deployment template.
+# The deployment securityContext is not set by default.
+#This should be a YAML map corresponding to a
+# Kubernetes [SecurityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) object.
+securityContext: {}
+    # runAsNonRoot: false
+    # runAsUser: 1000
+    # runAsGroup: 3000
+    # fsGroup: 2000
+
+# InitContainers is a list of init containers. Specified as a YAML list.
+# This is useful if you need to run a script to provision TLS certificates or
+# write out configuration files in a dynamic way.
+initContainers: null
+## Example ##
+#- name: init-demo
+#  image: busybox
+#  command:
+#      - wget
+#      - "-O"
+#      - "/work-dir/index.html"
+#      - http://info.cern.ch
+#    args:
+#  volumeMounts:
+#  - name: workdir
+#      mountPath "/work-dir"
+#    dnsPolicy: Default
+#    volumes:
+#    - name: workdir
+#    emptyDir: {}
+
+# Ingress allows ingress services to be created to allow external access
+# from Kubernetes to access Terraform Enterprise pods.
+ingress:
+  enabled: false
+  className: "" # nginx
+  annotations: {}
+    # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+  hosts:
+    - host: "" # "*.ptfe-dev.aws.ptfedev.com"
+      paths:
+        - path: /
+          pathType: Prefix
+          serviceName: "terraform-enterprise"
+          portNumber: 443
+  tls: []
+    # - secretName: terraform-enterprise-certificates
+    #   hosts:
+    #   - "*.ptfe-dev.aws.ptfedev.com"
+
+ # Injector service specific configurations
+service:
+  annotations: {}
+    # Add annotations here for specific cloud provider configurations.
+    # Examples:
+    # - For Google Cloud, use the NEG (Network Endpoint Group) annotation:
+    #   cloud.google.com/neg: '{"ingress": true}'
+    # - For Azure, configure the health probe request path for HTTPS health checks:
+    #   service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/_health_check"
+  labels: {}
+    # Add labels to the service created for Terraform Enterprise. Helpful if your metrics collection
+    # depends on ServiceMonitors instead of pod annotations.
+
+  type: LoadBalancer # The type of service to create. Options: LoadBalancer, ClusterIP, NodePort.
+                     # - LoadBalancer: Exposes the service externally using a cloud provider's load balancer.
+                     # - ClusterIP: Default type; exposes the service only within the cluster.
+                     # - NodePort: Exposes the service on a static port on each cluster node.
+
+  port: 443          # The port exposed by the service (external port).
+
+  nodePort: 32443    # If service.type is NodePort, this sets the external port on cluster nodes.
+                     # Ignored for LoadBalancer and ClusterIP types.
+
+  appProtocol: tcp   # Application protocol for the service.
+                     # - Default is "tcp" for broad compatibility across cloud providers.
+                     # - Set to "https" if Gateway API or Layer 7 features are required.
+
+  loadBalancerIP: null # If service.type is LoadBalancer, you can optionally set a specific external IP.
+                       # Useful for static IP requirements or pre-existing IP reservations.
+
+serviceSecondary:
+  annotations: {}
+    # Add annotations here for specific cloud provider configurations.
+    # Examples:
+    # - For Google Cloud, use the NEG (Network Endpoint Group) annotation:
+    #   cloud.google.com/neg: '{"ingress": true}'
+    # - For Azure, configure the health probe request path for HTTPS health checks:
+    #   service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/_health_check"
+  labels: {}
+    # Add labels to the service created for Terraform Enterprise. Helpful if your metrics collection
+    # depends on ServiceMonitors instead of pod annotations.
+
+  type: ClusterIP    # The type of service to create. Options: LoadBalancer, ClusterIP, NodePort.
+                     # - LoadBalancer: Exposes the service externally using a cloud provider's load balancer.
+                     # - ClusterIP: Default type; exposes the service only within the cluster.
+                     # - NodePort: Exposes the service on a static port on each cluster node.
+
+  port: 443          # The port exposed by the service (external port).
+
+  nodePort: 32443    # If service.type is NodePort, this sets the external port on cluster nodes.
+                     # Ignored for LoadBalancer and ClusterIP types.
+
+  appProtocol: tcp   # Application protocol for the service.
+                     # - Default is "tcp" for broad compatibility across cloud providers.
+                     # - Set to "https" if Gateway API or Layer 7 features are required.
+
+  loadBalancerIP: null # If service.type is LoadBalancer, you can optionally set a specific external IP.
+                       # Useful for static IP requirements or pre-existing IP reservations.
+
+
+# Custom pod template to define your own specifications for the creation of the agent worker pods.
+# This should be YAML representing a valid corev1.PodTemplateSpec. This format is documented
+# at https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-template-v1/#PodTemplateSpec.
+agentWorkerPodTemplate: {}
+  # metadata: {}
+  # spec:
+  #   containers: []
+  #   nodeSelector: {}
+
+# Configuration for running this Helm chart on Red Hat OpenShift platform.
+openshift:
+  # If true, the Helm chart will create necessary configuration for running its components on OpenShift.
+  enabled: false
+
+env:
+  # configFilePath: env-config.yaml
+  # secretsFilePath: # env-secrets.yaml
+  # configMapRefs:
+  #   - name:
+  # secretRefs:
+  #    - name:
+  secrets: {}
+    # TFE_ENCRYPTION_PASSWORD: "SECRET"
+    # TFE_DATABASE_PASSWORD: ""
+    # TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: ""
+    # TFE_OBJECT_STORAGE_GOOGLE_CREDENTIALS: ""
+    # TFE_OBJECT_STORAGE_S3_SECRET_ACCESS_KEY: ""
+    # TFE_VAULT_SECRET_ID: ""
+    # TFE_REDIS_PASSWORD: ""
+    # TFE_REDIS_SIDEKIQ_PASSWORD: ""
+    # TFE_LICENSE: ""
+  variables: {}
+    # TFE_HOSTNAME: ""
+    # TFE_CAPACITY_CONCURRENCY: ""
+    # TFE_CAPACITY_CPU: ""
+    # TFE_CAPACITY_MEMORY: ""
+    # TFE_DATABASE_HOST: ""
+    # TFE_DATABASE_NAME: ""
+    # TFE_DATABASE_PARAMETERS: ""
+    # TFE_DATABASE_USER: ""
+    # TFE_DISK_PATH: ""
+    # TFE_RUN_PIPELINE_KUBERNETES_DEBUG_ENABLED: false
+    # TFE_RUN_PIPELINE_KUBERNETES_DEBUG_JOBS_TTL: 86400
+    # TFE_OBJECT_STORAGE_TYPE: ""
+    # TFE_OBJECT_STORAGE_AZURE_ACCOUNT_NAME: ""
+    # TFE_OBJECT_STORAGE_AZURE_CONTAINER: ""
+    # TFE_OBJECT_STORAGE_AZURE_ENDPOINT: ""
+    # TFE_OBJECT_STORAGE_GOOGLE_BUCKET: ""
+    # TFE_OBJECT_STORAGE_GOOGLE_PROJECT: ""
+    # TFE_OBJECT_STORAGE_S3_ACCESS_KEY_ID: ""
+    # TFE_OBJECT_STORAGE_S3_BUCKET: ""
+    # TFE_OBJECT_STORAGE_S3_ENDPOINT: ""
+    # TFE_OBJECT_STORAGE_S3_REGION: ""
+    # TFE_OBJECT_STORAGE_S3_SERVER_SIDE_ENCRYPTION: ""
+    # TFE_OBJECT_STORAGE_S3_SERVER_SIDE_ENCRYPTION_KMS_KEY_ID: ""
+    # TFE_OBJECT_STORAGE_S3_USE_INSTANCE_PROFILE: ""
+    # TFE_REDIS_USE_TLS: ""
+    # TFE_REDIS_USER: ""
+    # TFE_REDIS_HOST: ""
+    # TFE_REDIS_USE_AUTH: ""
+    # TFE_REDIS_SIDEKIQ_USE_TLS: ""
+    # TFE_REDIS_SIDEKIQ_USER: ""
+    # TFE_REDIS_SIDEKIQ_HOST: ""
+    # TFE_REDIS_SIDEKIQ_USE_AUTH: ""
+    # TFE_TLS_CIPHERS: ""
+    # TFE_VAULT_ADDRESS: ""
+    # TFE_VAULT_NAMESPACE: ""
+    # TFE_VAULT_PATH: ""
+    # TFE_VAULT_ROLE_ID: ""
+    # TFE_IACT_SUBNETS: ""
+    # TFE_IACT_TIME_LIMIT: ""
+  # secretKeyRefs can be used to inject external Kubernetes secrets into the environment.
+  secretKeyRefs: {}
+    # Name is the name of the environment variable.
+    # - name: SECRET_ENV_VAR
+    #   secretName: my-secret
+    #   key: secret-key
+  # configMapKeyRefs can be used to inject external Kubernetes configmap entries into the environment.
+  configMapKeyRefs: {}
+    # Name is the name of the environment variable.
+    # - name: CONFIG_ENV_VAR
+    #   configMapName: my-configmap
+    #   key: config-key
+
+agents:
+  rbac:
+    enabled: true
+    annotations: {}
+    labels: {}
+  namespace:
+    # Whether to create a namespace for the agents.
+    enabled: true
+    # The name of the agent namespace to create, or the name of the namespace to use if it
+    # already exists. Defaults to the release namespace with the suffix "-agents".
+    name: null
+    annotations: {}
+    labels: {}
+
+# Extra volumes to add to the deployment's pod.
+# Reference: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#volumes
+# Usecases:
+## mount external secrets, such as certificates from cert-manager
+# extraVolumes:
+# - name: cert-manager-secret
+#   secret:
+#      secretName: tfe-example-com-tls
+#
+## associate a pre-existing PVC with /var/log/terraform-enterprise to have persistent logs
+# extraVolumes:
+# - name: logs
+#   persistentVolumeClaim:
+#      claimName: tfe-logs
+extraVolumes: []
+  # - name: extra-volume
+  #   emptyDir: {}
+
+# Extra volume mounts to add to the Terraform Enterprise container. The name should match an "extraVolumes" entry
+# Reference: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#volumes-1
+extraVolumeMounts: []
+  # - name: extra-volume
+  #   mountPath: /mnt/data
+
+# Pod Disruption Budget settings
+# Reference: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+pdb:
+  # Whether to create a PodDisruptionBudget for the Terraform Enterprise deployment.
+  enabled: false
+  # The number of replicas that must be available during disruptions.
+  replicaCount: 1
+  annotations: {}
+  labels: {}
+
+# CSI driver settings for Vault provider
+csi:
+  enabled: false
+  annotations: {}
+  labels: {}
+  secretProviderClass: terraform-enterprise-vault-secrets
+  vaultRole: ""
+  vaultAddress: "" # Example: http://vault.vault-namespace.svc.cluster.local:8200
+  mountPath: "" # Example: /mnt/secrets-store
+  secrets:
+    # The path to the secret defined in Vault. Example: secret/data/db
+    - secretPath: ""
+      # The key of the secret defined in Vault.
+      secretKey: ""
+      # A name for the secret
+      objectName: ""
+  # If this is added, secrets will be synced to Kubernetes secrets.
+  secretObjects:
+  - data:
+    # secret key from secrets section
+    - key: ""
+      # Object name from secrets section
+      objectName: ""
+    # Name of the Kubernetes secret
+    secretName: ""
+    # Type of the Kubernetes secret. Example: Opaque
+    type: ""
