@@ -40,6 +40,10 @@ spec:
           value: kubernetes
         - name: TFE_VAULT_DISABLE_MLOCK
           value: "true"
+        - name: TFE_TLS_CERT_FILE
+          value: "{{ .Values.tls.certMountPath }}"
+        - name: TFE_TLS_KEY_FILE
+          value: "{{ .Values.tls.keyMountPath }}"
         {{- if .Values.tls.caCertData }}
         - name: TFE_TLS_CA_BUNDLE_FILE
           value: /etc/ssl/certs/custom_ca_cert.pem
@@ -57,10 +61,10 @@ spec:
             cpu: {{ .Values.resources.limits.cpu }}
         volumeMounts:
           - name: certificates
-            mountPath: /etc/ssl/private/terraform-enterprise/cert.pem
+            mountPath: {{ .Values.tls.certMountPath }}
             subPath: tls.crt
           - name: certificates
-            mountPath: /etc/ssl/private/terraform-enterprise/key.pem
+            mountPath: {{ .Values.tls.keyMountPath }}
             subPath: tls.key
           {{- if .Values.tls.caCertData }}
           - name: ca-certificates
