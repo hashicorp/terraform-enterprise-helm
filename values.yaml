@@ -27,6 +27,8 @@ tls:
   certificateSecret: terraform-enterprise-certificates
   caCertBaseDir: /etc/ssl/certs
   caCertFileName: custom_ca_certs.pem
+  certMountPath: /etc/ssl/private/terraform-enterprise/cert.pem
+  keyMountPath: /etc/ssl/private/terraform-enterprise/key.pem
   # certData:
   # keyData:
   # caCertData:
@@ -70,8 +72,6 @@ env:
   TFE_IACT_TIME_LIMIT: "60"
   TFE_OPERATIONAL_MODE: "disk"
   TFE_TLS_VERSION: "tls_1_2_tls_1_3"
-  TFE_TLS_CERT_FILE: "/etc/ssl/private/terraform-enterprise/cert.pem"
-  TFE_TLS_KEY_FILE: "/etc/ssl/private/terraform-enterprise/key.pem"
   TFE_VAULT_DISABLE_MLOCK: true
   # TFE_CAPACITY_CONCURRENCY: ""
   # TFE_CAPACITY_CPU: ""
