@@ -156,15 +156,13 @@ This Helm chart supports an optional ingress resource with your Ingress controll
 
 ## helm upgrade
 
-This command upgrades a release to a new version of a chart.
-
-The upgrade arguments must be a release and chart or update SHA's in the helm values. The chart argument can be either: a chart reference('charts/terraform-enterprise'), a path to a chart directory, a packaged chart, or a fully qualified URL. For chart references, the latest version will be specified unless the '--version' flag is set.
+The upgrade arguments must be a release and chart or update SHAs in the helm values. The chart argument can be either: a chart reference(`charts/terraform-enterprise`), a path to a chart directory, a packaged chart, or a fully qualified URL. For chart references, the latest version will be specified unless the `--version` flag is set.
 
 This is a generic command to upgrade a release:
 
     helm upgrade [RELEASE] [CHART] [flags]
 
-If you want to correctly wait until the pods become ready, you can use a --wait flag
+If you want to wait until the pods become ready, you can use a `--wait` flag
 
     helm upgrade <release-name> hashicrop/terraform-enterprise \
      --version <target-helm-chart-version> \
@@ -172,9 +170,9 @@ If you want to correctly wait until the pods become ready, you can use a --wait 
      --wait \
      --namespace <namespace>
 
-To override values in a chart, use either the '--values' flag and pass in a file or use the '--set' flag and pass configuration from the command line, to force string values, use '--set-string'. You can use '--set-file' to set individual values from a file when the value itself is too long for the command line or is dynamically generated. If a namespace is set, make sure to use the -n flag along with the name of the namespace.
+To override values in a chart, use either the `--values` flag and pass in a file or use the `--set` flag and pass configuration from the command line, to force string values, use `--set-string`. You can use `--set-file` to set individual values from a file when the value itself is too long for the command line or is dynamically generated. If a namespace is set, make sure to use the `-n` flag along with the name of the namespace.
 
-    helm upgrade -f values.yaml -f override.yaml terraform-enterprise /path/to/charts -n <NAMESPACE>
+    helm upgrade -f values.yaml -f override.yaml terraform-enterprise -n <NAMESPACE>
 
 Helm also dded a new flag to their cli: `--atomic`. This flag will automatically run a helm rollback if your upgrade fails.
 
@@ -182,29 +180,27 @@ Helm also dded a new flag to their cli: `--atomic`. This flag will automatically
 
 ## Helm rollback to previous release
 
-This command rolls back a release to a previous version.
-
 The first argument of the rollback command is the name of a release, and the second is a revision (version) number. If this argument is omitted, it will roll back to the previous release.
 
-Note: kubectl this way will rollback only the deployment, but not other resources associated with helm release.
-
-To see revision numbers, run 'helm history RELEASE'  or 'helm ls'.
+To see revision numbers, run `helm history RELEASE`  or `helm ls`.
 
     helm rollback <RELEASE_NAME> -n <NAMESPACE>
 
+Note: The helm rollback command is recommend because using the kubectl command will only rollback the deployment, but not other resources associated with helm release.
+
 But if you need to rollback to specific previous version, You can:
 
-First: List revision numbers by running:
+List revision numbers by running:
 
     helm history <RELEASE_NAME>
 
-Second: Roll back to the version you want using:
+Then, rollback to the version you want using:
 
     helm rollback <RELEASE_NAME> [REVISION]
 
 ## Process for Upgrading TFE with Helm using the image tag
 
-In the resulting folder, go to the directory named after your chart, such as /files/charts/terraform-enterprise.
+In the resulting folder, go to the directory named after your chart.
 
 Inspect the values from the TFE K8s cluster, by running:
 
