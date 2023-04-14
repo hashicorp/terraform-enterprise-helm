@@ -174,7 +174,7 @@ To override values in a chart, use either the `--values` flag and pass in a file
 
     helm upgrade -f values.yaml -f override.yaml terraform-enterprise -n <NAMESPACE>
 
-Helm also dded a new flag to their cli: `--atomic`. This flag will automatically run a helm rollback if your upgrade fails.
+If you want Helm to rollback installation if it fails, you can use the `--atomic flag`. Note that the `--wait` flag will be set automatically if `--atomic` is used.
 
     helm upgrade -f my-values.yaml ./path/to/my/chart --install --atomic -n <NAMESPACE> 
 
@@ -186,7 +186,7 @@ To see revision numbers, run `helm history RELEASE`  or `helm ls`.
 
     helm rollback <RELEASE_NAME> -n <NAMESPACE>
 
-Note: The helm rollback command is recommend because using the kubectl command will only rollback the deployment, but not other resources associated with helm release.
+Note: The helm rollback command is recommended because using the kubectl command will only rollback the deployment, but not other resources associated with helm release.
 
 But if you need to rollback to specific previous version, You can:
 
@@ -212,7 +212,7 @@ After inspecting the helm values, print the output to an override.yaml file, by 
 
 Inside the override.yaml file, update the image tag to the version you want for the TFE upgrade and save the file.
 
-To uppgrade TFE, run the following commands:
+To upgrade TFE, run the following commands:
 
     helm upgrade -f values.yaml -f override.yaml terraform-enterprise -n <NAMESPACE> .
 
