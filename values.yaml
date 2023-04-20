@@ -33,6 +33,10 @@ tls:
   # keyData:
   # caCertData:
 
+tfe:
+    privateHttpPort: 8080
+    privateHttpsPort: 8443
+
 nodeSelector: {}
 
 tolerations: []
@@ -63,7 +67,7 @@ ingress:
 
 service:
   type: LoadBalancer # ClusterIP
-
+  port: 443
 
 env:
   TFE_ENCRYPTION_PASSWORD: "SUPERDUPERSECRET"
