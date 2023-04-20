@@ -53,12 +53,7 @@ spec:
             path: /_health_check
             port: 80
         resources:
-          requests:
-            memory: {{ .Values.resources.requests.memory }}
-            cpu: {{ .Values.resources.requests.cpu }}
-          limits:
-            memory: {{ .Values.resources.limits.memory }}
-            cpu: {{ .Values.resources.limits.cpu }}
+        {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
           - name: certificates
             mountPath: {{ .Values.tls.certMountPath }}
