@@ -5,7 +5,7 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: 443
-      targetPort: 443
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.tfe.privateHttpsPort }}
   selector:
     app: terraform-enterprise

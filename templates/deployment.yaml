@@ -48,6 +48,10 @@ spec:
           value: "{{ .Values.tls.certMountPath }}"
         - name: TFE_TLS_KEY_FILE
           value: "{{ .Values.tls.keyMountPath }}"
+        - name: TFE_HTTP_PORT
+          value: "{{ .Values.tfe.privateHttpPort }}"
+        - name: TFE_HTTPS_PORT
+          value: "{{ .Values.tfe.privateHttpsPort }}"
         {{- if .Values.tls.caCertData }}
         - name: TFE_TLS_CA_BUNDLE_FILE
           value: /etc/ssl/certs/custom_ca_cert.pem
@@ -55,7 +59,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /_health_check
-            port: 80
+            port: {{ .Values.tfe.privateHttpPort }}
         resources:
           requests:
             memory: {{ .Values.resources.requests.memory }}
