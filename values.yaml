@@ -26,7 +26,6 @@ resources: {}
 #    cpu: ""
 #  limits:
 #    memory: ""
-#    cpu: ""
 
 tls:
   certificateSecret: terraform-enterprise-certificates
