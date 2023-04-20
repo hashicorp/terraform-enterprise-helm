@@ -13,7 +13,9 @@ image:
  pullPolicy: IfNotPresent
  pullSecret: terraform-enterprise
 
-podAnnotations: {}
+pod:
+# Configure pod annotations
+  annotations: {}
 
 # Resource limits are not set by default, to give the user the ability to set specific resources.
 # If you do want to specify resources, uncomment the following lines,

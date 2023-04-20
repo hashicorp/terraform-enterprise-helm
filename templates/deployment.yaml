@@ -11,6 +11,10 @@ spec:
       app: terraform-enterprise
   template:
     metadata:
+      annotations:
+    {{- if .Values.pod.annotations }}
+    {{ toYaml .Values.pod.annotations | indent 8 }}
+    {{ end }}
       labels:
         app: terraform-enterprise
     spec:
