@@ -53,7 +53,7 @@ spec:
             path: /_health_check
             port: 80
         resources:
-        {{- toYaml .Values.resources | nindent 12 }}
+          {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
           - name: certificates
             mountPath: {{ .Values.tls.certMountPath }}
