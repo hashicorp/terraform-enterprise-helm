@@ -17,15 +17,15 @@ pod:
 # Configure pod annotations
   annotations: {}
 
-# Resource limits are not set by default, to give the user the ability to set specific resources.
-# If you do want to specify resources, uncomment the following lines,
-# adjust them as necessary, and remove the curly braces after 'resources:'.
-resources: {}
-#  requests:
-#    memory: ""
-#    cpu: ""
+# Resource limits are not set by default, to give the user the ability to set specific resource limits.
+# If you do want to specify resource limits, uncomment the following lines and adjust them as necessary.
+resources:
+   requests:
+     memory: "2500Mi"
+     cpu: "750m"
 #  limits:
 #    memory: ""
+#    cpu: ""
 
 tls:
   certificateSecret: terraform-enterprise-certificates
