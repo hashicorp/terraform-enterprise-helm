@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Default values for Terraform Enterprise on Kubernetes.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -63,6 +66,9 @@ tolerations: []
 # deployment to single node services such as Minikube
 # This should be either a multi-line string or YAML matching the PodSpec's affinity field.
 affinity: {}
+#
+## Example:
+#  
 #  affinity: |
 #    podAntiAffinity:
 #      requiredDuringSchedulingIgnoredDuringExecution:
