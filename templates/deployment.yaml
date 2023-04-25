@@ -18,8 +18,12 @@ spec:
       labels:
         app: terraform-enterprise
     spec:
-      tolerations: {{ .Values.tolerations }}
-      affinity: {{ .Values.affinity }} 
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }} 
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
       volumes:
@@ -33,7 +37,7 @@ spec:
         {{- end }}
       imagePullSecrets:
        - name: {{ .Values.image.pullSecret }}
-      serviceAccountName: {{ .Release.Namespace }} 
+      serviceAccountName: {{ .Release.Namespace }}
       containers: 
       - name: terraform-enterprise
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
