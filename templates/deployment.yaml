@@ -18,6 +18,8 @@ spec:
       labels:
         app: terraform-enterprise
     spec:
+      tolerations: {{ .Values.tolerations }}
+      affinity: {{ .Values.affinity }} 
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
       volumes:

@@ -3,9 +3,12 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
+
+# Image pull secret to use for registry authentication.
 imagePullSecrets:
 - name: {}
 
+# Image sets the repo, name and tag of the Terraform Enterprise image to use.
 image:
  repository: quay.io
  name: hashicorp/terraform-enterprise
@@ -27,6 +30,7 @@ resources:
 #    memory: ""
 #    cpu: ""
 
+# TLS for end-to-end encrypted transport
 tls:
   certificateSecret: terraform-enterprise-certificates
   caCertBaseDir: /etc/ssl/certs
@@ -41,17 +45,58 @@ tfe:
     privateHttpPort: 8080
     privateHttpsPort: 8443
 
+# nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
 nodeSelector: {}
 
+# Toleration Settings
+# This should be either a multi-line string or YAML matching
+# the Toleration array in a PodSpec.
 tolerations: []
+# tolerations:
+# - key: "key"
+#   operator: "Equal"
+#   value: "value"
+#   effect: "NoSchedule"
 
+# Affinity Settings
+# Commenting out or setting as empty the affinity variable, will allow
+# deployment to single node services such as Minikube
+# This should be either a multi-line string or YAML matching the PodSpec's affinity field.
 affinity: {}
+#  affinity: |
+#    podAntiAffinity:
+#      requiredDuringSchedulingIgnoredDuringExecution:
+#        - labelSelector:
+#            matchExpressions:
+#             - key: foo
+#               operator: In
+#               values:
+#               - bar
+#          topologyKey: "kubernetes.io/hostname
+#    podAffinity:
+#      preferredDuringSchedulingIgnoredDuringExecution:
+#        - weight: 50
+#        podAffinityTerm:
+#          labelSelector:
+#            matchExpressions:
+#            - key: foo
+#              operator: In
+#              values:
+#                - bar
+#          topologyKey: "kubernetes.io/hostname"
 
+# Security context for the deployment template.
+# The deployment securityContext is not set by default.
+#This should be a YAML map corresponding to a
+# Kubernetes [SecurityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) object.
 securityContext: {}
+    # runAsNonRoot: false
     # runAsUser: 1000
     # runAsGroup: 3000
     # fsGroup: 2000
 
+# Ingress allows ingress services to be created to allow external access
+# from Kubernetes to access Terraform Enterprise pods.
 ingress:
   enabled: false
   className: "" # nginx
@@ -69,6 +114,7 @@ ingress:
     #   hosts:
     #   - "*.ptfe-dev.aws.ptfedev.com"
 
+ # Injector service specific configurations
 service:
   type: LoadBalancer # ClusterIP
   port: 443
