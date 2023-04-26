@@ -1,11 +1,17 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Default values for Terraform Enterprise on Kubernetes.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
+
+# Image pull secret to use for registry authentication.
 imagePullSecrets:
 - name: {}
 
+# Image sets the repo, name and tag of the Terraform Enterprise image to use.
 image:
  repository: quay.io
  name: hashicorp/terraform-enterprise
@@ -13,19 +19,21 @@ image:
  pullPolicy: IfNotPresent
  pullSecret: terraform-enterprise
 
-podAnnotations: {}
+pod:
+# Configure pod annotations
+  annotations: {}
 
-# Resource limits are not set by default, to give users the ability to set specific resources.
-# If you do want to specify resources, uncomment the following lines,
-# adjust them as necessary, and remove the curly braces after 'resources:'.
-resources: {}
-#  requests:
-#    memory: ""
-#    cpu: ""
+# Resource limits are not set by default, to give the user the ability to set specific resource limits.
+# If you do want to specify resource limits, uncomment the following lines and adjust them as necessary.
+resources:
+   requests:
+     memory: "2500Mi"
+     cpu: "750m"
 #  limits:
 #    memory: ""
 #    cpu: ""
 
+# TLS for end-to-end encrypted transport
 tls:
   certificateSecret: terraform-enterprise-certificates
   caCertBaseDir: /etc/ssl/certs
@@ -36,17 +44,65 @@ tls:
   # keyData:
   # caCertData:
 
+tfe:
+    privateHttpPort: 8080
+    privateHttpsPort: 8443
+
+# nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
 nodeSelector: {}
 
+# Toleration Settings
+# This should be either a multi-line string or YAML matching
+# the Toleration array in a PodSpec.
 tolerations: []
+# tolerations:
+# - key: "key"
+#   operator: "Equal"
+#   value: "value"
+#   effect: "NoSchedule"
 
+# Affinity Settings
+# Commenting out or setting as empty the affinity variable, will allow
+# deployment to single node services such as Minikube
+# This should be either a multi-line string or YAML matching the PodSpec's affinity field.
 affinity: {}
+#
+## Example:
+#  
+#  affinity: |
+#    podAntiAffinity:
+#      requiredDuringSchedulingIgnoredDuringExecution:
+#        - labelSelector:
+#            matchExpressions:
+#             - key: foo
+#               operator: In
+#               values:
+#               - bar
+#          topologyKey: "kubernetes.io/hostname
+#    podAffinity:
+#      preferredDuringSchedulingIgnoredDuringExecution:
+#        - weight: 50
+#        podAffinityTerm:
+#          labelSelector:
+#            matchExpressions:
+#            - key: foo
+#              operator: In
+#              values:
+#                - bar
+#          topologyKey: "kubernetes.io/hostname"
 
+# Security context for the deployment template.
+# The deployment securityContext is not set by default.
+#This should be a YAML map corresponding to a
+# Kubernetes [SecurityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) object.
 securityContext: {}
+    # runAsNonRoot: false
     # runAsUser: 1000
     # runAsGroup: 3000
     # fsGroup: 2000
 
+# Ingress allows ingress services to be created to allow external access
+# from Kubernetes to access Terraform Enterprise pods.
 ingress:
   enabled: false
   className: "" # nginx
@@ -64,9 +120,10 @@ ingress:
     #   hosts:
     #   - "*.ptfe-dev.aws.ptfedev.com"
 
+ # Injector service specific configurations
 service:
   type: LoadBalancer # ClusterIP
-
+  port: 443
 
 env:
   TFE_ENCRYPTION_PASSWORD: "SUPERDUPERSECRET"
