@@ -106,7 +106,6 @@ securityContext: {}
 # write out configuration files in a dynamic way.
 initContainers: null
 ## Example ##
-#initContainers:
 #- name: init-demo
 #  image: busybox
 #  command:
