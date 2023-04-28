@@ -101,6 +101,27 @@ securityContext: {}
     # runAsGroup: 3000
     # fsGroup: 2000
 
+# InitContainers is a list of init containers. Specified as a YAML list.
+# This is useful if you need to run a script to provision TLS certificates or
+# write out configuration files in a dynamic way.
+initContainers: null
+## Example ##
+#- name: init-demo
+#  image: busybox
+#  command:
+#      - wget
+#      - "-O"
+#      - "/work-dir/index.html"
+#      - http://info.cern.ch
+#    args:
+#  volumeMounts:
+#  - name: workdir
+#      mountPath "/work-dir"
+#    dnsPolicy: Default
+#    volumes:
+#    - name: workdir
+#    emptyDir: {}   
+
 # Ingress allows ingress services to be created to allow external access
 # from Kubernetes to access Terraform Enterprise pods.
 ingress:
