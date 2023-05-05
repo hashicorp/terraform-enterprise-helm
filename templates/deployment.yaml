@@ -6,7 +6,7 @@ SPDX-License-Identifier: MPL-2.0
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: terraform-enterprise 
+  name: terraform-enterprise
   labels:
     app: terraform-enterprise
 spec:
@@ -46,7 +46,7 @@ spec:
       initContainers:
         {{ toYaml .Values.initContainers | nindent 8}}
         {{- end }}
-      containers: 
+      containers:
       - name: terraform-enterprise
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: IfNotPresent
@@ -68,12 +68,13 @@ spec:
           value: "{{ .Values.tfe.privateHttpsPort }}"
         {{- if .Values.tls.caCertData }}
         - name: TFE_TLS_CA_BUNDLE_FILE
-          value: /etc/ssl/certs/custom_ca_cert.pem
+          value: {{ .Values.tls.caCertBaseDir }}/{{ .Values.tls.caCertFileName }}
         {{- end }}
         readinessProbe:
           httpGet:
             path: /_health_check
             port: {{ .Values.tfe.privateHttpPort }}
+            scheme: HTTP
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
@@ -88,3 +89,6 @@ spec:
             mountPath: {{ .Values.tls.caCertBaseDir }}/{{ .Values.tls.caCertFileName }}
             subPath: {{ .Values.tls.caCertFileName }}
           {{- end }}
+        ports:
+        - containerPort: {{ .Values.tfe.privateHttpPort }}
+        - containerPort: {{ .Values.tfe.privateHttpsPort }}

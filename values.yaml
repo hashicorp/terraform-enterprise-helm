@@ -45,8 +45,8 @@ tls:
   # caCertData:
 
 tfe:
-    privateHttpPort: 8080
-    privateHttpsPort: 8443
+  privateHttpPort: 8080
+  privateHttpsPort: 8443
 
 # nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
 nodeSelector: {}
@@ -143,8 +143,11 @@ ingress:
 
  # Injector service specific configurations
 service:
+  annotations: {}
+    # cloud.google.com/neg: '{"ingress": true}'
   type: LoadBalancer # ClusterIP
   port: 443
+  nodePort: 32443 # if service.type is NodePort value will be set
 
 env:
   TFE_ENCRYPTION_PASSWORD: "SUPERDUPERSECRET"
@@ -154,6 +157,7 @@ env:
   TFE_OPERATIONAL_MODE: "disk"
   TFE_TLS_VERSION: "tls_1_2_tls_1_3"
   TFE_VAULT_DISABLE_MLOCK: true
+  TFE_LICENSE_REPORTING_OPT_OUT: true
   # TFE_CAPACITY_CONCURRENCY: ""
   # TFE_CAPACITY_CPU: ""
   # TFE_CAPACITY_MEMORY: ""
