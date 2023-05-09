@@ -153,7 +153,7 @@ This Helm chart supports an optional ingress resource with your Ingress controll
   ```
 * Make this address routable to your TFE URL (`terraform-enterprise.jkerryca.svc.cluster.local` in this example) by setting up a DNS record to point to it.
 
-## Custom Worker Image
+## Custom Agent Image
 
 Terraform Enterprise pulls the publicly available [hashicorp/tfc-agent:latest](https://hub.docker.com/r/hashicorp/tfc-agent) image when kubernetes jobs are scheduled to execute plans and applies. If a custom tfc-agent image is required or the tfc-agent image should be pulled from a private container registry you can set the following environment variables:
 
