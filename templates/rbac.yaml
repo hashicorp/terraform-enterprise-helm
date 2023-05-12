@@ -29,6 +29,7 @@ rules:
   - jobs
   - pods
   - configmaps
+  - "pods/log"
   verbs:
   - list
   - watch
