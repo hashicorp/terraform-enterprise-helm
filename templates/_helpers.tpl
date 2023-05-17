@@ -30,6 +30,10 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
+{{- define "cacert.path" -}}
+{{ .Values.tls.caCertBaseDir }}/{{ .Values.tls.caCertFileName }}
+{{- end }}
+
 {{/*
 Common labels
 */}}
