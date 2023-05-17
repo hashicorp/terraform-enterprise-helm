@@ -67,7 +67,7 @@ spec:
           value: "{{ .Values.tfe.privateHttpsPort }}"
         {{- if .Values.tls.caCertData }}
         - name: TFE_TLS_CA_BUNDLE_FILE
-          value: /etc/ssl/certs/custom_ca_cert.pem
+          value: {{ include "cacert.path" . }}
         {{- end }}
         readinessProbe:
           httpGet:
@@ -84,6 +84,6 @@ spec:
             subPath: tls.key
           {{- if .Values.tls.caCertData }}
           - name: ca-certificates
-            mountPath: {{ .Values.tls.caCertBaseDir }}/{{ .Values.tls.caCertFileName }}
+            mountPath: {{ include "cacert.path" . }}
             subPath: {{ .Values.tls.caCertFileName }}
           {{- end }}
