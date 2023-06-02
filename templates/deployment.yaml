@@ -6,7 +6,7 @@ SPDX-License-Identifier: MPL-2.0
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: terraform-enterprise 
+  name: terraform-enterprise
   labels:
     app: terraform-enterprise
 spec:
@@ -45,10 +45,10 @@ spec:
       serviceAccountName: {{ .Release.Namespace }}
       initContainers:
         {{ toYaml .Values.initContainers | nindent 8}}
-      containers: 
+      containers:
       - name: terraform-enterprise
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
-        imagePullPolicy:  {{ .Values.image.pullPolicy }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         {{- include "helpers.list-env-variables" . | indent 8 }}
         - name: TFE_RUN_PIPELINE_KUBERNETES_NAMESPACE
@@ -73,6 +73,7 @@ spec:
           httpGet:
             path: /_health_check
             port: {{ .Values.tfe.privateHttpPort }}
+            scheme: HTTP
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
@@ -87,3 +88,6 @@ spec:
             mountPath: {{ include "cacert.path" . }}
             subPath: {{ .Values.tls.caCertFileName }}
           {{- end }}
+        ports:
+        - containerPort: {{ .Values.tfe.privateHttpPort }}
+        - containerPort: {{ .Values.tfe.privateHttpsPort }}
