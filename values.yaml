@@ -9,7 +9,7 @@ replicaCount: 1
 
 # Image pull secret to use for registry authentication.
 imagePullSecrets:
-- name: {}
+- name: terraform-enterprise
 
 # Image sets the repo, name and tag of the Terraform Enterprise image to use.
 image:
@@ -17,7 +17,6 @@ image:
  name: hashicorp/terraform-enterprise
  tag: latest
  pullPolicy: Always
- pullSecret: terraform-enterprise
 
 pod:
 # Configure pod annotations
@@ -27,8 +26,8 @@ pod:
 # If you do want to specify resource limits, uncomment the following lines and adjust them as necessary.
 resources:
    requests:
-     memory: "2500Mi"
-     cpu: "750m"
+     memory: "5000Mi"
+     cpu: "4"
 #  limits:
 #    memory: ""
 #    cpu: ""
@@ -150,7 +149,7 @@ service:
   nodePort: 32443 # if service.type is NodePort value will be set
 
 env:
-  TFE_ENCRYPTION_PASSWORD: "SUPERDUPERSECRET"
+  TFE_ENCRYPTION_PASSWORD: "SECRET"
   TFE_HOSTNAME: "terraformernetes"
   TFE_IACT_SUBNETS: "0.0.0.0/0"
   TFE_IACT_TIME_LIMIT: "60"

@@ -40,8 +40,10 @@ spec:
           secret:
             secretName: terraform-enterprise-ca-certificates
         {{- end }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-       - name: {{ .Values.image.pullSecret }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ .Release.Namespace }}
       initContainers:
         {{ toYaml .Values.initContainers | nindent 8}}

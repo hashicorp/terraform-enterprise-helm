@@ -1,77 +1,103 @@
 # Terraform Enterprise
 
-This chart is used to install Terraform Enterprise in a generic Kubernetes environment. It is extremely minimal in its configuration and contains the basic things necessary to launch TFE on a Kubernetes cluster.
+This chart is used to install Terraform Enterprise in a generic Kubernetes environment. It is minimal in its configuration and contains the basic things necessary to launch Terraform Enterprise on a Kubernetes cluster.
 
 ## Prerequisites
 
-1. [Helm CLI](https://helm.sh/docs/intro/install/) installed on your machine. You can read more about Helm [here](https://helm.sh/docs/intro/using_helm/).
+To use the charts here, [Helm](https://helm.sh/) must be configured for your
+Kubernetes cluster. Setting up Kubernetes and Helm is outside the scope of
+this README. Please refer to the Kubernetes and Helm documentation.
 
-2. Create a custom namespace. This can be done by running:
+The versions required are:
+
+  * **Helm 3.0+** - This is the earliest version of Helm tested. It is possible
+    it works with earlier versions but this chart is untested for those versions.
+  * **Kubernetes 1.25+** - This is the earliest version of Kubernetes tested.
+    It is possible that this chart works with earlier versions but it is
+    untested.
+
+## Usage
+
+### Before You Begin
+Please confirm that you have an operating Kubernetes cluster and that your local kubectl client is configured to operate that cluster. Also confirm that helm is configured appropriately.
+
+```sh
+kubectl cluster-info
+helm list
+```
+
+You'll need the following to continue:
+
+1. A hostname for your TFE instance and some way to provision DNS for this hostname such that, at a minimum, Terraform Enterprise is addressable from your workstation and any pod provisioned inside your Kubernetes cluster. The former is required in order for your workstation to communicate with the Terraform Enterprise installation created here. The later is required in order for tfc-agent instances provisioned for Terraform Enterprise workloads to be able to communicate with the Terraform Enterprise services they require to operate.
+1. A valid TLS certificate and private key provisioned and matching the hostname selected in **1.** in pem format
+
+### Create Prerequisites
+
+1. Clone this repository
+1. Create a namespace for terraform-enterprise:
     ```sh
     # Here, terraform-enterprise is the name of the custom namespace.
     kubectl create namespace terraform-enterprise
     ```
+1. Create an image pull secret to fetch the `terraform-enterprise` container image from the beta registry. For example, you can create this secret by running this command:
+    ```sh
+    # replace REGISTRY_USERNAME, REGISTRY_PASSWORD, REGISTRY_URL with appropriate values
+    kubectl create secret docker-registry terraform-enterprise --docker-server=REGISTRY_URL --docker-username=REGISTRY_USERNAME --docker-password=REGISTRY_PASSWORD  -n terraform-enterprise
+    ```
 
-3. Create an image pull secret to fetch the `terraform-enterprise` container from Quay. You can either create this secret by running this command _(replace QUAY_USERNAME and QUAY_PASSWORD with yours)_:
-    ```sh
-    kubectl create secret docker-registry terraform-enterprise --docker-server=quay.io --docker-username=QUAY_USERNAME --docker-password=QUAY_PASSWORD  -n terraform-enterprise
-    ```
-    Or by generating a yaml equivalent from a dry run and adding it to a new yaml file inside the `/chart/templates` directory.
-    
-    _To generate a dry run, do:_
-    ```sh
-    kubectl create secret docker-registry terraform-enterprise --docker-server=quay.io --docker-username=QUAY_USERNAME --docker-password=QUAY_PASSWORD  -n terraform-enterprise --dry-run=client -o yaml
-    ```
-    _Afterwards, create a file `docker.secret.yaml` inside `/chart/templates`, then copy the resulting yaml that was generated from the dry run command to that file._
-    
-    If you decided to add the image pull secret to `docker.secret.yaml`, the contents should look like this:
-    ```yaml
-    apiVersion: v1
-    data:
-      .dockerconfigjson: WW91IHJlYWxseSBoYWQgdG8gY2hlY2sgdGhpcyBvbmUgdG9vPyBXZSBoYXZlbid0IGVzdGFibGlzaGVkIGF0IHRoaXMgcG9pbnQgdGhhdCBJJ20gbm90IHdyaXRpbmcgc2VjcmV0cyB0byBnaXQ/Cg==
-    kind: Secret
-    metadata:
-      name: terraform-enterprise
-      namespace: terraform-enterprise
-    type: kubernetes.io/dockerconfigjson
-    ```
-4. Create a file `cert.secret.yaml` in `/chart` directory. It should contain base64 encoded values of your `cert.pem` file (as `tls.crt`) and `key.pem` file (as `tls.key`) in this format:
+### Update Chart Configuration
+
+Create a configuration file (`/tmp/overrides.yaml` for the rest of this document) to override the default configuration values in the terraform-enterprise helm chart. **Replace all of the values in this example configuration.**
+
 ```yaml
-tls_crt: WW91IHJlYWxseSBoYWQgdG8gY2hlY2sgdGhpcyBvbmUgdG9vPyBXZSBoYXZlbid0IGVzdGFibGlzaGVkIGF0IHRoaXMgcG9pbnQgdGhhdCBJJ20gbm90IHdyaXRpbmcgc2VjcmV0cyB0byBnaXQ/Cg==
-tls_key: WW91IHJlYWxseSBoYWQgdG8gY2hlY2sgdGhpcyBvbmUgdG9vPyBXZSBoYXZlbid0IGVzdGFibGlzaGVkIGF0IHRoaXMgcG9pbnQgdGhhdCBJJ20gbm90IHdyaXRpbmcgc2VjcmV0cyB0byBnaXQ/Cg==
+tls:
+  certData: BASE_64_ENCODED_CERTIFICATE_PEM_FILE
+  keyData: BASE_64_ENCODED_CERTIFICATE_PRIVATE_KEY_PEM_FILE
+image:
+ repository: REGISTRY_URL
+ name: terraform-enterprise
+ tag: cab3e8f
+env:
+  TFE_HOSTNAME: "tfe.terraform-enterprise.service.cluster.local"
+  TFE_OPERATIONAL_MODE: "disk"
+
 ```
+> :warning: **This installation is in mounted-disk mode**: This will result in data loss on any update to terraform-enterprise or any pod deletion event. This is not suitable for any standard operation of terraform-enterprise but is sufficient for this exercise.
 
-Note: Terraform Kubernetes provider can also be used to build and assemble all of these prerequisites if properly bootstrapped.
+> :information_source:  There may be additional customization required for the database credentials, s3 compatible storage configuration, Redis configuration, etc that are often cloud provider or implementation specific.  See [the implementation examples documentation](docs/implementations.md#implementation-examples) for more information.
 
-## Install TFE
+> :information_source:  Base64 values for files can be generated by using the `base64` utilitiy. For example: `base64 -i fixtures/tls/privkey.pem`
 
-* On the root of this project directory (i.e `/chart`), run: 
-    ```sh
-    helm install terraform-enterprise . -n terraform-Enterprise  --values values.yaml --values cert.secret.yaml
-    ```
-    Note: The `-n` is for setting a namespace, if no namespace is specified and you did not create a namespace as part of the steps in the prerequisites, the namespace will be automatically set to `default`.
+
+### Install Terraform Enterprise
+
+This document will assume that the copy of the terraform-enterprise-helm chart is at `./terraform-enterprise-helm`. Use helm to install terraform-enterprise: 
+```sh
+helm install terraform-enterprise ./terraform-enterprise-helm -n terraform-enterprise  --values /tmp/overrides.yaml
+```
+> :information_source:  The `-n` is for setting a namespace, if no namespace is specified and you did not create a namespace as part of the steps in the prerequisites, the namespace will be automatically set to `default`.
 
 During installation, the helm client will print useful information about which resources were created, what the state of the release is, and also whether there are additional configuration steps you can or should take.
 
 By default, Helm does not wait until all of the resources are running before it exits. Many charts require Docker images that are over 600M in size, and may take additional time to install into the cluster. You can use the `--wait` and `--timeout` flags in helm install to force helm to wait until a minimum number of deployment replicates have passed their health-check based readiness checks before helm returns control to the shell.
 
-To keep track of a release's state, or to re-read configuration information, you can use `helm status`, IE:
+To keep track of a release's state, or to re-read configuration information, you can use [helm status](https://helm.sh/docs/helm/helm_status/), IE:
 
 ```sh
   helm status terraform-enterprise -n terraform-enterprise
 ```
     
-Note: When using helm commands, make sure to specify the namespace you created when using the `-n` flag. For this example we are use `terraform-enterprise`.
+> :information_source:  When using helm commands, make sure to specify the namespace you created when using the `-n` flag. For this example we are use `terraform-enterprise`.
 
 ## Post install
-The commands here assume that the namespace is `terraform-enterprise`. If you have a different namespace, replace it with yours.
+There are a number of common helm or kubectl commands you can use to monitor the installation and the runtime of Terraform Enterprise. We list some of them here. We assume that the namespace is `terraform-enterprise`. If you have a different namespace, replace it with yours.
 
 * To see releases:
   ```sh
   helm list -n terraform-enterprise
   ```
 
-* To check the status of the TFE pod:
+* To check the status of the Terraform Enterprise pod:
   ```sh
     kubectl get pod -n terraform-enterprise
   ```
@@ -81,35 +107,38 @@ The commands here assume that the namespace is `terraform-enterprise`. If you ha
   terraform-enterprise-5946d99fc-l22s9   1/1     Running   0          25m
   ```
   If this is not the case, you can use the following steps to debug:
-  * Check pod logs:
+* Check pod logs:
+  ```sh
+  kubectl logs terraform-enterprise-5946d99fc-l22s9
+  ```
+* To diagnose issues with the terraform-enterprise deployment such as image pull errors, run the following command:
+  ```sh
+  kubectl describe deployments -n terraform-enterprise
+  ```
+* Exec into the pod if possible:
+  ```sh
+  kubectl exec -it terraform-enterprise-5946d99fc-l22s9 -- /bin/bash
+  ```
+* In the Terraform Enterprise pod, run:
+  ```sh
+  supervisorctl status
+  ```
+  This should show you which service failed. From outside the pod you can also do this:
+  ```sh
+  kubectl exec -it terraform-enterprise-5946d99fc-l22s9 -- supervisorctl status
+  ```
+
+* All Terraform Enterprise services logs can be found in the pod here `/var/log/terraform-enterprise/`. E.g:
+  ```sh
+  cat /var/log/terraform-enterprise/atlas.log
+  ```
+  From outside the pod, this will be:
     ```sh
-    kubectl logs terraform-enterprise-5946d99fc-l22s9
-    ```
-  * To diagnose issues with the terraform-enterprise deployment such as image pull errors, run the following command:
-    ```sh
-    kubectl describe deployments -n terraform-enterprise
-    ```
-  * Exec into the pod if possible:
-    ```sh
-    kubectl exec -it terraform-enterprise-5946d99fc-l22s9 -- /bin/bash
-    ```
-  * In the TFE pod, run:
-    ```sh
-    supervisorctl status
-    ```
-    This should show you which service failed. From outside the pod you can also do this:
-    ```sh
-    kubectl exec -it terraform-enterprise-5946d99fc-l22s9 -- supervisorctl status
+    kubectl exec -it terraform-enterprise-5946d99fc-l22s9 -- cat /var/log/terraform-enterprise/atlas.log
     ```
 
-  * All TFE services logs can be found in the pod here `/var/log/terraform-enterprise/`. E.g:
-    ```sh
-    cat /var/log/terraform-enterprise/atlas.log
-    ```
-    From outside the pod, this will be:
-      ```sh
-      kubectl exec -it terraform-enterprise-5946d99fc-l22s9 -- cat /var/log/terraform-enterprise/atlas.log
-      ```
+## Bootstrap Terraform Enterprise
+
 
 * You can use this endpoint `/admin/account/new?token=hashicorp` to create an admin user. (Token=hashicorp is hardcoded at the moment)
 
@@ -144,14 +173,14 @@ This Helm chart supports an optional ingress resource with your Ingress controll
 
 **Example setup with Nginx:**
 * Install [nginx controller](https://kubernetes.github.io/ingress-nginx/deploy/) in a different namespace.
-* Deploy TFE with Ingress already enabled on the Helm chart as explained above.
+* Deploy Terraform Enterprise with Ingress already enabled on the Helm chart as explained above.
 * Get the address from the ingress resource. e.g:
   ```
   kubectl get ingress
   NAME                   CLASS   HOSTS                                             ADDRESS         PORTS     AGE
   terraform-enterprise   nginx   terraform-enterprise.jkerryca.svc.cluster.local   35.237.89.185   80, 443   60s
   ```
-* Make this address routable to your TFE URL (`terraform-enterprise.jkerryca.svc.cluster.local` in this example) by setting up a DNS record to point to it.
+* Make this address routable to your Terraform Enterprise URL (`terraform-enterprise.jkerryca.svc.cluster.local` in this example) by setting up a DNS record to point to it.
 
 ## Custom Agent Image
 
@@ -206,11 +235,11 @@ Then, rollback to the version you want using:
 
     helm rollback <RELEASE_NAME> [REVISION]
 
-## Process for Upgrading TFE with Helm using the image tag
+## Process for Upgrading Terraform Enterprise with Helm using the image tag
 
 In the resulting folder, go to the directory named after your chart.
 
-Inspect the values from the TFE K8s cluster, by running:
+Inspect the values from the Terraform Enterprise K8s cluster, by running:
 
     helm get values terraform-enterprise -n <NAMESPACE>
 
@@ -218,9 +247,9 @@ After inspecting the helm values, print the output to an override.yaml file, by 
 
     helm get values terraform-enterprise -n <NAMESPACE>  > override.yaml
 
-Inside the override.yaml file, update the image tag to the version you want for the TFE upgrade and save the file.
+Inside the override.yaml file, update the image tag to the version you want for the Terraform Enterprise upgrade and save the file.
 
-To upgrade TFE, run the following commands:
+To upgrade Terraform Enterprise, run the following commands:
 
     helm upgrade -f values.yaml -f override.yaml terraform-enterprise -n <NAMESPACE> .
 
@@ -242,9 +271,9 @@ REVISION        UPDATED                         STATUS          CHART           
 
 Note: Depending on how quickly you check the status after running the upgrade, the pods may still be getting recreated.
 
-## Helm Rollback process for TFE using the image tag
+## Helm Rollback process for Terraform Enterprise using the image tag
 
-To rollback a TFE release we'll use the same approach as upgrading, by using the image tag. Make sure you have a current override.yaml file, if not print out the following command:
+To rollback a Terraform Enterprise release we'll use the same approach as upgrading, by using the image tag. Make sure you have a current override.yaml file, if not print out the following command:
 
     helm get values terraform-enterprise -n <NAMESPACE>  > override.yaml
 
