@@ -37,7 +37,7 @@ You'll need the following to continue:
     * The agent pods generated for plan / apply activity within your Kubernetes cluster
     * Any additional persistent agents added to your Terraform Enterprise instance or any additional Kubernetes clusters in which agents will be provisioned.
 1. A valid TLS certificate and private key provisioned and matching the hostname selected in **1.** in pem format
-1. External dependencies : Terraform Enterprise must run under the `external` or `active-active` operational mode when the Kubernetes driver used. The following prerequisite services must be available and configured prior to installing terraform-enterprise:
+1. External dependencies : Terraform Enterprise must run under the `external` or `active-active` operational mode when the Kubernetes driver is used. The following prerequisite services must be available and configured prior to installing terraform-enterprise:
     * A PostgreSQL server meeting the requirements outlined in [PostgreSQL Requirements for Terraform Enterprise](https://developer.hashicorp.com/terraform/enterprise/requirements/data-storage/postgres-requirements)
     * S3 compatible object storage meeting the requirements outlined in the external services mode section of [Operational Mode Data Storage Requirements](https://developer.hashicorp.com/terraform/enterprise/requirements/data-storage/operational-mode-requirements#external-services-mode).
     * If Terraform Enterprise is running in `active-active` mode then a Redis cache instance is required also meeting the guidance in the above article.
