@@ -1,6 +1,6 @@
 # Terraform Enterprise
 
-> :heavy_exclamation_mark: You are viewing a beta version of the official helm chart to install Terraform Enterprise. This chart is intended for the beta release of Terraform Enterprise, Flexible Deployment Options, on Kubernetes, and it is not currently meant for production use. Please contact your Customer Success Manager for details before using.
+> :heavy_exclamation_mark: You are viewing a beta version of the official helm chart to install Terraform Enterprise. This chart is intended for the beta release of Terraform Enterprise Flexible Deployment Options, on Kubernetes, and it is not currently meant for production use. Please contact your Customer Success Manager for details before using.
 
 This chart is used to install Terraform Enterprise in a generic Kubernetes environment. It is minimal in its configuration and contains the basic things necessary to launch Terraform Enterprise on a Kubernetes cluster.
 
@@ -30,14 +30,10 @@ helm list
 
 You'll need the following to continue:
 
-1. A hostname for your TFE instance and some way to provision DNS for this hostname such that, at a minimum, Terraform Enterprise is addressable from your workstation and any pod provisioned inside your Kubernetes cluster. The former is required in order for your workstation to communicate with the Terraform Enterprise installation created here. The later is required in order for tfc-agent instances provisioned for Terraform Enterprise workloads to be able to communicate with the Terraform Enterprise services they require to operate.
-1. With the exception of a small number of cases you will need a way to create a dns address for the resulting Terraform Enterprise load balancer public ip address. This DNS address does not need to be generally publicly available, but it does need to be visible to the following use cases:
-    * A user interacting with Terraform Enterprise
-    * The terraform-enterprise pods within your Kubernetes cluster
-    * The agent pods generated for plan / apply activity within your Kubernetes cluster
-    * Any additional persistent agents added to your Terraform Enterprise instance or any additional Kubernetes clusters in which agents will be provisioned.
+1. A hostname for Terraform Enterprise
+1. A DNS zone to create a record for the interface of Terraform Enterprise
 1. A valid TLS certificate and private key provisioned and matching the hostname selected in **1.** in pem format
-1. External dependencies : Terraform Enterprise must run under the `external` or `active-active` operational mode when the Kubernetes driver is used. The following prerequisite services must be available and configured prior to installing terraform-enterprise:
+1. External dependencies : Terraform Enterprise must run under the `external` or `active-active` operational mode when the Kubernetes driver is used. This requires the following external dependencies:
     * A PostgreSQL server meeting the requirements outlined in [PostgreSQL Requirements for Terraform Enterprise](https://developer.hashicorp.com/terraform/enterprise/requirements/data-storage/postgres-requirements)
     * S3 compatible object storage meeting the requirements outlined in the external services mode section of [Operational Mode Data Storage Requirements](https://developer.hashicorp.com/terraform/enterprise/requirements/data-storage/operational-mode-requirements#external-services-mode).
     * If Terraform Enterprise is running in `active-active` mode then a Redis cache instance is required also meeting the guidance in the above article.
