@@ -12,7 +12,6 @@ This Helm chart supports an optional ingress resource with your Ingress controll
   ```
   kubectl get ingress
   NAME                   CLASS   HOSTS                                             ADDRESS         PORTS     AGE
-  terraform-enterprise   nginx   terraform-enterprise.jkerryca.svc.cluster.local   35.237.89.185   80, 443   60s
+  terraform-enterprise   nginx   terraform-enterprise.terraform-enterprise.svc.cluster.local   35.237.89.185   80, 443   60s
   ```
-* Make this address routable to your Terraform Enterprise URL (`terraform-enterprise.jkerryca.svc.cluster.local` in this example) by setting up a DNS record to point to it.
-
+* Make this address routable to your Terraform Enterprise URL (`terraform-enterprise.terraform-enterprise.svc.cluster.local` in this example) by setting up a DNS record to point to it.

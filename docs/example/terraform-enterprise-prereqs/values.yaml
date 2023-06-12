@@ -100,8 +100,6 @@ minio:
     - name: tfe
       policy: none
       purge: false
-      versioning: false
-      objectlocking: false
   users:
     - accessKey: tfeadmin
       secretKey: Terraform-Enterprise!
