@@ -60,8 +60,8 @@ Given that we are not owners of this reserved root DNS address we are going to u
 | Terraform Enterprise Release Name | `terraform-enterprise` |
 
 Any deviation from these settings could cause:
-* Internal DNS addresses to not match up with the example configuration for dependencies
-* TLS certificates to not match terraform-enterprise hostnames 
+* Internal DNS addresses not to match up with the example configuration for dependencies
+* TLS certificates not to match terraform-enterprise hostnames 
 
 This quick start guide assumes this configuration does not change. If you do modify any of these take care to update other configuration to match the resulting DNS addresses and/or generate your own certificates matching the resulting service hostnames.
 
@@ -93,13 +93,13 @@ You now have PostgreSQL listening on address `prereqs-postgresql.terraform-enter
 
 ## Provisioning Terraform Enterprise
 
-Now that the prerequisite services are installed, operational, and listening on the expected dns addresses we can install Terraform Enterprise.  Review your copy of `override.yaml` before installing Terraform Enterprise. Install the terraform-enterprise chart:
+Now that the prerequisite services are installed, operational, and listening on the expected dns addresses, we can install Terraform Enterprise.  Review your copy of `override.yaml` before installing Terraform Enterprise. Install the terraform-enterprise chart:
 
 ```shell
 helm install terraform-enterprise . -n terraform-enterprise --values /tmp/override.yaml --wait
 ```
 
-Once this operation is complete you should have a terraform-enterprise pod in a ready state with a passing health check!
+You should have a terraform-enterprise pod in a ready state with a passing health check once this operation is complete!
 ![kubectl get all -n terraform-enterprise](./images/full_install.png)
 
 ## Create a MinIO Bucket for TFE
@@ -128,13 +128,13 @@ We need to establish communication with Terraform Enterprise to continue. This w
 * Testing your connection to Terraform Enterprise by inspecting the `_health_check` endpoint of Terraform Enterprise with `curl`
 * Creating an administrative account and authenticating to Terraform Enterprise in the browser.
 
-If you do not wish to install the included CA certificate feel free to generate a new TLS key set, including a CA certificate. Alternatively you could execute this configuration and testing procedure inside an isolated virtual machine.
+Feel free to generate a new TLS key set and a CA certificate if you do not wish to install the included CA certificate. Alternatively, you could execute this configuration and testing procedure inside an isolated virtual machine.
 
 ### Local Connectivity Step 0: Install the CA Certificate
 
 > :warning: If you are uncomfortable making the following CA certificate file changes or want to confirm the validity of the procedure please consult your local IT staff.
 
-There is a CA certificate included in this repository [here](./example/ca-certificate.pem). Install this CA certificate by whatever means your workstation operating system expects. On MacOS we need to open the Keychain Access application and drag the CA cert into the System zone.  We then open the Get Info interface on the Hashicorp DevTest certificate and update the trust to Always.
+There is a CA certificate included in this repository [here](./example/ca-certificate.pem). Install this CA certificate by whatever means your workstation operating system expects. On MacOS we need to open the Keychain Access application and drag the CA cert into the System zone.  We then open the `Get Info` interface on the Hashicorp DevTest certificate and update the trust to `Always`.
 
 ### Local Connectivity Step 1: Create a Host File Entry
 

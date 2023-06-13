@@ -52,11 +52,11 @@ Inspect the values from the Terraform Enterprise K8s cluster, by running:
 
     helm get values terraform-enterprise -n <NAMESPACE>
 
-After inspecting the helm values, print the output to an override.yaml file, by running:
+After inspecting the helm values, print the output to an `override.yaml` file, by running:
 
     helm get values terraform-enterprise -n <NAMESPACE>  > override.yaml
 
-Inside the override.yaml file, update the image tag to the version you want for the Terraform Enterprise upgrade and save the file.
+Inside the `override.yaml` file, update the image tag to the version you want for the Terraform Enterprise upgrade and save the file.
 
 To upgrade Terraform Enterprise, run the following commands:
 
@@ -82,7 +82,7 @@ Note: Depending on how quickly you check the status after running the upgrade, t
 
 ## Helm Rollback process for Terraform Enterprise using the image tag
 
-To rollback a Terraform Enterprise release we'll use the same approach as upgrading, by using the image tag. Make sure you have a current override.yaml file, if not print out the following command:
+To rollback a Terraform Enterprise release we'll use the same approach as upgrading, by using the image tag. Make sure you have a current `override.yaml` file, if not print out the following command:
 
     helm get values terraform-enterprise -n <NAMESPACE>  > override.yaml
 
