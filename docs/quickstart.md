@@ -67,7 +67,7 @@ This quick start guide assumes this configuration does not change. If you do mod
 
 ## Namespace and Image Pull Secrets
 
-Let's start by creating our namespace and create our `ImagePullSecret` for Terraform Enterprise. Replace `REGISTRY_URL`, `REGISTRY_USERNAME`, and `REGISTRY_PASSWORD` appropriately.
+Let's start by creating our namespace and `ImagePullSecret` for Terraform Enterprise. Replace `REGISTRY_URL`, `REGISTRY_USERNAME`, and `REGISTRY_PASSWORD` appropriately.
 
 ```
 kubectl create namespace terraform-enterprise
@@ -138,7 +138,7 @@ There is a CA certificate included in this repository [here](./example/ca-certif
 
 ### Local Connectivity Step 1: Create a Host File Entry
 
-Determine the ip address of the load balancer. If you're using a local Kubernetes implementation like MinIO this might require that you explicitly expose or proxy the LoadBalancer service first in order to get an accessible ip address.
+Determine the ip address of the load balancer. This might require that you explicitly expose or proxy the LoadBalancer service first in order to get an accessible ip address if you're using a local Kubernetes implementation like MinIO.
 
 ```shell
 kubectl get service terraform-enterprise -n terraform-enterprise
