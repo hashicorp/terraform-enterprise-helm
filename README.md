@@ -7,7 +7,7 @@ This chart is used to install Terraform Enterprise in a generic Kubernetes envir
 ## Prerequisites
 
 To use the charts here, [Helm](https://helm.sh/) must be configured for your
-Kubernetes cluster. Setting up Kubernetes and Helm is outside the scope of
+Kubernetes cluster. Setting up Kubernetes and Helm are outside the scope of
 this README. Please refer to the Kubernetes and Helm documentation.
 
 The versions required are:
@@ -33,7 +33,7 @@ You'll need the following to continue:
 1. A hostname for Terraform Enterprise
 1. A DNS zone to create a record for the interface of Terraform Enterprise
 1. A valid TLS certificate and private key provisioned and matching the hostname selected in **1.** in pem format
-1. External dependencies : Terraform Enterprise must run under the `external` or `active-active` operational mode when the Kubernetes driver is used. This requires the following external dependencies:
+1. External dependencies : Terraform Enterprise must run under the `external` or `active-active` operational mode when run in a Kubernetes cluster. This requires the following external dependencies:
     * A PostgreSQL server meeting the requirements outlined in [PostgreSQL Requirements for Terraform Enterprise](https://developer.hashicorp.com/terraform/enterprise/requirements/data-storage/postgres-requirements)
     * S3 compatible object storage meeting the requirements outlined in the external services mode section of [Operational Mode Data Storage Requirements](https://developer.hashicorp.com/terraform/enterprise/requirements/data-storage/operational-mode-requirements#external-services-mode).
     * If Terraform Enterprise is running in `active-active` mode then a Redis cache instance is required also meeting the guidance in the above article.
@@ -55,7 +55,7 @@ You'll need the following to continue:
 
 ### Update Chart Configuration
 
-Create a configuration file (`/tmp/overrides.yaml` for the rest of this document) to override the default configuration values in the terraform-enterprise helm chart. **Replace all of the values in this example configuration.**
+Create a configuration file (e.g `/tmp/overrides.yaml`, used as an example for the rest of this document) to override the default configuration values in the terraform-enterprise helm chart. **Replace all of the values in this example configuration.**
 
 ```yaml
 tls:
@@ -90,7 +90,7 @@ During installation, the helm client will print useful information about which r
 
 By default, Helm does not wait until all of the resources are running before it exits. Many charts require Docker images that are over 600M in size, and may take additional time to install into the cluster. You can use the `--wait` and `--timeout` flags in helm install to force helm to wait until a minimum number of deployment replicates have passed their health-check based readiness checks before helm returns control to the shell.
 
-To keep track of a release's state, or to re-read configuration information, you can use [helm status](https://helm.sh/docs/helm/helm_status/), IE:
+To keep track of a release's state, or to re-read configuration information, you can use [helm status](https://helm.sh/docs/helm/helm_status/), i.e:
 
 ```sh
   helm status terraform-enterprise -n terraform-enterprise
@@ -159,7 +159,7 @@ Once Terraform Enterprise has loaded and passed all startup health checks you sh
 
 ### Create an Administrative User
 
-In order to retrieve an _initial admin creation token_ or and iact visit the `admin/retrieve-iact` url path with a browser or curl from a source ip address and time in agreement with your `TFE_IACT_SUBNETS` and `TFE_IACT_TIME_LIMIT` settings.
+In order to retrieve an _initial admin creation token_ or an iact, visit the `admin/retrieve-iact` url path with a browser or curl from a source ip address within your `TFE_IACT_SUBNETS` range and a time before the limit defined by the `TFE_IACT_TIME_LIMIT` setting.
 
 ```shell
 curl https://terraform-enterprise.terraform-enterprise.svc.cluster.local/admin/retrieve-iact

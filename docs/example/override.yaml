@@ -22,4 +22,3 @@ env:
   TFE_OBJECT_STORAGE_S3_ACCESS_KEY_ID: "tfeclusteradmin"
   TFE_OBJECT_STORAGE_S3_SECRET_ACCESS_KEY: "Terraform-Enterprise!"
   TFE_OBJECT_STORAGE_S3_REGION: us-east-2
-  

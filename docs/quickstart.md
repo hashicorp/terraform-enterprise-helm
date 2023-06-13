@@ -16,7 +16,7 @@ This example is provisioning a single Terraform Enterprise pod in the `external`
 
 ## A Note on Kubernetes Internal DNS and Configuration Rigidity 
 
-The namespace, helm release names, certificates and hostnames used in this example are selected to exploit the fact that given a kubernetes service with the following configuration:
+The namespace, helm release names, certificates and hostnames used in this example are selected to exploit the fact that given a Kubernetes service with the following configuration:
 
 ```yaml
 apiVersion: v1
@@ -123,7 +123,7 @@ mc ls
 
 We need to establish communication with Terraform Enterprise to continue. This will involve:
 
-* Installing the included CA certificate into your local CA certificates or keystore
+* Installing the included CA certificate into your local CA certificates or key store
 * Creating a host file entry for the load balancer for Terraform Enterprise
 * Testing your connection to Terraform Enterprise by inspecting the `_health_check` endpoint of Terraform Enterprise with `curl`
 * Creating an administrative account and authenticating to Terraform Enterprise in the browser.
@@ -138,7 +138,7 @@ There is a CA certificate included in this repository [here](./example/ca-certif
 
 ### Local Connectivity Step 1: Create a Host File Entry
 
-Determine the ip address of the load balancer. If you're using a local kubernetes implementation like MinIO this might require that you explicitly expose or proxy the LoadBalancer service first in order to get an accessible ip address.
+Determine the ip address of the load balancer. If you're using a local Kubernetes implementation like MinIO this might require that you explicitly expose or proxy the LoadBalancer service first in order to get an accessible ip address.
 
 ```shell
 kubectl get service terraform-enterprise -n terraform-enterprise
