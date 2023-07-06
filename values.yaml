@@ -67,7 +67,7 @@ tolerations: []
 affinity: {}
 #
 ## Example:
-#  
+#
 #  affinity: |
 #    podAntiAffinity:
 #      requiredDuringSchedulingIgnoredDuringExecution:
@@ -119,7 +119,7 @@ initContainers: null
 #    dnsPolicy: Default
 #    volumes:
 #    - name: workdir
-#    emptyDir: {}   
+#    emptyDir: {}
 
 # Ingress allows ingress services to be created to allow external access
 # from Kubernetes to access Terraform Enterprise pods.
@@ -149,42 +149,47 @@ service:
   nodePort: 32443 # if service.type is NodePort value will be set
 
 env:
-  TFE_ENCRYPTION_PASSWORD: "SECRET"
-  TFE_HOSTNAME: "terraformernetes"
-  TFE_IACT_SUBNETS: "0.0.0.0/0"
-  TFE_IACT_TIME_LIMIT: "60"
-  TFE_OPERATIONAL_MODE: "disk"
-  TFE_TLS_VERSION: "tls_1_2_tls_1_3"
-  TFE_LICENSE_REPORTING_OPT_OUT: true
-  # TFE_CAPACITY_CONCURRENCY: ""
-  # TFE_CAPACITY_CPU: ""
-  # TFE_CAPACITY_MEMORY: ""
-  # TFE_DATABASE_HOST: ""
-  # TFE_DATABASE_NAME: ""
-  # TFE_DATABASE_PARAMETERS: ""
-  # TFE_DATABASE_PASSWORD: ""
-  # TFE_DATABASE_USER: ""
-  # TFE_DISK_PATH: ""
-  # TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: ""
-  # TFE_OBJECT_STORAGE_AZURE_ACCOUNT_NAME: ""
-  # TFE_OBJECT_STORAGE_AZURE_CONTAINER: ""
-  # TFE_OBJECT_STORAGE_AZURE_ENDPOINT: ""
-  # TFE_OBJECT_STORAGE_GOOGLE_BUCKET: ""
-  # TFE_OBJECT_STORAGE_GOOGLE_CREDENTIALS: ""
-  # TFE_OBJECT_STORAGE_GOOGLE_PROJECT: ""
-  # TFE_OBJECT_STORAGE_S3_ACCESS_KEY_ID: ""
-  # TFE_OBJECT_STORAGE_S3_BUCKET: ""
-  # TFE_OBJECT_STORAGE_S3_ENDPOINT: ""
-  # TFE_OBJECT_STORAGE_S3_REGION: ""
-  # TFE_OBJECT_STORAGE_S3_SECRET_ACCESS_KEY: ""
-  # TFE_OBJECT_STORAGE_S3_SERVER_SIDE_ENCRYPTION: ""
-  # TFE_OBJECT_STORAGE_S3_SERVER_SIDE_ENCRYPTION_KMS_KEY_ID: ""
-  # TFE_OBJECT_STORAGE_S3_USE_INSTANCE_PROFILE: ""
-  # TFE_OBJECT_STORAGE_TYPE: ""
-  # TFE_REDIS_URL: ""
-  # TFE_TLS_CIPHERS: ""
-  # TFE_VAULT_ADDRESS: ""
-  # TFE_VAULT_NAMESPACE: ""
-  # TFE_VAULT_PATH: ""
-  # TFE_VAULT_ROLE_ID: ""
-  # TFE_VAULT_SECRET_ID: ""
+  configFilePath: env-config.yaml
+  secretsFilePath: env-secrets.yaml
+  secrets: {}
+    # TFE_ENCRYPTION_PASSWORD: "SECRET"
+    # TFE_DATABASE_PASSWORD: ""
+    # TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: ""
+    # TFE_OBJECT_STORAGE_GOOGLE_CREDENTIALS: ""
+    # TFE_OBJECT_STORAGE_S3_SECRET_ACCESS_KEY: ""
+    # TFE_VAULT_SECRET_ID: ""
+  variables: {}
+    # TFE_CAPACITY_CONCURRENCY: ""
+    # TFE_CAPACITY_CPU: ""
+    # TFE_CAPACITY_MEMORY: ""
+    # TFE_DATABASE_HOST: ""
+    # TFE_DATABASE_NAME: ""
+    # TFE_DATABASE_PARAMETERS: ""
+    # TFE_DATABASE_USER: ""
+    # TFE_DISK_PATH: ""
+    # TFE_OBJECT_STORAGE_TYPE: ""
+    # TFE_OBJECT_STORAGE_AZURE_ACCOUNT_NAME: ""
+    # TFE_OBJECT_STORAGE_AZURE_CONTAINER: ""
+    # TFE_OBJECT_STORAGE_AZURE_ENDPOINT: ""
+    # TFE_OBJECT_STORAGE_GOOGLE_BUCKET: ""
+    # TFE_OBJECT_STORAGE_GOOGLE_PROJECT: ""
+    # TFE_OBJECT_STORAGE_S3_ACCESS_KEY_ID: ""
+    # TFE_OBJECT_STORAGE_S3_BUCKET: ""
+    # TFE_OBJECT_STORAGE_S3_ENDPOINT: ""
+    # TFE_OBJECT_STORAGE_S3_REGION: ""
+    # TFE_OBJECT_STORAGE_S3_SERVER_SIDE_ENCRYPTION: ""
+    # TFE_OBJECT_STORAGE_S3_SERVER_SIDE_ENCRYPTION_KMS_KEY_ID: ""
+    # TFE_OBJECT_STORAGE_S3_USE_INSTANCE_PROFILE: ""
+    # TFE_REDIS_URL: ""
+    # TFE_TLS_CIPHERS: ""
+    # TFE_VAULT_ADDRESS: ""
+    # TFE_VAULT_NAMESPACE: ""
+    # TFE_VAULT_PATH: ""
+    # TFE_VAULT_ROLE_ID: ""
+  configMapRefs: []
+    # - name:
+    #   filepath:
+  secretRefs: []
+    # - name:
+    #   filepath:
+

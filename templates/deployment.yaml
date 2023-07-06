@@ -28,7 +28,7 @@ spec:
       affinity:
         {{- toYaml .Values.affinity | nindent 8 }}
       tolerations:
-        {{- toYaml .Values.tolerations | nindent 8 }} 
+        {{- toYaml .Values.tolerations | nindent 8 }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
       volumes:
@@ -51,25 +51,28 @@ spec:
       - name: terraform-enterprise
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-        {{- include "helpers.list-env-variables" . | indent 8 }}
-        - name: TFE_RUN_PIPELINE_KUBERNETES_NAMESPACE
-          value: {{ .Release.Namespace }}-agents
-        - name: TFE_RUN_PIPELINE_DRIVER
-          value: kubernetes
-        - name: TFE_VAULT_DISABLE_MLOCK
-          value: "true"
-        - name: TFE_TLS_CERT_FILE
-          value: "{{ .Values.tls.certMountPath }}"
-        - name: TFE_TLS_KEY_FILE
-          value: "{{ .Values.tls.keyMountPath }}"
-        - name: TFE_HTTP_PORT
-          value: "{{ .Values.tfe.privateHttpPort }}"
-        - name: TFE_HTTPS_PORT
-          value: "{{ .Values.tfe.privateHttpsPort }}"
-        {{- if .Values.tls.caCertData }}
-        - name: TFE_TLS_CA_BUNDLE_FILE
-          value: {{ include "cacert.path" . }}
+        envFrom:
+        {{- if .Values.env.configMaps }}
+          {{- range .Values.env.configMaps }}
+          - configMapRef:
+              name: {{ .name }}
+          {{- end }}
+        {{- else }}
+          - configMapRef:
+              name: terraform-enterprise-env-config
+        {{- end }}
+          {{- range .Values.env.configMapRefs }}
+          - configMapRef:
+              name: {{ .name }}
+          {{- end }}
+        {{- if .Values.env.secretRefs }}
+          {{- range .Values.env.secretRefs }}
+          - secretRef:
+              name: {{ .name }}
+          {{- end }}
+        {{- else }}
+          - secretRef:
+              name: terraform-enterprise-env-secrets
         {{- end }}
         readinessProbe:
           httpGet:
