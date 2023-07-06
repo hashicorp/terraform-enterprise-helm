@@ -150,7 +150,7 @@ service:
 
 env:
   configMaps:
-    - name: terraform-enterprise-env-vars
+    - name: terraform-enterprise-env-config
     # - name: config-map-name
   secrets:
     - name: terraform-enterprise-env-secrets
