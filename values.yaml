@@ -149,6 +149,8 @@ service:
   nodePort: 32443 # if service.type is NodePort value will be set
 
 env:
+  configFilePath: env-config.yaml
+  secretsFilePath: env-secrets.yaml
   secrets: {}
     # TFE_ENCRYPTION_PASSWORD: "SECRET"
     # TFE_DATABASE_PASSWORD: ""
@@ -184,10 +186,10 @@ env:
     # TFE_VAULT_NAMESPACE: ""
     # TFE_VAULT_PATH: ""
     # TFE_VAULT_ROLE_ID: ""
-  configMapRefs:
-    - name: terraform-enterprise-env-config
-      filepath: "env-config.yaml"
-  secretRefs:
-    - name: terraform-enterprise-env-secrets
-      filepath: env-secrets.yaml
+  configMapRefs: []
+    # - name:
+    #   filepath:
+  secretRefs: []
+    # - name:
+    #   filepath:
 

@@ -16,9 +16,4 @@ data:
   {{- if .Values.tls.caCertData }}
   TFE_TLS_CA_BUNDLE_FILE: {{ include "cacert.path" . }}
   {{- end }}
-{{- $files := .Files }}
-{{- range .Values.env.configMapRefs }}
-{{- if eq .name "terraform-enterprise-env-config" }}
-{{ ($files.Glob .filepath).AsConfig | indent 2 }}
-{{- end }}
-{{- end }}
+{{ (.Files.Glob .Values.env.configFilePath).AsConfig | indent 2 }}

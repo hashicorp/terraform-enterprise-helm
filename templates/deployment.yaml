@@ -52,14 +52,28 @@ spec:
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         envFrom:
+        {{- if .Values.env.configMaps }}
+          {{- range .Values.env.configMaps }}
+          - configMapRef:
+              name: {{ .name }}
+          {{- end }}
+        {{- else }}
+          - configMapRef:
+              name: terraform-enterprise-env-config
+        {{- end }}
           {{- range .Values.env.configMapRefs }}
           - configMapRef:
               name: {{ .name }}
           {{- end }}
+        {{- if .Values.env.secretRefs }}
           {{- range .Values.env.secretRefs }}
           - secretRef:
               name: {{ .name }}
           {{- end }}
+        {{- else }}
+          - secretRef:
+              name: terraform-enterprise-env-secrets
+        {{- end }}
         readinessProbe:
           httpGet:
             path: /_health_check
