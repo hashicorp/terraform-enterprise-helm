@@ -66,8 +66,13 @@ Create the name of the service account to use
 {{- end }}
 
 {{- define "helpers.list-env-variables"}}
-{{- range $key, $val := .Values.env }}
-- name: "{{ $key }}"
-  value: "{{ $val }}"
+{{- range $key, $val := .Values.env.variables }}
+"{{ $key }}": "${{ $val }}"
+{{- end }}
+{{- end }}
+
+{{- define "helpers.list-env-secrets" }}
+{{- range $key, $val := .Values.env.secrets }}
+"{{ $key }}": "${{ $val }}"
 {{- end }}
 {{- end }}

@@ -52,11 +52,11 @@ spec:
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         envFrom:
-          {{- range .Values.env.configMaps }}
+          {{- range .Values.env.configMapRefs }}
           - configMapRef:
               name: {{ .name }}
           {{- end }}
-          {{- range .Values.env.secrets }}
+          {{- range .Values.env.secretRefs }}
           - secretRef:
               name: {{ .name }}
           {{- end }}

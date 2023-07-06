@@ -5,6 +5,7 @@ metadata:
   name: terraform-enterprise-env-config
   namespace: {{ .Release.Namespace }}
 data:
+  {{- include "helpers.list-env-variables" . | indent 2 }}
   TFE_RUN_PIPELINE_DRIVER: kubernetes
   TFE_RUN_PIPELINE_KUBERNETES_NAMESPACE: {{ .Release.Namespace }}-agents
   TFE_VAULT_DISABLE_MLOCK: "true"
@@ -15,4 +16,9 @@ data:
   {{- if .Values.tls.caCertData }}
   TFE_TLS_CA_BUNDLE_FILE: {{ include "cacert.path" . }}
   {{- end }}
-{{ (.Files.Glob "env-config.yaml").AsConfig | indent 2 }}
+{{- $files := .Files }}
+{{- range .Values.env.configMapRefs }}
+{{- if eq .name "terraform-enterprise-env-config" }}
+{{ ($files.Glob .filepath).AsConfig | indent 2 }}
+{{- end }}
+{{- end }}
