@@ -16,4 +16,6 @@ data:
   {{- if .Values.tls.caCertData }}
   TFE_TLS_CA_BUNDLE_FILE: {{ include "cacert.path" . }}
   {{- end }}
-{{ (.Files.Glob .Values.env.configFilePath).AsConfig | indent 2 }}
+{{- if .Values.env.configFilePath }}
+{{ .Files.Get .Values.env.configFilePath | indent 2 }}
+{{- end }}
