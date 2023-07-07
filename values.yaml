@@ -189,8 +189,6 @@ env:
     # TFE_VAULT_ROLE_ID: ""
   configMapRefs: []
     # - name:
-    #   filepath:
   secretRefs: []
     # - name:
-    #   filepath:
 
