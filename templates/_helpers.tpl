@@ -80,7 +80,7 @@ and base64 encodes the value.
 */}}
 {{- define "helpers.list-env-secrets" }}
 {{- range $key, $val := .Values.env.secrets }}
-{{ $key }}: {{ $val | b64enc }}
+{{ $key }}: {{ trim $val | b64enc }}
 {{- end }}
 {{- end }}
 
@@ -93,7 +93,7 @@ and base64 encodes the value from the key-value pair.
 {{- $kv := splitList ":" . -}}
 {{- $k := first $kv -}}
 {{- if and ($k) (eq (hasPrefix "#" $k) false)  }}
-{{ $k }}: {{ last $kv | b64enc }}
+{{ $k }}: {{ trim (last $kv) | b64enc }}
 {{- end }}
 {{- end }}
 {{- end }}
