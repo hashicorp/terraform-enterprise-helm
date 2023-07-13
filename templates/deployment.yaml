@@ -52,8 +52,8 @@ spec:
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         envFrom:
-        {{- if .Values.env.configMaps }}
-          {{- range .Values.env.configMaps }}
+        {{- if .Values.env.configMapRefs }}
+          {{- range .Values.env.configMapRefs }}
           - configMapRef:
               name: {{ .name }}
           {{- end }}
@@ -61,10 +61,6 @@ spec:
           - configMapRef:
               name: terraform-enterprise-env-config
         {{- end }}
-          {{- range .Values.env.configMapRefs }}
-          - configMapRef:
-              name: {{ .name }}
-          {{- end }}
         {{- if .Values.env.secretRefs }}
           {{- range .Values.env.secretRefs }}
           - secretRef:
