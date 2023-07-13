@@ -1,0 +1,17 @@
+# comment
+
+# Match any file or path named .helmignore
+.helmignore
+
+# Match any file or path named .git
+.git
+
+# Match any github configuration files
+.github
+
+
+
+# Match only directories named mydir
+docs/
+
+CODEOWNERS

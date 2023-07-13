@@ -65,9 +65,35 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+{{/*
+Prints the key-value pair from the 'env.variables' entry in the Values file.
+*/}}
 {{- define "helpers.list-env-variables"}}
-{{- range $key, $val := .Values.env }}
-- name: "{{ $key }}"
-  value: "{{ $val }}"
+{{- range $key, $val := .Values.env.variables }}
+{{ $key }}: {{ $val | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Prints the key-value pair from the 'env.secrets' entry in the Values file
+and base64 encodes the value.
+*/}}
+{{- define "helpers.list-env-secrets" }}
+{{- range $key, $val := .Values.env.secrets }}
+{{ $key }}: {{ trim $val | b64enc }}
+{{- end }}
+{{- end }}
+
+{{/*
+Prints the file contents of the environment secrets file
+and base64 encodes the value from the key-value pair.
+*/}}
+{{- define "helpers.enc-b64-secrets-file" }}
+{{- range .Files.Lines .Values.env.secretsFilePath }}
+{{- $kv := splitList ":" . -}}
+{{- $k := first $kv -}}
+{{- if and ($k) (eq (hasPrefix "#" $k) false)  }}
+{{ $k }}: {{ trim (last $kv) | b64enc }}
+{{- end }}
 {{- end }}
 {{- end }}
