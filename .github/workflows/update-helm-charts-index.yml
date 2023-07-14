@@ -31,8 +31,8 @@ jobs:
         uses: hashicorp/actions-slack-status@v1
         with:
           # Note: we opt not to send a message on cancellation
-          success-message: ":tada: waypoint-helm charts index update triggered successfully. View the <https://github.com/hashicorp/helm-charts/actions/workflows/publish-charts.yml|run>."
-          failure-message: ":red_circle: The waypoint-helm charts index update trigger failed."
+          success-message: ":tada: terraform-enterprise-helm charts index update triggered successfully. View the <https://github.com/hashicorp/helm-charts/actions/workflows/publish-charts.yml|run>."
+          failure-message: ":red_circle: The terraform-enterprise-helm charts index update trigger failed."
           status: ${{ steps.update.conclusion }}
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
 permissions:
