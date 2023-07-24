@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Note: These certificates are self-signed, development certificates using an
 # untrusted locally provisioned CA certificate. There is no exposure risk.
 tls:
