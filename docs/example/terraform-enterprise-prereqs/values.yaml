@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Default values for terraform-enterprise-prereqs.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
