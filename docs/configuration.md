@@ -13,7 +13,7 @@ If an ImagePullSecret is required to access a private repository you must create
 
 Terraform Enterprise immediately deletes Kubernetes jobs after their execution finishes. However, if something goes wrong
 during the lifespan of these, it is possible to keep them alive for a limited amount of time. To configure this,
-provide these environment variable to the chart:
+provide these environment variables to the chart:
 
 * `TFE_RUN_PIPELINE_KUBERNETES_DEBUG_ENABLE`: boolean flag that will enable debug mode, and will consume all the settings
 from the `TFE_RUN_PIPELINE_KUBERNETES_DEBUG_*` environment variables.
