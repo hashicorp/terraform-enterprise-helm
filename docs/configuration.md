@@ -11,7 +11,7 @@ If an ImagePullSecret is required to access a private repository you must create
 
 ### Debug mode
 
-Terraform Enterprise immediatly deletes kubernetes jobs after their execution finishes. However, if something goes wrong
+Terraform Enterprise immediately deletes Kubernetes jobs after their execution finishes. However, if something goes wrong
 during the lifespan of these, it is possible to keep them alive for a limited amount of time. To configure this
 provide these environment variable to the chart:
 
