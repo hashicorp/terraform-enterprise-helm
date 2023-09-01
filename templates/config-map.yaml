@@ -20,9 +20,9 @@ data:
   TFE_TLS_CA_BUNDLE_FILE: {{ include "cacert.path" . }}
   {{- end }}
   {{- if .Values.tfe.metrics.enable }}
-  TFE_METRICS_ENABLE: {{ include ".Values.tfe.metrics.enable" . }}
-  TFE_METRICS_HTTP_PORT: {{ include ".Values.tfe.metrics.httpPort" . }}
-  TFE_METRICS_HTTPS_PORT: {{ include ".Values.tfe.metrics.httpsPort" . }}
+  TFE_METRICS_ENABLE: "{{ .Values.tfe.metrics.enable }}"
+  TFE_METRICS_HTTP_PORT: "{{ .Values.tfe.metrics.httpPort }}"
+  TFE_METRICS_HTTPS_PORT: "{{ .Values.tfe.metrics.httpsPort }}"
   {{- end }}
 {{- if .Values.env.configFilePath }}
 {{ .Files.Get .Values.env.configFilePath | indent 2 }}
