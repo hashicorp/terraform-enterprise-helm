@@ -12,15 +12,18 @@ image:
  name: terraform-enterprise
  tag: beta-1
 env:
-  TFE_HOSTNAME: "terraform-enterprise.terraform-enterprise.svc.cluster.local"
-  TFE_DATABASE_HOST: "prereqs-postgresql.terraform-enterprise.svc.cluster.local"
-  TFE_DATABASE_NAME: tfe
-  TFE_DATABASE_PASSWORD: Terraform-Enterprise!
-  TFE_DATABASE_USER: postgres
-  TFE_DATABASE_PARAMETERS: "sslmode=disable"
-  TFE_OBJECT_STORAGE_TYPE: s3
-  TFE_OBJECT_STORAGE_S3_BUCKET: "tfe"
-  TFE_OBJECT_STORAGE_S3_ENDPOINT: "http://prereqs-minio.terraform-enterprise.svc.cluster.local:9000"
-  TFE_OBJECT_STORAGE_S3_ACCESS_KEY_ID: "tfeclusteradmin"
-  TFE_OBJECT_STORAGE_S3_SECRET_ACCESS_KEY: "Terraform-Enterprise!"
-  TFE_OBJECT_STORAGE_S3_REGION: us-east-2
+  variables:
+    TFE_ENCRYPTION_PASSWORD: Terraform-Enterprise!
+    TFE_HOSTNAME: "terraform-enterprise.terraform-enterprise.svc.cluster.local"
+    TFE_DATABASE_HOST: "prereqs-postgresql.terraform-enterprise.svc.cluster.local"
+    TFE_DATABASE_NAME: tfe
+    TFE_DATABASE_PASSWORD: Terraform-Enterprise!
+    TFE_DATABASE_USER: postgres
+    TFE_DATABASE_PARAMETERS: "sslmode=disable"
+    TFE_OBJECT_STORAGE_TYPE: s3
+    TFE_OBJECT_STORAGE_S3_BUCKET: "tfe"
+    TFE_OBJECT_STORAGE_S3_ENDPOINT: "http://prereqs-minio.terraform-enterprise.svc.cluster.local:9000"
+    TFE_OBJECT_STORAGE_S3_ACCESS_KEY_ID: "tfeclusteradmin"
+    TFE_OBJECT_STORAGE_S3_SECRET_ACCESS_KEY: "Terraform-Enterprise!"
+    TFE_OBJECT_STORAGE_S3_REGION: us-east-2
+    TFE_REDIS_HOST: "prereqs-redis-master.terraform-enterprise.svc.cluster.local:6379"
