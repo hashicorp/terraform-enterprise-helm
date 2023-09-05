@@ -32,3 +32,25 @@ tls:
 ```
 
 The contents of this file are appended to the terraform-enterprise container CA certificates file. Agent images are then instantiated with the entirety of this combined CA certificate file fully replacing the native container operating system's CA certificate file. This allows tfc-agent to communicate with any dependent services or endpoints that might signed with your private certificate authorities, including Terraform Enterprise itself.
+
+## Metrics
+
+Terraform Enterprise exposes metrics in json or Prometheus format. The `.Values.tfe.metrics.enable` value exposes the container ports for the metrics service, configures Terraform Enterprise to launch the metrics service, and annotates the Terraform Enterprise pods with common annotations required for Prometheus discovery and automated metrics scraping. More information about metrics can be found [in the Terraform Enterprise Metrics documentation](https://developer.hashicorp.com/terraform/enterprise/admin/infrastructure/monitoring).
+
+Prometheus scrape annotations
+```
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      prometheus.io/path: /metrics
+      prometheus.io/port: "9090"
+      prometheus.io/scrape: "true"
+    creationTimestamp: "2023-09-01T15:42:32Z"
+    generateName: terraform-enterprise-546db68fcd-
+    labels:
+      app: terraform-enterprise
+...
+```

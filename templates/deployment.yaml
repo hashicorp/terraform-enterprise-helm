@@ -17,9 +17,14 @@ spec:
   template:
     metadata:
       annotations:
-    {{- if .Values.pod.annotations }}
-    {{ toYaml .Values.pod.annotations | indent 8 }}
-    {{ end }}
+        {{- if .Values.pod.annotations }}
+        {{ toYaml .Values.pod.annotations | indent 8 }}
+        {{ end }}
+        {{- if .Values.tfe.metrics.enable }}
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "{{ .Values.tfe.metrics.httpPort }}"
+        prometheus.io/scrape: "true"
+        {{- end }}
       labels:
         app: terraform-enterprise
     spec:
@@ -90,3 +95,7 @@ spec:
         ports:
         - containerPort: {{ .Values.tfe.privateHttpPort }}
         - containerPort: {{ .Values.tfe.privateHttpsPort }}
+        {{- if .Values.tfe.metrics.enable }}
+        - containerPort: {{.Values.tfe.metrics.httpPort}}
+        - containerPort: {{.Values.tfe.metrics.httpsPort}}
+        {{- end }}
