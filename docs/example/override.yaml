@@ -13,7 +13,6 @@ image:
  tag: beta-1
 env:
   TFE_HOSTNAME: "terraform-enterprise.terraform-enterprise.svc.cluster.local"
-  TFE_OPERATIONAL_MODE: "external"
   TFE_DATABASE_HOST: "prereqs-postgresql.terraform-enterprise.svc.cluster.local"
   TFE_DATABASE_NAME: tfe
   TFE_DATABASE_PASSWORD: Terraform-Enterprise!
