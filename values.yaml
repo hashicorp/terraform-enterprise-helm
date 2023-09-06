@@ -25,10 +25,10 @@ pod:
 # Resource limits are not set by default, to give the user the ability to set specific resource limits.
 # If you do want to specify resource limits, uncomment the following lines and adjust them as necessary.
 resources:
-   requests:
-     memory: "5000Mi"
-     cpu: "4"
-#  limits:
+  limits:
+    memory: "5000Mi"
+    cpu: "4"
+#  requests:
 #    memory: ""
 #    cpu: ""
 
@@ -166,7 +166,10 @@ env:
     # TFE_OBJECT_STORAGE_GOOGLE_CREDENTIALS: ""
     # TFE_OBJECT_STORAGE_S3_SECRET_ACCESS_KEY: ""
     # TFE_VAULT_SECRET_ID: ""
+    # TFE_REDIS_PASSWORD: ""
+    # TFE_LICENSE: ""
   variables: {}
+    # TFE_HOSTNAME: ""
     # TFE_CAPACITY_CONCURRENCY: ""
     # TFE_CAPACITY_CPU: ""
     # TFE_CAPACITY_MEMORY: ""
@@ -190,10 +193,12 @@ env:
     # TFE_OBJECT_STORAGE_S3_SERVER_SIDE_ENCRYPTION: ""
     # TFE_OBJECT_STORAGE_S3_SERVER_SIDE_ENCRYPTION_KMS_KEY_ID: ""
     # TFE_OBJECT_STORAGE_S3_USE_INSTANCE_PROFILE: ""
-    # TFE_REDIS_URL: ""
+    # TFE_REDIS_USE_TLS: ""
+    # TFE_REDIS_USER: ""
+    # TFE_REDIS_HOST: ""
+    # TFE_REDIS_USE_AUTH: ""
     # TFE_TLS_CIPHERS: ""
     # TFE_VAULT_ADDRESS: ""
     # TFE_VAULT_NAMESPACE: ""
     # TFE_VAULT_PATH: ""
     # TFE_VAULT_ROLE_ID: ""
-
