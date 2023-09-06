@@ -10,7 +10,7 @@ tls:
 image:
  repository: terraform-enterprise-beta.terraform.io
  name: terraform-enterprise
- tag: beta-1
+ tag: <vYYYYMM-#>
 env:
   variables:
     TFE_ENCRYPTION_PASSWORD: Terraform-Enterprise!
