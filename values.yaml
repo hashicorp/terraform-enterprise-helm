@@ -13,9 +13,9 @@ imagePullSecrets:
 
 # Image sets the repo, name and tag of the Terraform Enterprise image to use.
 image:
- repository: terraform-enterprise-beta.terraform.io
+ repository: images.releases.hashicorp.com
  name: terraform-enterprise
- tag: beta-1
+ tag: <vYYYYMM-#>
  pullPolicy: Always
 
 pod:
@@ -167,7 +167,6 @@ env:
     # TFE_OBJECT_STORAGE_S3_SECRET_ACCESS_KEY: ""
     # TFE_VAULT_SECRET_ID: ""
   variables: {}
-    # TFE_OPERATIONAL_MODE: external
     # TFE_CAPACITY_CONCURRENCY: ""
     # TFE_CAPACITY_CPU: ""
     # TFE_CAPACITY_MEMORY: ""

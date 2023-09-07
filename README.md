@@ -33,10 +33,10 @@ You'll need the following to continue:
 1. A hostname for Terraform Enterprise
 1. A DNS zone to create a record for the interface of Terraform Enterprise
 1. A valid TLS certificate and private key provisioned and matching the hostname selected in **1.** in pem format
-1. External dependencies : Terraform Enterprise must run under the `external` or `active-active` operational mode when run in a Kubernetes cluster. This requires the following external dependencies:
+1. Terraform Enterprise requires the following external dependencies:
     * A PostgreSQL server meeting the requirements outlined in [PostgreSQL Requirements for Terraform Enterprise](https://developer.hashicorp.com/terraform/enterprise/requirements/data-storage/postgres-requirements)
     * S3 compatible object storage meeting the requirements outlined in the external services mode section of [Operational Mode Data Storage Requirements](https://developer.hashicorp.com/terraform/enterprise/requirements/data-storage/operational-mode-requirements#external-services-mode).
-    * If Terraform Enterprise is running in `active-active` mode then a Redis cache instance is required also meeting the guidance in the above article.
+    * A Redis cache instance is required also meeting the guidance in the above article.
     * Please confirm that all external services have network configuration allowing access from the Kubernetes nodes that may host Terraform Enterprise pods before proceeding.
 
 ### Create Prerequisites

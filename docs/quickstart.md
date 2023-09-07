@@ -89,7 +89,7 @@ helm install prereqs ./docs/example/terraform-enterprise-prereqs  -n terraform-e
 When this operation is complete your namespace resources should look something like this:
 ![kubectl get all -n terraform-enterprise](./images/prereqs.png)
 
-You now have PostgreSQL listening on address `prereqs-postgresql.terraform-enterprise.svc.cluster.local` and MinIO listening on address `http://prereqs-minio.terraform-enterprise.svc.cluster.local:9000`.
+You now have PostgreSQL listening on address `prereqs-postgresql.terraform-enterprise.svc.cluster.local`, MinIO listening on address `http://prereqs-minio.terraform-enterprise.svc.cluster.local:9000`, and Redis listening at `prereqs-redis-master.terraform-enterprise.svc.cluster.local`.
 
 ## Provisioning Terraform Enterprise
 
