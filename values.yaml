@@ -28,9 +28,9 @@ resources:
   requests:
     memory: "2500Mi"
     cpu: "750m"
-#  limits:
-#    memory: ""
-#    cpu: ""
+  # limits:
+  #   memory: ""
+  #   cpu: ""
 
 # TLS for end-to-end encrypted transport
 tls:
