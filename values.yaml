@@ -25,10 +25,10 @@ pod:
 # Resource limits are not set by default, to give the user the ability to set specific resource limits.
 # If you do want to specify resource limits, uncomment the following lines and adjust them as necessary.
 resources:
-  limits:
-    memory: "5000Mi"
-    cpu: "4"
-#  requests:
+  requests:
+    memory: "2500Mi"
+    cpu: "750m"
+#  limits:
 #    memory: ""
 #    cpu: ""
 
