@@ -68,34 +68,6 @@ There are a number of common helm or kubectl commands you can use to monitor the
     kubectl exec -it terraform-enterprise-5946d99fc-l22s9 -- cat /var/log/terraform-enterprise/atlas.log
     ```
 
-## Bootstrap Terraform Enterprise
-
-### Establish DNS
-
-Once Terraform Enterprise has loaded and passed all startup health checks you should take the following actions, the details of which are particular to your environment:
-
-* Expose the terraform-enterprise load balancer service to network access from your workstation
-* Establish a DNS address or a host file entry for the Terraform Enterprise load balancer public ip address and hostname
-* Install the CA certificate for your instance certificate on your workstation if necessary
-* Confirm the above actions by visiting the Terraform Enterprise health check endpoint at `https://<terraform_enterprise_hostname>/_health_check`
-
-### Create an Administrative User
-
-In order to retrieve an _initial admin creation token_ or an iact, visit the `admin/retrieve-iact` url path with a browser or curl from a source ip address within your `TFE_IACT_SUBNETS` range and a time before the limit defined by the `TFE_IACT_TIME_LIMIT` setting.
-
-```shell
-curl https://terraform-enterprise.terraform-enterprise.svc.cluster.local/admin/retrieve-iact
-> 1b5c826a739fe1e2b91cc5932f7adda204bfefcf4bcbe006ac88831d8d208114
-```
-
-Then use this token as a url parameter for the initial admin creation workflow:
-
-`https://terraform-enterprise.terraform-enterprise.svc.cluster.local/admin/account/new?token=1b5c826a739fe1e2b91cc5932f7adda204bfefcf4bcbe006ac88831d8d208114`
-
-![An image of the admin account creation page using the iact token](./docs/images/account_creation.png)
-
-Congratulations, you're ready to start using Terraform Enterprise!  Create an organization and get started.
-
 ## Additional Documentation
 
 For more information about Terraform Enterprise and the capabilities of this helm chart please see the following additional documentation:
