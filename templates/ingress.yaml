@@ -8,6 +8,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: terraform-enterprise
+  namespace: {{ .Release.Namespace }}
   labels:
     app: terraform-enterprise
   {{- with .Values.ingress.annotations }}
