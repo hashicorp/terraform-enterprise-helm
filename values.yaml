@@ -14,7 +14,7 @@ imagePullSecrets:
 # Image sets the repo, name and tag of the Terraform Enterprise image to use.
 image:
  repository: images.releases.hashicorp.com
- name: terraform-enterprise
+ name: hashicorp/terraform-enterprise
  tag: <vYYYYMM-#>
  pullPolicy: Always
 
