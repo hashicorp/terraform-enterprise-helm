@@ -18,6 +18,9 @@ image:
  tag: <vYYYYMM-#>
  pullPolicy: Always
 
+serviceAccount:
+  annotations: {}
+
 pod:
 # Configure pod annotations
   annotations: {}
