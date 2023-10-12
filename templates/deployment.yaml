@@ -19,8 +19,8 @@ spec:
     metadata:
       annotations:
         {{- if .Values.pod.annotations }}
-        {{ toYaml .Values.pod.annotations | indent 8 }}
-        {{ end }}
+        {{- toYaml .Values.pod.annotations | nindent 8 }}
+        {{- end }}
         {{- if .Values.tfe.metrics.enable }}
         prometheus.io/path: "/metrics"
         prometheus.io/port: "{{ .Values.tfe.metrics.httpPort }}"
