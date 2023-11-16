@@ -58,7 +58,7 @@ spec:
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         securityContext:
-        {{- toYaml .Values.pod.securityContext | nindent 10 }}
+        {{- toYaml .Values.container.securityContext | nindent 10 }}
         envFrom:
           - configMapRef:
               name: terraform-enterprise-env-config
