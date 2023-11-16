@@ -24,6 +24,8 @@ serviceAccount:
 pod:
 # Configure pod annotations
   annotations: {}
+# Configure pod specific security context settings
+  securityContext: {}
 
 # Resource limits are not set by default, to give the user the ability to set specific resource limits.
 # If you do want to specify resource limits, uncomment the following lines and adjust them as necessary.
@@ -173,6 +175,7 @@ env:
     # TFE_LICENSE: ""
   variables: {}
     # TFE_HOSTNAME: ""
+
     # TFE_CAPACITY_CONCURRENCY: ""
     # TFE_CAPACITY_CPU: ""
     # TFE_CAPACITY_MEMORY: ""
