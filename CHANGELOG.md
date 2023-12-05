@@ -1,3 +1,6 @@
+## 1.1.1 (December 5th, 2023)
+* Support container securityContext configuration from values [#57](https://github.com/hashicorp/terraform-enterprise-helm/pull/57) 
+
 ## 1.1.0 (November 2nd, 2023)
 * Support annotations on the service account [#45](https://github.com/hashicorp/terraform-enterprise-helm/pull/45)
 
