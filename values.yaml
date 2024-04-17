@@ -158,6 +158,18 @@ service:
   port: 443
   nodePort: 32443 # if service.type is NodePort value will be set
 
+# Custom pod template to define your own specifications for the creation of the agent worker pods.
+# This should be a JSON string representing a valid corev1.PodTemplateSpec.
+# For example:
+# {
+#   "metadata": {},
+#   "spec": {
+#     "containers": [],
+#     "nodeSelector": {}
+#   }
+# }
+agentWorkerPodTemplate: ""
+
 env:
   # configFilePath: env-config.yaml
   # secretsFilePath: # env-secrets.yaml

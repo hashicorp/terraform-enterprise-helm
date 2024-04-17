@@ -11,6 +11,9 @@ data:
   {{- include "helpers.list-env-variables" . | indent 2 }}
   TFE_RUN_PIPELINE_DRIVER: kubernetes
   TFE_RUN_PIPELINE_KUBERNETES_NAMESPACE: {{ .Release.Namespace }}-agents
+  {{- if .Values.agentWorkerPodTemplate }}
+  TFE_RUN_PIPELINE_KUBERNETES_POD_TEMPLATE: {{ .Values.agentWorkerPodTemplate | b64enc }}
+  {{- end }}
   TFE_VAULT_DISABLE_MLOCK: "true"
   TFE_HTTP_PORT: "{{ .Values.tfe.privateHttpPort }}"
   TFE_HTTPS_PORT: "{{ .Values.tfe.privateHttpsPort }}"

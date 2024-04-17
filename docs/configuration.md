@@ -54,3 +54,9 @@ items:
       app: terraform-enterprise
 ...
 ```
+
+## Custom agent worker pod template
+
+Terraform Enterprise now supports the inclusion of a custom pod template via `agentWorkerPodTemplate` in the Values file.
+With this, you can define your own specifications for the creation of the agent worker pods.
+The custom pod template must be a valid `corev1.PodTemplateSpec` and should be provided in JSON format.
