@@ -168,7 +168,7 @@ service:
 #     "nodeSelector": {}
 #   }
 # }
-agentWorkerPodTemplate: "{}"
+agentWorkerPodTemplate: ""
 
 env:
   # configFilePath: env-config.yaml
