@@ -161,12 +161,11 @@ service:
 # Custom pod template to define your own specifications for the creation of the agent worker pods.
 # This should be YAML representing a valid corev1.PodTemplateSpec. This format is documented
 # at https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-template-v1/#PodTemplateSpec.
-# For example:
-# metadata: {},
-# spec:
-#   containers: [],
-#   nodeSelector: {}
 agentWorkerPodTemplate: {}
+  # metadata: {}
+  # spec:
+  #   containers: []
+  #   nodeSelector: {}
 
 env:
   # configFilePath: env-config.yaml
