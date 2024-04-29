@@ -157,6 +157,7 @@ service:
   type: LoadBalancer # ClusterIP
   port: 443
   nodePort: 32443 # if service.type is NodePort value will be set
+  loadBalancerIP: null # if the service.type is LoadBalancer, this can optionally be set
 
 env:
   # configFilePath: env-config.yaml
