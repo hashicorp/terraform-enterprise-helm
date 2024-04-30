@@ -157,6 +157,7 @@ service:
   type: LoadBalancer # ClusterIP
   port: 443
   nodePort: 32443 # if service.type is NodePort value will be set
+  loadBalancerIP: null # if the service.type is LoadBalancer, this can optionally be set
 
 # Custom pod template to define your own specifications for the creation of the agent worker pods.
 # This should be YAML representing a valid corev1.PodTemplateSpec. This format is documented
