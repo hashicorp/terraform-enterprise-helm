@@ -2,6 +2,12 @@
 
 This chart is used to install Terraform Enterprise in a generic Kubernetes environment. It is minimal in its configuration and contains the basic things necessary to launch Terraform Enterprise on a Kubernetes cluster.
 
+## Forking supported
+
+This helm chart aims to meet the needs of 80% of customers. You are welcome to fork this chart and adapt it to your organization’s requirements. 
+
+In case you open a ticket with HashiCorp support, please include your custom helm chart alongside your support bundle.
+
 ## Prerequisites
 
 To use the charts here, [Helm](https://helm.sh/) must be configured for your
