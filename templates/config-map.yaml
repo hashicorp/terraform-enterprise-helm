@@ -15,7 +15,7 @@ data:
   TFE_RUN_PIPELINE_KUBERNETES_POD_TEMPLATE: {{ .Values.agentWorkerPodTemplate | mustToJson | b64enc }}
   {{- end }}
   {{- if .Values.openshift.enabled }}
-  TFE_RUN_PIPELINE_KUBERNETES_OPEN_SHIFT_ENABLED: true
+  TFE_RUN_PIPELINE_KUBERNETES_OPEN_SHIFT_ENABLED: "true"
   {{- end }}
   TFE_VAULT_DISABLE_MLOCK: "true"
   TFE_HTTP_PORT: "{{ .Values.tfe.privateHttpPort }}"
