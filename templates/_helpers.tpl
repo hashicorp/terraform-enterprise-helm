@@ -97,3 +97,17 @@ and base64 encodes the value from the key-value pair.
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+Generates a SHA-256 sum of concatenated env vars ConfigMap contents and env secrets.
+*/}}
+{{- define "helpers.env-checksum" }}
+{{- $env_vars := include (print $.Template.BasePath "/config-map.yaml") . -}}
+{{- if .Values.env.secretsFilePath }}
+{{- $env_secrets := print "%s%s" (include "helpers.list-env-secrets" .) (include "helpers.enc-b64-secrets-file" .) -}}
+{{- print "%s%s" $env_vars $env_secrets | sha256sum }}
+{{- else }}
+{{- $env_secrets := include "helpers.list-env-secrets" . -}}
+{{- print "%s%s" $env_vars $env_secrets | sha256sum }}
+{{- end }}
+{{- end }}

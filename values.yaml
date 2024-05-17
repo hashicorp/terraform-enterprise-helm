@@ -220,3 +220,10 @@ env:
     # TFE_VAULT_ROLE_ID: ""
     # TFE_IACT_SUBNETS: ""
     # TFE_IACT_TIME_LIMIT: ""
+
+  # Automatically roll deployment if env vars or env secrets change by adding
+  # the checksum of env vars and env secrets as annotation to the deployment:
+  # https://helm.sh/docs/howto/charts_tips_and_tricks/#automatically-roll-deployments
+  # Please note: this doesn't work with env.configMapRefs or env.secretRefs
+  autoRollDeployment:
+    enabled: false

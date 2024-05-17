@@ -26,6 +26,9 @@ spec:
         prometheus.io/port: "{{ .Values.tfe.metrics.httpPort }}"
         prometheus.io/scrape: "true"
         {{- end }}
+        {{- if .Values.env.autoRollDeployment.enabled }}
+        checksum/env: {{- include "helpers.env-checksum" . }}
+        {{- end }}
       labels:
         app: terraform-enterprise
     spec:
