@@ -97,3 +97,19 @@ and base64 encodes the value from the key-value pair.
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+Define helper to conditionally add securityContext to agentWorkerPodTemplate.
+It does not output anything if agentWorkerPodTemplate is empty and OpenShift is not enabled.
+*/}}
+{{- define "k8s.addSecurityContext" -}}
+{{- if or .Values.agentWorkerPodTemplate .Values.openshift.enabled }}
+  {{- $defaultSecurityContext := dict "seccompProfile" (dict "type" "RuntimeDefault") "allowPrivilegeEscalation" false "capabilities" (dict "drop" (list "ALL")) "runAsNonRoot" true }}
+  {{- if and .Values.openshift.enabled (not (hasKey .Values.agentWorkerPodTemplate "securityContext")) }}
+    {{- $securityContextAdded := set .Values.agentWorkerPodTemplate "securityContext" $defaultSecurityContext }}
+    {{- $securityContextAdded | toJson | b64enc }}
+  {{- else }}
+    {{- .Values.agentWorkerPodTemplate | toJson | b64enc }}
+  {{- end }}
+{{- end }}
+{{- end }}
