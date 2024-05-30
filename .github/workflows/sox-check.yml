@@ -4,4 +4,4 @@ on:
     types: [opened, synchronize, edited]
 jobs:
   sox-check:
-    uses: hashicorp/tf-enterprise-workflows/.github/workflows/sox-check.yml@v0.3.14
+    uses: hashicorp/tf-enterprise-workflows/.github/workflows/sox-check.yml@main
