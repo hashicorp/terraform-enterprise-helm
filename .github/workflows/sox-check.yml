@@ -1,6 +1,5 @@
 name: Sox Check
 on:
-  workflow_dispatch:
   pull_request:
     types: [opened, synchronize, edited]
 jobs:
