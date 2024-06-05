@@ -183,7 +183,6 @@ env:
   #   - name:
   # secretRefs:
   #    - name:
-
   secrets: {}
     # TFE_ENCRYPTION_PASSWORD: "SECRET"
     # TFE_DATABASE_PASSWORD: ""
