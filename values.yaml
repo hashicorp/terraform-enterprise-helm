@@ -41,7 +41,8 @@ resources:
 # TLS for end-to-end encrypted transport
 # Including secrets in Helm charts can expose sensitive data if the charts are 
 # stored in a version control system like Git, where they might be accessible 
-# to unauthorized users. The values given below are for testing purposes only.
+# to unauthorized users. It is recommended to manage secrets through a secure 
+# secrets management system. The values given below are for testing purposes only.
 tls:
   certificateSecret: terraform-enterprise-certificates
   caCertBaseDir: /etc/ssl/certs
