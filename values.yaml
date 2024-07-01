@@ -19,7 +19,9 @@ image:
  pullPolicy: Always
 
 serviceAccount:
+  enabled: true
   annotations: {}
+  labels: {}
 
 pod:
 # Configure pod annotations
@@ -241,3 +243,13 @@ env:
     # TFE_VAULT_ROLE_ID: ""
     # TFE_IACT_SUBNETS: ""
     # TFE_IACT_TIME_LIMIT: ""
+
+agents:
+  rbac:
+    enabled: true
+    annotations: {}
+    labels: {}
+  namespace:
+    enabled: true
+    annotations: {}
+    labels: {}

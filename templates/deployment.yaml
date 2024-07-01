@@ -54,7 +54,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.serviceAccount.enabled }}
       serviceAccountName: {{ .Release.Namespace }}
+      {{- end }}
       initContainers:
         {{ toYaml .Values.initContainers | nindent 8}}
       containers:

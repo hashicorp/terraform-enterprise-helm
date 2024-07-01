@@ -3,27 +3,21 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-apiVersion: v1
-automountServiceAccountToken: true
-kind: ServiceAccount
-metadata:
-  name: {{ .Release.Namespace }}
-  namespace: {{ .Release.Namespace }}
-  {{- if .Values.serviceAccount.annotations }}
-  annotations:
-    {{- toYaml .Values.serviceAccount.annotations | nindent 4 }}
-  {{- end }}
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Release.Namespace }}-agents
+{{- if .Values.agents.rbac.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: {{ .Release.Namespace }}
   namespace: {{ .Release.Namespace }}-agents
+  {{- with .Values.agents.rbac.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.agents.rbac.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 rules:
 - apiGroups:
   - ""
@@ -47,6 +41,14 @@ kind: RoleBinding
 metadata:
   name: {{ .Release.Namespace }}-agents
   namespace: {{ .Release.Namespace }}-agents
+  {{- with .Values.agents.rbac.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.agents.rbac.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -55,3 +57,4 @@ subjects:
 - kind: ServiceAccount
   name: {{ .Release.Namespace }}
   namespace: {{ .Release.Namespace }}
+{{- end }}
