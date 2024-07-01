@@ -104,6 +104,18 @@ affinity: {}
 #                - bar
 #          topologyKey: "kubernetes.io/hostname"
 
+# Topology Spread Constraints
+# This should be either a multi-line string or YAML matching the PodSpec's typologySpreadConstraints field.
+topologySpreadConstraints: []
+
+## Example:
+#  - maxSkew: 1
+#    topologyKey: topology.kubernetes.io/zone
+#    whenUnsatisfiable: DoNotSchedule
+#    labelSelector:
+#      matchLabels:
+#        app: terraform-enterprise
+
 # Security context for the deployment template.
 # The deployment securityContext is not set by default.
 #This should be a YAML map corresponding to a
