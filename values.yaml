@@ -30,6 +30,14 @@ container:
 # Configure pod specific security context settings
   securityContext: {}
 
+# The deployment's strategy is not set by default. This should be a YAML map corresponding to a 
+# Kubernetes [DeploymentStrategy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#deploymentstrategy-v1-apps) object.
+# strategy:
+#   type: RollingUpdate
+#   rollingUpdate:
+#     maxSurge: 1
+#     maxUnavailable: 0
+
 # Resource limits are not set by default, to give the user the ability to set specific resource limits.
 # If you do want to specify resource limits, uncomment the following lines and adjust them as necessary.
 resources:
