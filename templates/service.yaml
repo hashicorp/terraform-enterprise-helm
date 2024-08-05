@@ -24,5 +24,6 @@ spec:
       nodePort: {{ .Values.service.nodePort }}
       {{- end }}
       targetPort: {{ .Values.tfe.privateHttpsPort }}
+      appProtocol: https
   selector:
     app: terraform-enterprise
