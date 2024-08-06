@@ -26,6 +26,7 @@ serviceAccount:
 pod:
 # Configure pod annotations
   annotations: {}
+  labels: {}
 container:
 # Configure pod specific security context settings
   securityContext: {}
