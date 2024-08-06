@@ -30,8 +30,8 @@ spec:
         {{- end }}
       labels:
         app: terraform-enterprise
-        {{- if .Values.pod.extraLabels }}
-        {{- toYaml .Values.pod.extraLabels | nindent 8 }}
+        {{- if .Values.pod.labels }}
+        {{- toYaml .Values.pod.labels | nindent 8 }}
         {{- end }}
     spec:
       nodeSelector:
