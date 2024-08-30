@@ -11,6 +11,7 @@ metadata:
   labels:
     app: terraform-enterprise
 spec:
+  serviceName: terraform-enterprise
   replicas: 3
   selector:
     matchLabels:
@@ -65,7 +66,6 @@ spec:
       {{- end }}
       {{- if .Values.serviceAccount.enabled }}
       serviceAccountName: {{ .Release.Namespace }}
-      serviceName: terraform-enterprise
       {{- end }}
       initContainers:
         {{ toYaml .Values.initContainers | nindent 8}}
