@@ -4,14 +4,14 @@ SPDX-License-Identifier: MPL-2.0
 */}}
 
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: terraform-enterprise
   namespace: {{ .Release.Namespace }}
   labels:
     app: terraform-enterprise
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 3
   selector:
     matchLabels:
       app: terraform-enterprise
@@ -51,6 +51,9 @@ spec:
         - name: certificates
           secret:
             secretName: {{ .Values.tls.certificateSecret }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: terraform-enterprise-data
         {{- if .Values.tls.caCertData }}
         - name: ca-certificates
           secret:
@@ -62,6 +65,7 @@ spec:
       {{- end }}
       {{- if .Values.serviceAccount.enabled }}
       serviceAccountName: {{ .Release.Namespace }}
+      serviceName: terraform-enterprise
       {{- end }}
       initContainers:
         {{ toYaml .Values.initContainers | nindent 8}}
@@ -69,6 +73,9 @@ spec:
       - name: terraform-enterprise
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: data
+          mountPath: {{ .Values.tfe.vaultDiskPath }}
         securityContext:
         {{- if and .Values.openshift.enabled (not .Values.container.securityContext) }}
           seccompProfile:

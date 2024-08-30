@@ -30,7 +30,7 @@ container:
 # Configure pod specific security context settings
   securityContext: {}
 
-# The deployment's strategy is not set by default. This should be a YAML map corresponding to a 
+# The deployment's strategy is not set by default. This should be a YAML map corresponding to a
 # Kubernetes [DeploymentStrategy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#deploymentstrategy-v1-apps) object.
 # strategy:
 #   type: RollingUpdate
@@ -49,9 +49,9 @@ resources:
   #   cpu: ""
 
 # TLS for end-to-end encrypted transport
-# Including secrets in Helm charts can expose sensitive data if the charts are 
-# stored in a version control system like Git, where they might be accessible 
-# to unauthorized users. It is recommended to manage secrets through a secure 
+# Including secrets in Helm charts can expose sensitive data if the charts are
+# stored in a version control system like Git, where they might be accessible
+# to unauthorized users. It is recommended to manage secrets through a secure
 # secrets management system. The values given below are for testing purposes only.
 tls:
   certificateSecret: terraform-enterprise-certificates
@@ -70,6 +70,7 @@ tfe:
     httpsPort: 9091
   privateHttpPort: 8080
   privateHttpsPort: 8443
+  vaultDiskPath: /opt/etc/vault
 
 # nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
 nodeSelector: {}

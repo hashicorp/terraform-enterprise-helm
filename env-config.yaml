@@ -1,6 +1,10 @@
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
+TFE_VAULT_DISK_PATH: {{ .Values.tfe.vaultDiskPath }}
+TFE_VAULT_ADDRESS: terraform-enterprise-0.terraform-enterprise.{{ .Release.Namespace }}.svc.cluster.local
+TFE_VAULT_NODE1_ADDRESS: terraform-enterprise-1.terraform-enterprise.{{ .Release.Namespace }}.svc.cluster.local
+TFE_VAULT_NODE2_ADDRESS: terraform-enterprise-2.terraform-enterprise.{{ .Release.Namespace }}.svc.cluster.local
 # TFE_HOSTNAME: ""
 # TFE_CAPACITY_CONCURRENCY: ""
 # TFE_CAPACITY_CPU: ""
