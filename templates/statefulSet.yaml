@@ -73,9 +73,6 @@ spec:
       - name: terraform-enterprise
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        volumeMounts:
-        - name: data
-          mountPath: {{ .Values.tfe.vaultDiskPath }}
         securityContext:
         {{- if and .Values.openshift.enabled (not .Values.container.securityContext) }}
           seccompProfile:
@@ -124,6 +121,8 @@ spec:
             mountPath: {{ include "cacert.path" . }}
             subPath: {{ .Values.tls.caCertFileName }}
           {{- end }}
+          - name: data
+            mountPath: {{ .Values.tfe.vaultDiskPath }}
         ports:
         - containerPort: {{ .Values.tfe.privateHttpPort }}
         - containerPort: {{ .Values.tfe.privateHttpsPort }}
