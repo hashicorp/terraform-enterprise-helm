@@ -127,6 +127,7 @@ spec:
         ports:
         - containerPort: {{ .Values.tfe.privateHttpPort }}
         - containerPort: {{ .Values.tfe.privateHttpsPort }}
+        - containerPort: 8200
         {{- if .Values.tfe.metrics.enable }}
         - containerPort: {{.Values.tfe.metrics.httpPort}}
         - containerPort: {{.Values.tfe.metrics.httpsPort}}

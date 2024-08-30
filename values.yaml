@@ -217,7 +217,7 @@ env:
     # TFE_REDIS_PASSWORD: ""
     # TFE_LICENSE: ""
   variables:
-    TFE_VAULT_DISK_PATH: /opt/etc/vault
+    TFE_VAULT_DATA_DIR: /opt/etc/vault
     TFE_VAULT_ADDRESS: terraform-enterprise-0.terraform-enterprise.vault.svc.cluster.local
     TFE_VAULT_NODE1_ADDRESS: terraform-enterprise-1.terraform-enterprise.vault.svc.cluster.local
     TFE_VAULT_NODE2_ADDRESS: terraform-enterprise-2.terraform-enterprise.vault.svc.cluster.local
