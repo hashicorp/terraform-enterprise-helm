@@ -4,21 +4,26 @@ SPDX-License-Identifier: MPL-2.0
 */}}
 
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: terraform-enterprise
   namespace: {{ .Release.Namespace }}
   labels:
     app: terraform-enterprise
 spec:
+  volumeClaimTemplates:
+  - metadata:
+      name: terraform-enterprise-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size  }}
+  serviceName: terraform-enterprise
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: terraform-enterprise
-  {{- with .Values.strategy }}
-  strategy:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   template:
     metadata:
       annotations:
