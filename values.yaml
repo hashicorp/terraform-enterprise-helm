@@ -32,9 +32,9 @@ container:
   securityContext: {}
 
 kubeconfig: {}
-  # clusterName: null
-  # apiServer: null
-  # caData: "<base64-encoded-ca-cert>"
+  # clusterName: <cluster-name>
+  # apiServer: <cluster-api-server>
+  # caData: "<ca-cert-data>"
   # token: "<user-token>"
 
 # The deployment's strategy is not set by default. This should be a YAML map corresponding to a
