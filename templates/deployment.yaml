@@ -59,6 +59,11 @@ spec:
           secret:
             secretName: terraform-enterprise-ca-certificates
         {{- end }}
+        {{- if .Values.kubeconfig}}
+        - name: kubeconfig-volume
+          secret:
+            secretName: terraform-enterprise-kubeconfig
+        {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -119,6 +124,12 @@ spec:
           - name: ca-certificates
             mountPath: {{ include "cacert.path" . }}
             subPath: {{ .Values.tls.caCertFileName }}
+          {{- end }}
+          {{- if .Values.kubeconfig}}
+          - name: kubeconfig-volume
+            mountPath: /etc/kubernetes
+            subpath: kubeconfig
+            readOnly: true
           {{- end }}
         ports:
         - containerPort: {{ .Values.tfe.privateHttpPort }}
