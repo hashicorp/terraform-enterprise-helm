@@ -1,4 +1,4 @@
-{{- if .Values.openshift.enabled }}
+{{- if and .Values.openshift.enabled .Values.openshift.serviceServingCertificates }}
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
