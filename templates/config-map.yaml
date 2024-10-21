@@ -33,3 +33,14 @@ data:
 {{- if .Values.env.configFilePath }}
 {{ .Files.Get .Values.env.configFilePath | indent 2 }}
 {{- end }}
+
+{{- if .Values.openshift.serviceServingCertificates }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: terraform-enterprise-ca-certificates
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+{{- end}}

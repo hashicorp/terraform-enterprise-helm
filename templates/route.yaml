@@ -1,0 +1,20 @@
+{{- if .Values.openshift.enabled }}
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: terraform-enterprise
+  namespace: {{ .Release.Namespace }}
+spec:
+  host: {{ .Values.env.variables.TFE_HOSTNAME }}
+  to:
+    kind: Service
+    name: terraform-enterprise
+    weight: 100
+  port:
+    targetPort: https-port
+  tls:
+    termination: reencrypt
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+{{- end }}

@@ -59,6 +59,11 @@ spec:
           secret:
             secretName: terraform-enterprise-ca-certificates
         {{- end }}
+        {{- if .Values.openshift.serviceServingCertificates}}
+        - name: ca-certificates
+          configMap:
+            name: terraform-enterprise-ca-certificates
+        {{- end}}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -119,6 +124,11 @@ spec:
           - name: ca-certificates
             mountPath: {{ include "cacert.path" . }}
             subPath: {{ .Values.tls.caCertFileName }}
+          {{- end }}
+          {{- if .Values.openshift.serviceServingCertificates }}
+          - name: ca-certificates
+            mountPath:  {{ .Values.tls.caCertBaseDir }}/service-ca.crt
+            subPath: service-ca.crt
           {{- end }}
         ports:
         - containerPort: {{ .Values.tfe.privateHttpPort }}

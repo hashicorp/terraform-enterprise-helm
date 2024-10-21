@@ -200,6 +200,8 @@ agentWorkerPodTemplate: {}
 openshift:
   # If true, the Helm chart will create necessary configuration for running its components on OpenShift.
   enabled: false
+  # If true, the Helm chart will create necessary configuration for using service serving certificates from the OpenShift service.
+  serviceServingCertificates: false
 
 env:
   # configFilePath: env-config.yaml

@@ -8,10 +8,13 @@ kind: Service
 metadata:
   name: terraform-enterprise
   namespace: {{ .Release.Namespace }}
-  {{- with .Values.service.annotations }}
   annotations:
+    {{- with .Values.service.annotations }}
     {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- end }}
+    {{- if .Values.openshift.serviceServingCertificates }}
+      service.beta.openshift.io/serving-cert-secret-name: terraform-enterprise-certificates
+    {{- end }}
 spec:
   type: {{ .Values.service.type }}
   {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerIP }}
