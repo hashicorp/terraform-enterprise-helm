@@ -14,7 +14,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
     {{- if and .Values.openshift.enabled .Values.openshift.serviceServingCertificates }}
-      service.beta.openshift.io/serving-cert-secret-name: terraform-enterprise-certificates
+    service.beta.openshift.io/serving-cert-secret-name: terraform-enterprise-certificates
     {{- end }}
   {{- end }}
 spec:
