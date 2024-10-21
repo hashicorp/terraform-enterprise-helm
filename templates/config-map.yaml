@@ -34,7 +34,7 @@ data:
 {{ .Files.Get .Values.env.configFilePath | indent 2 }}
 {{- end }}
 
-{{- if .Values.openshift.serviceServingCertificates }}
+{{- if and .Values.openshift.enabled .Values.openshift.serviceServingCertificates }}
 ---
 apiVersion: v1
 kind: ConfigMap

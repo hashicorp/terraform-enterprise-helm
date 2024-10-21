@@ -59,7 +59,7 @@ spec:
           secret:
             secretName: terraform-enterprise-ca-certificates
         {{- end }}
-        {{- if .Values.openshift.serviceServingCertificates}}
+        {{- if and .Values.openshift.enabled .Values.openshift.serviceServingCertificates }}
         - name: ca-certificates
           configMap:
             name: terraform-enterprise-ca-certificates
@@ -125,7 +125,7 @@ spec:
             mountPath: {{ include "cacert.path" . }}
             subPath: {{ .Values.tls.caCertFileName }}
           {{- end }}
-          {{- if .Values.openshift.serviceServingCertificates }}
+          {{- if and .Values.openshift.enabled .Values.openshift.serviceServingCertificates }}
           - name: ca-certificates
             mountPath:  {{ .Values.tls.caCertBaseDir }}/service-ca.crt
             subPath: service-ca.crt
