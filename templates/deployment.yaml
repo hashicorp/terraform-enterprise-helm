@@ -64,7 +64,11 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.serviceAccount.enabled }}
+      {{- if .Values.serviceAccount.name}}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- else }}
       serviceAccountName: {{ .Release.Namespace }}
+      {{- end }}
       {{- end }}
       initContainers:
         {{ toYaml .Values.initContainers | nindent 8}}
