@@ -260,6 +260,10 @@ agents:
     annotations: {}
     labels: {}
   namespace:
+    # Whether to create a namespace for the agents.
     enabled: true
+    # The name of the agent namespace to create, or the name of the namespace to use if it
+    # already exists. Defaults to the release namespace with the suffix "-agents".
+    name: null
     annotations: {}
     labels: {}
