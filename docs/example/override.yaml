@@ -13,11 +13,9 @@ image:
  tag: <vYYYYMM-#>
 env:
   variables:
-    TFE_ENCRYPTION_PASSWORD: Terraform-Enterprise!
     TFE_HOSTNAME: "terraform-enterprise.terraform-enterprise.svc.cluster.local"
     TFE_DATABASE_HOST: "prereqs-postgresql.terraform-enterprise.svc.cluster.local"
     TFE_DATABASE_NAME: tfe
-    TFE_DATABASE_PASSWORD: Terraform-Enterprise!
     TFE_DATABASE_USER: postgres
     TFE_DATABASE_PARAMETERS: "sslmode=disable"
     TFE_OBJECT_STORAGE_TYPE: s3
@@ -27,3 +25,7 @@ env:
     TFE_OBJECT_STORAGE_S3_SECRET_ACCESS_KEY: "Terraform-Enterprise!"
     TFE_OBJECT_STORAGE_S3_REGION: us-east-2
     TFE_REDIS_HOST: "prereqs-redis-master.terraform-enterprise.svc.cluster.local:6379"
+  secrets:
+    TFE_LICENSE: <license file content>
+    TFE_DATABASE_PASSWORD: "Terraform-Enterprise!"
+    TFE_ENCRYPTION_PASSWORD: "Terraform-Enterprise!"
