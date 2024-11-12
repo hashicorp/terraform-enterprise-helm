@@ -113,3 +113,14 @@ It does not output anything if agentWorkerPodTemplate is empty and OpenShift is 
   {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+Obtains the agent namespace as configured
+*/}}
+{{- define "helpers.agent-namespace"}}
+{{- if .Values.agents.namespace.name }}
+{{- .Values.agents.namespace.name }}
+{{- else }}
+{{- .Release.Namespace }}-agents
+{{- end }}
+{{- end }}
