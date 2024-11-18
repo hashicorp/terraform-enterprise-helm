@@ -26,9 +26,8 @@ jobs:
         run: |
           curl -LO https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
           tar -xzf kubeconform-linux-amd64.tar.gz
-          sudo mv kubeconform /usr/local/bin/
 
       # Step 5: Render and validate Helm templates
       - name: Validate rendered Helm templates
         run: |
-          helm template . | kubeconform --strict
+          helm template . | ./kubeconform --strict
