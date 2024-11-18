@@ -107,9 +107,9 @@ spec:
         {{- end }}
         readinessProbe:
           httpGet:
-            path: {{ default "/_health_check" .values.tfe.readinessProbePath }}
+            path: {{ .Values.tfe.readinessProbePath | default "/_health_check" }}
             port: {{ .Values.tfe.privateHttpPort }}
-            scheme: {{ default "HTTP" .values.tfe.readinessProbeScheme }}
+            scheme: {{ .Values.tfe.readinessProbeScheme | default "HTTP"  }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
