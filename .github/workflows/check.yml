@@ -1,0 +1,27 @@
+name: Helm Chart CI
+
+on:
+  pull_request:
+
+jobs:
+  helm_chart_ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Helm
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+
+      # Step 3: Lint the Helm chart
+      - name: Lint Helm chart
+        run: |
+          helm lint .
+
+      # Step 4: Render and validate Helm templates
+      - name: Validate rendered Helm templates
+        run: |
+          helm template . | kubeconform --strict
