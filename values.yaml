@@ -184,11 +184,30 @@ ingress:
  # Injector service specific configurations
 service:
   annotations: {}
-    # cloud.google.com/neg: '{"ingress": true}'
-  type: LoadBalancer # ClusterIP
-  port: 443
-  nodePort: 32443 # if service.type is NodePort value will be set
-  loadBalancerIP: null # if the service.type is LoadBalancer, this can optionally be set
+    # Add annotations here for specific cloud provider configurations.
+    # Examples:
+    # - For Google Cloud, use the NEG (Network Endpoint Group) annotation:
+    #   cloud.google.com/neg: '{"ingress": true}'
+    # - For Azure, configure the health probe request path for HTTPS health checks:
+    #   service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/_health_check"
+
+  type: LoadBalancer # The type of service to create. Options: LoadBalancer, ClusterIP, NodePort.
+                     # - LoadBalancer: Exposes the service externally using a cloud provider's load balancer.
+                     # - ClusterIP: Default type; exposes the service only within the cluster.
+                     # - NodePort: Exposes the service on a static port on each cluster node.
+
+  port: 443          # The port exposed by the service (external port).
+
+  nodePort: 32443    # If service.type is NodePort, this sets the external port on cluster nodes.
+                     # Ignored for LoadBalancer and ClusterIP types.
+
+  appProtocol: tcp   # Application protocol for the service.
+                     # - Default is "tcp" for broad compatibility across cloud providers.
+                     # - Set to "https" if Gateway API or Layer 7 features are required.
+
+  loadBalancerIP: null # If service.type is LoadBalancer, you can optionally set a specific external IP.
+                       # Useful for static IP requirements or pre-existing IP reservations.
+
 
 # Custom pod template to define your own specifications for the creation of the agent worker pods.
 # This should be YAML representing a valid corev1.PodTemplateSpec. This format is documented
