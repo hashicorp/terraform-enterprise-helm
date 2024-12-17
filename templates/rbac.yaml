@@ -55,6 +55,10 @@ roleRef:
   name: {{ .Release.Namespace }}
 subjects:
 - kind: ServiceAccount
+  {{- if .Values.serviceAccount.name}}
+  name: {{ .Values.serviceAccount.name }}
+  {{- else }}
   name: {{ .Release.Namespace }}
+  {{- end }}
   namespace: {{ .Release.Namespace }}
 {{- end }}
