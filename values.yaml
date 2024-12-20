@@ -7,6 +7,10 @@
 
 replicaCount: 1
 
+# define the pdb minimal  replica count 
+pdb:
+  replicaCount: 1
+
 # Image pull secret to use for registry authentication.
 imagePullSecrets:
 - name: terraform-enterprise
