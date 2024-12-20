@@ -1,0 +1,9 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: terraform-enterprise
+spec:
+  minAvailable: {{ .Values.pdb.replicaCount }}
+  selector:
+    matchLabels:
+      app: terraform-enterprise
