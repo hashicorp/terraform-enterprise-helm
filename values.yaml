@@ -294,3 +294,13 @@ agents:
     name: null
     annotations: {}
     labels: {}
+
+# Extra volumes to add to the deployment.
+extraVolumes: []
+  # - name: extra-volume
+  #   emptyDir: {}
+
+# Extra volumes to add to the Terraform Enterprise container
+extraVolumeMounts: []
+  # - name: extra-volume
+  #   mountPath: /mnt/data
