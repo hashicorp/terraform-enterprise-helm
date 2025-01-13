@@ -295,12 +295,26 @@ agents:
     annotations: {}
     labels: {}
 
-# Extra volumes to add to the deployment.
+# Extra volumes to add to the deployment's pod. 
+# Reference: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#volumes
+# Usecases:
+## mount external secrets, such as certificates from cert-manager
+# extraVolumes:
+# - name: cert-manager-secret
+#   secret:
+#      secretName: tfe-example-com-tls
+#
+## associate a pre-existing PVC with /var/log/terraform-enterprise to have persistent logs
+# extraVolumes:
+# - name: logs
+#   persistentVolumeClaim:
+#      claimName: tfe-logs
 extraVolumes: []
   # - name: extra-volume
   #   emptyDir: {}
 
-# Extra volumes to add to the Terraform Enterprise container
+# Extra volume mounts to add to the Terraform Enterprise container. The name should match an "extraVolumes" entry
+# Reference: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#volumes-1
 extraVolumeMounts: []
   # - name: extra-volume
   #   mountPath: /mnt/data
