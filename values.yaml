@@ -190,6 +190,9 @@ service:
     #   cloud.google.com/neg: '{"ingress": true}'
     # - For Azure, configure the health probe request path for HTTPS health checks:
     #   service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/_health_check"
+  labels: {}
+    # Add labels to the service created for Terraform Enterprise. Helpful if your metrics collection
+    # depends on ServiceMonitors instead of pod annotations.
 
   type: LoadBalancer # The type of service to create. Options: LoadBalancer, ClusterIP, NodePort.
                      # - LoadBalancer: Exposes the service externally using a cloud provider's load balancer.
