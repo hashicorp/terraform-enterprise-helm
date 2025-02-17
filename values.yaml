@@ -321,3 +321,11 @@ extraVolumes: []
 extraVolumeMounts: []
   # - name: extra-volume
   #   mountPath: /mnt/data
+
+# Pod Disruption Budget settings
+# Reference: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+pdb:
+  # Whether to create a PodDisruptionBudget for the Terraform Enterprise deployment.
+  enabled: false
+  # The number of replicas that must be available during disruptions.
+  replicaCount: 1
