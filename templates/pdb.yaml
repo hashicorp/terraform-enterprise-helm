@@ -3,6 +3,15 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: terraform-enterprise
+  namespace: {{ .Release.Namespace }}
+  {{- with .Values.pdb.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.pdb.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   minAvailable: {{ .Values.pdb.replicaCount }}
   selector:

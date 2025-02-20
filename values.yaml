@@ -329,3 +329,5 @@ pdb:
   enabled: false
   # The number of replicas that must be available during disruptions.
   replicaCount: 1
+  annotations: {}
+  labels: {}
