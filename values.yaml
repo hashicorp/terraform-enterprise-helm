@@ -331,3 +331,23 @@ pdb:
   replicaCount: 1
   annotations: {}
   labels: {}
+
+# CSI driver settings for Vault provider
+csi:
+  enabled: false
+  annotations: {}
+  labels: {}
+  secretProviderClass: terraform-enterprise-secrets
+  vaultRole: terraform-enterprise-role
+  vaultAddress: http://vault.vault.svc.cluster.local
+  mountPath: /mnt/secrets-store
+  secrets:
+    - secretName: "kv/data/terraform-enterprise"
+      secretKey: test.crt"
+      objectName: "test.crt"
+  secretObjects:
+  - data:
+    - key: username
+      objectName: foo1
+    secretName: foosecret
+    type: Opaque

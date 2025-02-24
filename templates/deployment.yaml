@@ -59,6 +59,14 @@ spec:
           secret:
             secretName: terraform-enterprise-ca-certificates
         {{- end }}
+        {{- if .Values.csi.enabled }}
+        - name: terraform-enterprise-secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "{{ .Values.csi.secretProviderClass }}"
+        {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -126,6 +134,11 @@ spec:
           - name: ca-certificates
             mountPath: {{ include "cacert.path" . }}
             subPath: {{ .Values.tls.caCertFileName }}
+          {{- end }}
+          {{- if .Values.csi.enabled }}
+          - name: secrets-store
+            mountPath: {{ .Values.csi.mountPath }}
+            readOnly: true
           {{- end }}
           {{- with .Values.extraVolumeMounts }}
           {{- toYaml . | nindent 10 }}
