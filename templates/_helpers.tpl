@@ -67,22 +67,48 @@ Create the name of the service account to use
 
 {{/*
 Prints the key-value pair from the 'env.variables' entry in the Values file.
+Excludes any non-string values, as `valueFrom` is handled separately.
 */}}
-{{- define "helpers.list-env-variables"}}
+{{- define "helpers.list-configmap-env-variables"}}
 {{- range $key, $val := .Values.env.variables }}
+{{- if kindOf $val | eq "string" }}
 {{ $key }}: {{ $val | quote }}
+{{- end }}
 {{- end }}
 {{- end }}
 
 {{/*
 Prints the key-value pair from the 'env.secrets' entry in the Values file
-and base64 encodes the value.
+and base64 encodes the value. Excludes any non-string values, as `valueFrom`
+is handled separately.
 */}}
 {{- define "helpers.list-env-secrets" }}
 {{- range $key, $val := .Values.env.secrets }}
+{{- if kindOf $val | eq "string" }}
 {{ $key }}: {{ trim $val | b64enc }}
 {{- end }}
 {{- end }}
+{{- end }}
+
+{{/*
+Prints the key-value pairs from the 'env.variables' and 'env.secrets'
+entries containing `valueFrom` in the Values file.
+*/}}
+{{- define "helpers.list-valueFrom-variables"}}
+{{- range $key, $val := .Values.env.variables }}
+{{- if and (kindOf $val | eq "map") (hasKey $val "valueFrom") }}
+- name: {{ $key }}
+  {{- toYaml $val | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- range $key, $val := .Values.env.secrets }}
+{{- if and (kindOf $val | eq "map") (hasKey $val "valueFrom") }}
+- name: {{ $key }}
+  {{- toYaml $val | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 
 {{/*
 Prints the file contents of the environment secrets file
