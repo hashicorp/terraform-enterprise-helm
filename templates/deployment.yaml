@@ -60,7 +60,7 @@ spec:
             secretName: terraform-enterprise-ca-certificates
         {{- end }}
         {{- if .Values.csi.enabled }}
-        - name: terraform-enterprise-secrets-store
+        - name: secrets-store
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
@@ -137,7 +137,7 @@ spec:
           {{- end }}
           {{- if .Values.csi.enabled }}
           - name: secrets-store
-            mountPath: {{ .Values.csi.mountPath }}
+            mountPath: "{{ .Values.csi.mountPath }}"
             readOnly: true
           {{- end }}
           {{- with .Values.extraVolumeMounts }}
