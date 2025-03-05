@@ -334,7 +334,7 @@ pdb:
 
 # CSI driver settings for Vault provider
 csi:
-  enabled: true
+  enabled: false
   annotations: {}
   labels: {}
   secretProviderClass: terraform-enterprise-vault-secrets
