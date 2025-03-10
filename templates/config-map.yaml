@@ -8,7 +8,7 @@ metadata:
   name: terraform-enterprise-env-config
   namespace: {{ .Release.Namespace }}
 data:
-  {{- include "helpers.list-env-variables" . | indent 2 }}
+  {{- include "helpers.list-configmap-env-variables" . | indent 2 }}
   TFE_RUN_PIPELINE_DRIVER: kubernetes
   TFE_RUN_PIPELINE_KUBERNETES_NAMESPACE: {{ include "helpers.agent-namespace" . }}
   {{- if or .Values.agentWorkerPodTemplate .Values.openshift.enabled }}
