@@ -298,7 +298,7 @@ agents:
     annotations: {}
     labels: {}
 
-# Extra volumes to add to the deployment's pod. 
+# Extra volumes to add to the deployment's pod.
 # Reference: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#volumes
 # Usecases:
 ## mount external secrets, such as certificates from cert-manager
@@ -331,3 +331,31 @@ pdb:
   replicaCount: 1
   annotations: {}
   labels: {}
+
+# CSI driver settings for Vault provider
+csi:
+  enabled: false
+  annotations: {}
+  labels: {}
+  secretProviderClass: terraform-enterprise-vault-secrets
+  vaultRole: ""
+  vaultAddress: "" # Example: http://vault.vault-namespace.svc.cluster.local:8200
+  mountPath: "" # Example: /mnt/secrets-store
+  secrets:
+    # The path to the secret defined in Vault. Example: secret/data/db
+    - secretPath: ""
+      # The key of the secret defined in Vault.
+      secretKey: ""
+      # A name for the secret
+      objectName: ""
+  # If this is added, secrets will be synced to Kubernetes secrets.
+  secretObjects:
+  - data:
+    # secret key from secrets section
+    - key: ""
+      # Object name from secrets section
+      objectName: ""
+    # Name of the Kubernetes secret
+    secretName: ""
+    # Type of the Kubernetes secret. Example: Opaque
+    type: ""
