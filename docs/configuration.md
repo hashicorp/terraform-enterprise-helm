@@ -61,3 +61,14 @@ Terraform Enterprise now supports the inclusion of a custom pod template via `ag
 With this, you can define your own specifications for the creation of the agent worker pods.
 The custom pod template must be a valid `corev1.PodTemplateSpec` and should be provided in YAML format. The `PodTemplateSpec` is
 documented at <https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-template-v1/#PodTemplateSpec>.
+
+
+## Vault CSI Provider
+Terraform Enterprise now supports [Vault CSI provider](https://developer.hashicorp.com/vault/docs/platform/k8s/csi). This allows TFE pods to consume Vault secrets using CSI Secrets Store volumes.
+
+The settings for this can be found in the `values.yaml` file under the `csi` section.
+If `csi.enabled` is set to true, the Vault CSI provider will be used to retrieve secrets, as it is the only supported provider. This requires using an external Vault.
+
+The Secrets Store CSI Driver also supports syncing to Kubernetes secret objects. The `secretObjects` section adds secret syncing for TFE if values are provided.
+
+**Note:** The Vault CSI Provider requires the [CSI Secret Store Driver](https://secrets-store-csi-driver.sigs.k8s.io/getting-started/installation.html) to be installed.
