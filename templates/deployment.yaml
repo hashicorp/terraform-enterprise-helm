@@ -99,6 +99,10 @@ spec:
         {{- else }}
         {{- toYaml .Values.container.securityContext | nindent 10 }}
         {{- end }}
+        {{- with (include "helpers.list-valueFrom-variables" .) }}
+        env:
+          {{- . | indent 10 }}
+        {{- end }}
         envFrom:
           - configMapRef:
               name: terraform-enterprise-env-config

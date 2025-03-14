@@ -283,6 +283,14 @@ env:
     # TFE_VAULT_ROLE_ID: ""
     # TFE_IACT_SUBNETS: ""
     # TFE_IACT_TIME_LIMIT: ""
+  secretKeyRefs: {}
+    # - name: SECRET_ENV_VAR
+    #   secretName: my-secret
+    #   key: secret-key
+  configMapKeyRefs: {}
+    # - name: CONFIG_ENV_VAR
+    #   configMapName: my-configmap
+    #   key: config-key
 
 agents:
   rbac:
