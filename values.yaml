@@ -264,8 +264,6 @@ openshift:
   enabled: false
 
 env:
-  # configFilePath: env-config.yaml
-  # secretsFilePath: # env-secrets.yaml
   # configMapRefs:
   #   - name:
   # secretRefs:

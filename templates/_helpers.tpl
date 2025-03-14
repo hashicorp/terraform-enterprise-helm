@@ -85,20 +85,6 @@ and base64 encodes the value.
 {{- end }}
 
 {{/*
-Prints the file contents of the environment secrets file
-and base64 encodes the value from the key-value pair.
-*/}}
-{{- define "helpers.enc-b64-secrets-file" }}
-{{- range .Files.Lines .Values.env.secretsFilePath }}
-{{- $kv := splitList ":" . -}}
-{{- $k := first $kv -}}
-{{- if and ($k) (eq (hasPrefix "#" $k) false)  }}
-{{ $k }}: {{ trim (last $kv) | b64enc }}
-{{- end }}
-{{- end }}
-{{- end }}
-
-{{/*
 Define helper to conditionally add securityContext to agentWorkerPodTemplate.
 It does not output anything if agentWorkerPodTemplate is empty and OpenShift is not enabled.
 */}}

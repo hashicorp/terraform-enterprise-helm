@@ -34,6 +34,3 @@ data:
   TFE_METRICS_HTTP_PORT: "{{ .Values.tfe.metrics.httpPort }}"
   TFE_METRICS_HTTPS_PORT: "{{ .Values.tfe.metrics.httpsPort }}"
   {{- end }}
-{{- if .Values.env.configFilePath }}
-{{ .Files.Get .Values.env.configFilePath | indent 2 }}
-{{- end }}
