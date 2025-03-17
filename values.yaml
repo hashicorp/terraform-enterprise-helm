@@ -284,10 +284,12 @@ env:
     # TFE_IACT_SUBNETS: ""
     # TFE_IACT_TIME_LIMIT: ""
   secretKeyRefs: {}
+    # Name is the name of the environment variable.
     # - name: SECRET_ENV_VAR
     #   secretName: my-secret
     #   key: secret-key
   configMapKeyRefs: {}
+    # Name is the name of the environment variable.
     # - name: CONFIG_ENV_VAR
     #   configMapName: my-configmap
     #   key: config-key
