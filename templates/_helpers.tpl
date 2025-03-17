@@ -124,3 +124,24 @@ Obtains the agent namespace as configured
 {{- .Release.Namespace }}-agents
 {{- end }}
 {{- end }}
+
+{{/*
+Prints the key-value pairs from the 'env.secretKeyRefs' and 'env.configMapKeyRefs'
+entries as `valueFrom` environment variables in the Values file.
+*/}}
+{{- define "helpers.list-valueFrom-variables"}}
+{{- range $val := .Values.env.secretKeyRefs }}
+- name: {{ $val.name }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $val.secretName }}
+      key: {{ $val.key }}
+{{- end }}
+{{- range $val := .Values.env.configMapKeyRefs }}
+- name: {{ $val.name }}
+  valueFrom:
+    configMapKeyRef:
+      name: {{ $val.configMapName }}
+      key: {{ $val.key }}
+{{- end }}
+{{- end }}
