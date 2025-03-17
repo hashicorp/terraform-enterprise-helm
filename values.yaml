@@ -283,11 +283,13 @@ env:
     # TFE_VAULT_ROLE_ID: ""
     # TFE_IACT_SUBNETS: ""
     # TFE_IACT_TIME_LIMIT: ""
+  # secretKeyRefs can be used to inject external Kubernetes secrets into the environment.
   secretKeyRefs: {}
     # Name is the name of the environment variable.
     # - name: SECRET_ENV_VAR
     #   secretName: my-secret
     #   key: secret-key
+  # configMapKeyRefs can be used to inject external Kubernetes configmap entries into the environment.
   configMapKeyRefs: {}
     # Name is the name of the environment variable.
     # - name: CONFIG_ENV_VAR
