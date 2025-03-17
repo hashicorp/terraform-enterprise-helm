@@ -9,7 +9,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: {{ .Release.Namespace }}
-  namespace: {{ .Release.Namespace }}-agents
+  namespace: {{ include "helpers.agent-namespace" . }}
   {{- with .Values.agents.rbac.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -39,8 +39,8 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ .Release.Namespace }}-agents
-  namespace: {{ .Release.Namespace }}-agents
+  name: {{ include "helpers.agent-namespace" . }}
+  namespace: {{ include "helpers.agent-namespace" . }}
   {{- with .Values.agents.rbac.labels }}
   labels:
     {{- toYaml . | nindent 4 }}
@@ -55,6 +55,10 @@ roleRef:
   name: {{ .Release.Namespace }}
 subjects:
 - kind: ServiceAccount
+  {{- if .Values.serviceAccount.name}}
+  name: {{ .Values.serviceAccount.name }}
+  {{- else }}
   name: {{ .Release.Namespace }}
+  {{- end }}
   namespace: {{ .Release.Namespace }}
 {{- end }}

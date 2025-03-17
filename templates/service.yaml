@@ -17,6 +17,10 @@ metadata:
     service.beta.openshift.io/serving-cert-secret-name: terraform-enterprise-certificates
     {{- end }}
   {{- end }}
+  {{- with .Values.service.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.service.type }}
   {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerIP }}
@@ -29,6 +33,6 @@ spec:
       nodePort: {{ .Values.service.nodePort }}
       {{- end }}
       targetPort: {{ .Values.tfe.privateHttpsPort }}
-      appProtocol: https
+      appProtocol: {{ .Values.service.appProtocol }}
   selector:
     app: terraform-enterprise

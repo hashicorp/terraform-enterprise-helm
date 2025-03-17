@@ -113,3 +113,35 @@ It does not output anything if agentWorkerPodTemplate is empty and OpenShift is 
   {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+Obtains the agent namespace as configured
+*/}}
+{{- define "helpers.agent-namespace"}}
+{{- if .Values.agents.namespace.name }}
+{{- .Values.agents.namespace.name }}
+{{- else }}
+{{- .Release.Namespace }}-agents
+{{- end }}
+{{- end }}
+
+{{/*
+Prints the key-value pairs from the 'env.secretKeyRefs' and 'env.configMapKeyRefs'
+entries as `valueFrom` environment variables in the Values file.
+*/}}
+{{- define "helpers.list-valueFrom-variables"}}
+{{- range $val := .Values.env.secretKeyRefs }}
+- name: {{ $val.name }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $val.secretName }}
+      key: {{ $val.key }}
+{{- end }}
+{{- range $val := .Values.env.configMapKeyRefs }}
+- name: {{ $val.name }}
+  valueFrom:
+    configMapKeyRef:
+      name: {{ $val.configMapName }}
+      key: {{ $val.key }}
+{{- end }}
+{{- end }}

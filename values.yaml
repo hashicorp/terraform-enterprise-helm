@@ -72,6 +72,9 @@ tfe:
     httpsPort: 9091
   privateHttpPort: 8080
   privateHttpsPort: 8443
+  ## Readiness probe settings customize the terraform-enterprise health check path, eg: to use the full service dependency check
+  # readinessProbePath: "/_health_check?full"
+  # readinessProbeScheme: "HTTP"
 
 # nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
 nodeSelector: {}
@@ -181,11 +184,33 @@ ingress:
  # Injector service specific configurations
 service:
   annotations: {}
-    # cloud.google.com/neg: '{"ingress": true}'
-  type: LoadBalancer # ClusterIP
-  port: 443
-  nodePort: 32443 # if service.type is NodePort value will be set
-  loadBalancerIP: null # if the service.type is LoadBalancer, this can optionally be set
+    # Add annotations here for specific cloud provider configurations.
+    # Examples:
+    # - For Google Cloud, use the NEG (Network Endpoint Group) annotation:
+    #   cloud.google.com/neg: '{"ingress": true}'
+    # - For Azure, configure the health probe request path for HTTPS health checks:
+    #   service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/_health_check"
+  labels: {}
+    # Add labels to the service created for Terraform Enterprise. Helpful if your metrics collection
+    # depends on ServiceMonitors instead of pod annotations.
+
+  type: LoadBalancer # The type of service to create. Options: LoadBalancer, ClusterIP, NodePort.
+                     # - LoadBalancer: Exposes the service externally using a cloud provider's load balancer.
+                     # - ClusterIP: Default type; exposes the service only within the cluster.
+                     # - NodePort: Exposes the service on a static port on each cluster node.
+
+  port: 443          # The port exposed by the service (external port).
+
+  nodePort: 32443    # If service.type is NodePort, this sets the external port on cluster nodes.
+                     # Ignored for LoadBalancer and ClusterIP types.
+
+  appProtocol: tcp   # Application protocol for the service.
+                     # - Default is "tcp" for broad compatibility across cloud providers.
+                     # - Set to "https" if Gateway API or Layer 7 features are required.
+
+  loadBalancerIP: null # If service.type is LoadBalancer, you can optionally set a specific external IP.
+                       # Useful for static IP requirements or pre-existing IP reservations.
+
 
 # Custom pod template to define your own specifications for the creation of the agent worker pods.
 # This should be YAML representing a valid corev1.PodTemplateSpec. This format is documented
@@ -219,6 +244,7 @@ env:
     # TFE_OBJECT_STORAGE_S3_SECRET_ACCESS_KEY: ""
     # TFE_VAULT_SECRET_ID: ""
     # TFE_REDIS_PASSWORD: ""
+    # TFE_REDIS_SIDEKIQ_PASSWORD: ""
     # TFE_LICENSE: ""
   variables: {}
     # TFE_HOSTNAME: ""
@@ -249,6 +275,10 @@ env:
     # TFE_REDIS_USER: ""
     # TFE_REDIS_HOST: ""
     # TFE_REDIS_USE_AUTH: ""
+    # TFE_REDIS_SIDEKIQ_USE_TLS: ""
+    # TFE_REDIS_SIDEKIQ_USER: ""
+    # TFE_REDIS_SIDEKIQ_HOST: ""
+    # TFE_REDIS_SIDEKIQ_USE_AUTH: ""
     # TFE_TLS_CIPHERS: ""
     # TFE_VAULT_ADDRESS: ""
     # TFE_VAULT_NAMESPACE: ""
@@ -256,6 +286,18 @@ env:
     # TFE_VAULT_ROLE_ID: ""
     # TFE_IACT_SUBNETS: ""
     # TFE_IACT_TIME_LIMIT: ""
+  # secretKeyRefs can be used to inject external Kubernetes secrets into the environment.
+  secretKeyRefs: {}
+    # Name is the name of the environment variable.
+    # - name: SECRET_ENV_VAR
+    #   secretName: my-secret
+    #   key: secret-key
+  # configMapKeyRefs can be used to inject external Kubernetes configmap entries into the environment.
+  configMapKeyRefs: {}
+    # Name is the name of the environment variable.
+    # - name: CONFIG_ENV_VAR
+    #   configMapName: my-configmap
+    #   key: config-key
 
 agents:
   rbac:
@@ -263,6 +305,72 @@ agents:
     annotations: {}
     labels: {}
   namespace:
+    # Whether to create a namespace for the agents.
     enabled: true
+    # The name of the agent namespace to create, or the name of the namespace to use if it
+    # already exists. Defaults to the release namespace with the suffix "-agents".
+    name: null
     annotations: {}
     labels: {}
+
+# Extra volumes to add to the deployment's pod.
+# Reference: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#volumes
+# Usecases:
+## mount external secrets, such as certificates from cert-manager
+# extraVolumes:
+# - name: cert-manager-secret
+#   secret:
+#      secretName: tfe-example-com-tls
+#
+## associate a pre-existing PVC with /var/log/terraform-enterprise to have persistent logs
+# extraVolumes:
+# - name: logs
+#   persistentVolumeClaim:
+#      claimName: tfe-logs
+extraVolumes: []
+  # - name: extra-volume
+  #   emptyDir: {}
+
+# Extra volume mounts to add to the Terraform Enterprise container. The name should match an "extraVolumes" entry
+# Reference: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#volumes-1
+extraVolumeMounts: []
+  # - name: extra-volume
+  #   mountPath: /mnt/data
+
+# Pod Disruption Budget settings
+# Reference: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+pdb:
+  # Whether to create a PodDisruptionBudget for the Terraform Enterprise deployment.
+  enabled: false
+  # The number of replicas that must be available during disruptions.
+  replicaCount: 1
+  annotations: {}
+  labels: {}
+
+# CSI driver settings for Vault provider
+csi:
+  enabled: false
+  annotations: {}
+  labels: {}
+  secretProviderClass: terraform-enterprise-vault-secrets
+  vaultRole: ""
+  vaultAddress: "" # Example: http://vault.vault-namespace.svc.cluster.local:8200
+  mountPath: "" # Example: /mnt/secrets-store
+  secrets:
+    # The path to the secret defined in Vault. Example: secret/data/db
+    - secretPath: ""
+      # The key of the secret defined in Vault.
+      secretKey: ""
+      # A name for the secret
+      objectName: ""
+  # If this is added, secrets will be synced to Kubernetes secrets.
+  secretObjects:
+  - data:
+    # secret key from secrets section
+    - key: ""
+      # Object name from secrets section
+      objectName: ""
+    # Name of the Kubernetes secret
+    secretName: ""
+    # Type of the Kubernetes secret. Example: Opaque
+    type: ""

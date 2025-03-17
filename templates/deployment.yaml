@@ -64,12 +64,27 @@ spec:
           configMap:
             name: terraform-enterprise-ca-certificates
         {{- end}}
+        {{- if .Values.csi.enabled }}
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "{{ .Values.csi.secretProviderClass }}"
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.serviceAccount.enabled }}
+      {{- if .Values.serviceAccount.name}}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- else }}
       serviceAccountName: {{ .Release.Namespace }}
+      {{- end }}
       {{- end }}
       initContainers:
         {{ toYaml .Values.initContainers | nindent 8}}
@@ -88,6 +103,10 @@ spec:
           runAsNonRoot: true
         {{- else }}
         {{- toYaml .Values.container.securityContext | nindent 10 }}
+        {{- end }}
+        {{- with (include "helpers.list-valueFrom-variables" .) }}
+        env:
+          {{- . | indent 10 }}
         {{- end }}
         envFrom:
           - configMapRef:
@@ -108,9 +127,9 @@ spec:
         {{- end }}
         readinessProbe:
           httpGet:
-            path: /_health_check
+            path: {{ .Values.tfe.readinessProbePath | default "/_health_check" }}
             port: {{ .Values.tfe.privateHttpPort }}
-            scheme: HTTP
+            scheme: {{ .Values.tfe.readinessProbeScheme | default "HTTP"  }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
@@ -129,6 +148,13 @@ spec:
           - name: ca-certificates
             mountPath:  {{ .Values.tls.caCertBaseDir }}/service-ca.crt
             subPath: service-ca.crt
+          {{- if .Values.csi.enabled }}
+          - name: secrets-store
+            mountPath: "{{ .Values.csi.mountPath }}"
+            readOnly: true
+          {{- end }}
+          {{- with .Values.extraVolumeMounts }}
+          {{- toYaml . | nindent 10 }}
           {{- end }}
         ports:
         - containerPort: {{ .Values.tfe.privateHttpPort }}
