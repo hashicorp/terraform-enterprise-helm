@@ -1,4 +1,4 @@
-# Terraform Enterprise
+# Terraform Enterprise forked to my repo
 
 This chart is used to install Terraform Enterprise in a generic Kubernetes environment. It is minimal in its configuration and contains the basic things necessary to launch Terraform Enterprise on a Kubernetes cluster.
 
