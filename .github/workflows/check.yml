@@ -31,3 +31,4 @@ jobs:
       - name: Validate rendered Helm templates
         run: |
           helm template . | ./kubeconform --strict
+
