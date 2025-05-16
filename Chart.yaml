@@ -7,4 +7,4 @@ kubeVersion: ">=1.21.0-0"
 description: Official HashiCorp Terraform-Enterprise Chart
 type: application
 version: 1.6.1
-appVersion: "v202504-1"
+appVersion: "v202505-1"
