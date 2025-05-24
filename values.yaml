@@ -65,6 +65,15 @@ tls:
   # keyData:
   # caCertData:
 
+
+tlsSecondary:
+  certificateSecret: terraform-enterprise-certificates-secondary
+  certMountPath: /etc/ssl/private/terraform-enterprise-secondary/cert.pem
+  keyMountPath: /etc/ssl/private/terraform-enterprise-secondary/key.pem
+  # certData:
+  # keyData:
+  # caCertData:  
+
 tfe:
   metrics:
     enable: false
