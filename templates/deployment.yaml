@@ -54,6 +54,11 @@ spec:
         - name: certificates
           secret:
             secretName: {{ .Values.tls.certificateSecret }}
+        {{- if and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData }}
+        - name: certificates-secondary
+          secret:
+            secretName: {{ .Values.tlsSecondary.certificateSecret }}  
+        {{- end }}
         {{- if .Values.tls.caCertData }}
         - name: ca-certificates
           secret:
@@ -128,6 +133,14 @@ spec:
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
+          {{- if and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData }}
+          - name: certificates-secondary
+            mountPath: {{ .Values.tlsSecondary.certMountPath }}
+            subPath: tls.crt
+          - name: certificates-secondary
+            mountPath: {{ .Values.tlsSecondary.keyMountPath }}
+            subPath: tls.key        
+          {{- end }}  
           - name: certificates
             mountPath: {{ .Values.tls.certMountPath }}
             subPath: tls.crt

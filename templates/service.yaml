@@ -31,3 +31,34 @@ spec:
       appProtocol: {{ .Values.service.appProtocol }}
   selector:
     app: terraform-enterprise
+---
+{{- if .Values.env.variables.TFE_HOSTNAME_SECONDARY }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: terraform-enterprise-secondary
+  namespace: {{ .Release.Namespace }}
+  {{- with .Values.serviceSecondary.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.serviceSecondary.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.serviceSecondary.type }}
+  {{- if and (eq .Values.serviceSecondary.type "LoadBalancer") .Values.serviceSecondary.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.serviceSecondary.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: https-port
+      port: {{ .Values.serviceSecondary.port }}
+      {{- if eq .Values.serviceSecondary.type "NodePort" }}
+      nodePort: {{ .Values.serviceSecondary.nodePort }}
+      {{- end }}
+      targetPort: {{ .Values.tfe.privateHttpsPort }}
+      appProtocol: {{ .Values.serviceSecondary.appProtocol }}
+  selector:
+    app: terraform-enterprise    
+{{- end}}
