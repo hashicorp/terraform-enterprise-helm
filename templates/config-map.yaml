@@ -20,8 +20,10 @@ data:
   TFE_VAULT_DISABLE_MLOCK: "true"
   TFE_HTTP_PORT: "{{ .Values.tfe.privateHttpPort }}"
   TFE_HTTPS_PORT: "{{ .Values.tfe.privateHttpsPort }}"
+  {{- if and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData }}
   TFE_TLS_CERT_FILE_SECONDARY: "{{ .Values.tlsSecondary.certMountPath }}"
   TFE_TLS_KEY_FILE_SECONDARY:  "{{ .Values.tlsSecondary.keyMountPath }}"
+  {{- end }}
   TFE_TLS_CERT_FILE: "{{ .Values.tls.certMountPath }}"
   TFE_TLS_KEY_FILE:  "{{ .Values.tls.keyMountPath }}"
   {{- if .Values.tls.caCertData }}
