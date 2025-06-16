@@ -54,10 +54,10 @@ spec:
         - name: certificates
           secret:
             secretName: {{ .Values.tls.certificateSecret }}
-        {{- if and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData }}
+        {{- if or (and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData) .Values.tlsSecondary.certificateSecret }}
         - name: certificates-secondary
           secret:
-            secretName: {{ .Values.tlsSecondary.certificateSecret }}  
+            secretName: {{ .Values.tlsSecondary.certificateSecret | default "terraform-enterprise-certificates-secondary" }}  
         {{- end }}
         {{- if .Values.tls.caCertData }}
         - name: ca-certificates
@@ -133,7 +133,7 @@ spec:
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
-          {{- if and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData }}
+          {{- if or (and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData) .Values.tlsSecondary.certificateSecret }}
           - name: certificates-secondary
             mountPath: {{ .Values.tlsSecondary.certMountPath }}
             subPath: tls.crt
