@@ -65,6 +65,14 @@ tls:
   # keyData:
   # caCertData:
 
+
+tlsSecondary:
+  # certificateSecret: terraform-enterprise-certificates-secondary
+  certMountPath: /etc/ssl/private/terraform-enterprise-secondary/cert.pem
+  keyMountPath: /etc/ssl/private/terraform-enterprise-secondary/key.pem
+  # certData:
+  # keyData:
+
 tfe:
   metrics:
     enable: false
@@ -195,6 +203,35 @@ service:
     # depends on ServiceMonitors instead of pod annotations.
 
   type: LoadBalancer # The type of service to create. Options: LoadBalancer, ClusterIP, NodePort.
+                     # - LoadBalancer: Exposes the service externally using a cloud provider's load balancer.
+                     # - ClusterIP: Default type; exposes the service only within the cluster.
+                     # - NodePort: Exposes the service on a static port on each cluster node.
+
+  port: 443          # The port exposed by the service (external port).
+
+  nodePort: 32443    # If service.type is NodePort, this sets the external port on cluster nodes.
+                     # Ignored for LoadBalancer and ClusterIP types.
+
+  appProtocol: tcp   # Application protocol for the service.
+                     # - Default is "tcp" for broad compatibility across cloud providers.
+                     # - Set to "https" if Gateway API or Layer 7 features are required.
+
+  loadBalancerIP: null # If service.type is LoadBalancer, you can optionally set a specific external IP.
+                       # Useful for static IP requirements or pre-existing IP reservations.
+
+serviceSecondary:
+  annotations: {}
+    # Add annotations here for specific cloud provider configurations.
+    # Examples:
+    # - For Google Cloud, use the NEG (Network Endpoint Group) annotation:
+    #   cloud.google.com/neg: '{"ingress": true}'
+    # - For Azure, configure the health probe request path for HTTPS health checks:
+    #   service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/_health_check"
+  labels: {}
+    # Add labels to the service created for Terraform Enterprise. Helpful if your metrics collection
+    # depends on ServiceMonitors instead of pod annotations.
+
+  type: ClusterIP    # The type of service to create. Options: LoadBalancer, ClusterIP, NodePort.
                      # - LoadBalancer: Exposes the service externally using a cloud provider's load balancer.
                      # - ClusterIP: Default type; exposes the service only within the cluster.
                      # - NodePort: Exposes the service on a static port on each cluster node.
