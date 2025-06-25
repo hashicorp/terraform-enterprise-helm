@@ -8,9 +8,14 @@ kind: Service
 metadata:
   name: terraform-enterprise
   namespace: {{ .Release.Namespace }}
-  {{- with .Values.service.annotations }}
+  {{- if or .Values.service.annotations (and .Values.openshift.enabled .Values.openshift.serviceServingCertificates) }}
   annotations:
+    {{- with .Values.service.annotations }}
     {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if and .Values.openshift.enabled .Values.openshift.serviceServingCertificates }}
+    service.beta.openshift.io/serving-cert-secret-name: terraform-enterprise-certificates
+    {{- end }}
   {{- end }}
   {{- with .Values.service.labels }}
   labels:
