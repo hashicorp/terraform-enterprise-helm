@@ -44,8 +44,8 @@ container:
 # If you do want to specify resource limits, uncomment the following lines and adjust them as necessary.
 resources:
   requests:
-    memory: "2500Mi"
-    cpu: "750m"
+    memory: "8192Mi"
+    cpu: "4000m"
   # limits:
   #   memory: ""
   #   cpu: ""
