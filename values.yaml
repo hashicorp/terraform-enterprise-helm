@@ -80,6 +80,7 @@ tfe:
     httpsPort: 9091
   privateHttpPort: 8080
   privateHttpsPort: 8443
+  # Specifies the port that the system API endpoints listen on for HTTPS requests.
   adminHttpsPort: 8446
   ## Readiness probe settings customize the terraform-enterprise health check path, eg: to use the full service dependency check
   # readinessProbePath: "/_health_check?full"
