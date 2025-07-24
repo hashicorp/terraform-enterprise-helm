@@ -214,6 +214,9 @@ service:
   nodePort: 32443    # If service.type is NodePort, this sets the external port on cluster nodes.
                      # Ignored for LoadBalancer and ClusterIP types.
 
+  adminNodePort: 32446 # If service.type is NodePort, this sets the external port on cluster nodes for the admin HTTPS port.
+                       # Ignored for LoadBalancer and ClusterIP types.
+
   appProtocol: tcp   # Application protocol for the service.
                      # - Default is "tcp" for broad compatibility across cloud providers.
                      # - Set to "https" if Gateway API or Layer 7 features are required.
@@ -242,6 +245,9 @@ serviceSecondary:
 
   nodePort: 32443    # If service.type is NodePort, this sets the external port on cluster nodes.
                      # Ignored for LoadBalancer and ClusterIP types.
+
+  adminNodePort: 32447 # If service.type is NodePort, this sets the external port on cluster nodes for the admin HTTPS port.
+                       # Ignored for LoadBalancer and ClusterIP types.
 
   appProtocol: tcp   # Application protocol for the service.
                      # - Default is "tcp" for broad compatibility across cloud providers.
