@@ -29,6 +29,13 @@ spec:
       {{- end }}
       targetPort: {{ .Values.tfe.privateHttpsPort }}
       appProtocol: {{ .Values.service.appProtocol }}
+    - name: admin-https-port
+      port: {{ .Values.tfe.adminHttpsPort }}
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.adminNodePort }}
+      {{- end }}
+      targetPort: {{ .Values.tfe.adminHttpsPort }}
+      appProtocol: {{ .Values.service.appProtocol }}
   selector:
     app: terraform-enterprise
 ---
@@ -58,6 +65,13 @@ spec:
       nodePort: {{ .Values.serviceSecondary.nodePort }}
       {{- end }}
       targetPort: {{ .Values.tfe.privateHttpsPort }}
+      appProtocol: {{ .Values.serviceSecondary.appProtocol }}
+    - name: admin-https-port
+      port: {{ .Values.tfe.adminHttpsPort }}
+      {{- if eq .Values.serviceSecondary.type "NodePort" }}
+      nodePort: {{ .Values.serviceSecondary.adminNodePort }}
+      {{- end }}
+      targetPort: {{ .Values.tfe.adminHttpsPort }}
       appProtocol: {{ .Values.serviceSecondary.appProtocol }}
   selector:
     app: terraform-enterprise    
