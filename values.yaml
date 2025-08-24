@@ -266,11 +266,6 @@ agentWorkerPodTemplate: {}
   #   containers: []
   #   nodeSelector: {}
 
-# Configuration for running this Helm chart on Red Hat OpenShift platform.
-openshift:
-  # If true, the Helm chart will create necessary configuration for running its components on OpenShift.
-  enabled: false
-
 env:
   # configMapRefs:
   #   - name:
