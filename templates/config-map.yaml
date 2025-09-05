@@ -11,7 +11,7 @@ data:
   {{- include "helpers.list-env-variables" . | indent 2 }}
   TFE_RUN_PIPELINE_DRIVER: kubernetes
   TFE_RUN_PIPELINE_KUBERNETES_NAMESPACE: {{ include "helpers.agent-namespace" . }}
-  {{- if .Values.agentWorkerPodTemplate }}
+  {{- if or .Values.agentWorkerPodTemplate .Values.openshift.enabled }}
   TFE_RUN_PIPELINE_KUBERNETES_POD_TEMPLATE: {{ include "k8s.addSecurityContext" . }}
   {{- end }}
   TFE_VAULT_DISABLE_MLOCK: "true"

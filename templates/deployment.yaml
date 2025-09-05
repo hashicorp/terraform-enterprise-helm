@@ -93,7 +93,17 @@ spec:
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         securityContext:
+        {{- if and .Values.openshift.enabled (not .Values.container.securityContext) }}
+          seccompProfile:
+            type: RuntimeDefault
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+        {{- else }}
         {{- toYaml .Values.container.securityContext | nindent 10 }}
+        {{- end }}
         {{- with (include "helpers.list-valueFrom-variables" .) }}
         env:
           {{- . | indent 10 }}
