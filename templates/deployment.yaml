@@ -64,6 +64,11 @@ spec:
           secret:
             secretName: terraform-enterprise-ca-certificates
         {{- end }}
+        {{- if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}
+        - name: certificates-redis
+          secret:
+            secretName: {{ .Values.tlsRedis.certificateSecret | default "terraform-enterprise-certificates-redis" }}
+        {{- end }}
         {{- if .Values.csi.enabled }}
         - name: secrets-store
           csi:
@@ -151,6 +156,17 @@ spec:
           - name: ca-certificates
             mountPath: {{ include "cacert.path" . }}
             subPath: {{ .Values.tls.caCertFileName }}
+          {{- end }}
+          {{- if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}
+          - name: certificates-redis
+            mountPath: {{ .Values.tlsRedis.certMountPath }}
+            subPath: tls.crt
+          - name: certificates-redis
+            mountPath: {{ .Values.tlsRedis.keyMountPath }}
+            subPath: tls.key
+          - name: certificates-redis
+            mountPath: {{ .Values.tlsRedis.caCertMountPath }}
+            subPath: tls.ca
           {{- end }}
           {{- if .Values.csi.enabled }}
           - name: secrets-store

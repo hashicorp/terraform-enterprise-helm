@@ -65,13 +65,21 @@ tls:
   # keyData:
   # caCertData:
 
-
 tlsSecondary:
   # certificateSecret: terraform-enterprise-certificates-secondary
   certMountPath: /etc/ssl/private/terraform-enterprise-secondary/cert.pem
   keyMountPath: /etc/ssl/private/terraform-enterprise-secondary/key.pem
   # certData:
   # keyData:
+
+tlsRedis:
+  # certificateSecret: terraform-enterprise-certificates-redis
+  certMountPath: /etc/ssl/private/terraform-enterprise-redis/cert.pem
+  keyMountPath: /etc/ssl/private/terraform-enterprise-redis/key.pem
+  caCertMountPath: /etc/ssl/private/terraform-enterprise-redis/ca.pem
+  # certData:
+  # keyData:
+  # caCertData:
 
 tfe:
   metrics:
@@ -311,6 +319,7 @@ env:
     # TFE_OBJECT_STORAGE_S3_SERVER_SIDE_ENCRYPTION: ""
     # TFE_OBJECT_STORAGE_S3_SERVER_SIDE_ENCRYPTION_KMS_KEY_ID: ""
     # TFE_OBJECT_STORAGE_S3_USE_INSTANCE_PROFILE: ""
+    # TFE_REDIS_USE_MTLS: ""
     # TFE_REDIS_USE_TLS: ""
     # TFE_REDIS_USER: ""
     # TFE_REDIS_HOST: ""
