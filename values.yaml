@@ -81,6 +81,15 @@ tlsRedis:
   # keyData:
   # caCertData:
 
+tlsRedisSidekiq:
+  # certificateSecret: terraform-enterprise-certificates-redis-sidekiq
+  certMountPath: /etc/ssl/private/terraform-enterprise-redis-sidekiq/cert.pem
+  keyMountPath: /etc/ssl/private/terraform-enterprise-redis-sidekiq/key.pem
+  caCertMountPath: /etc/ssl/private/terraform-enterprise-redis-sidekiq/ca.pem
+  # certData:
+  # keyData:
+  # caCertData:
+
 tfe:
   metrics:
     enable: false

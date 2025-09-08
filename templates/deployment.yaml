@@ -69,6 +69,11 @@ spec:
           secret:
             secretName: {{ .Values.tlsRedis.certificateSecret | default "terraform-enterprise-certificates-redis" }}
         {{- end }}
+        {{- if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}
+        - name: certificates-redis-sidekiq
+          secret:
+            secretName: {{ .Values.tlsRedisSidekiq.certificateSecret | default "terraform-enterprise-certificates-redis-sidekiq" }}
+        {{- end }}
         {{- if .Values.csi.enabled }}
         - name: secrets-store
           csi:
@@ -166,6 +171,17 @@ spec:
             subPath: tls.key
           - name: certificates-redis
             mountPath: {{ .Values.tlsRedis.caCertMountPath }}
+            subPath: tls.ca
+          {{- end }}
+          {{- if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}
+          - name: certificates-redis-sidekiq
+            mountPath: {{ .Values.tlsRedisSidekiq.certMountPath }}
+            subPath: tls.crt
+          - name: certificates-redis-sidekiq
+            mountPath: {{ .Values.tlsRedisSidekiq.keyMountPath }}
+            subPath: tls.key
+          - name: certificates-redis-sidekiq
+            mountPath: {{ .Values.tlsRedisSidekiq.caCertMountPath }}
             subPath: tls.ca
           {{- end }}
           {{- if .Values.csi.enabled }}
