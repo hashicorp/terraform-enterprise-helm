@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: terraform-enterprise
+  name: terraform-enterprise-mtls
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -10,7 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:hashicorp/terraform-enterprise-helm.git
+    repoURL: https://github.com/hashicorp/terraform-enterprise-helm
     targetRevision: test
     path: .
     helm:
