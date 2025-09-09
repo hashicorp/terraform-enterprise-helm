@@ -44,8 +44,6 @@ spec:
           value: "true"
         - name: env.variables.TFE_REDIS_USE_MTLS
           value: "true"
-        - name: env.secrets.TFE_REDIS_PASSWORD
-          value: ""
         
         # Redis TLS Configuration (using your new Redis TLS support)
         - name: tlsRedis.certData
