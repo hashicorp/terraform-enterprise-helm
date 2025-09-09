@@ -1,0 +1,131 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: terraform-enterprise
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:hashicorp/terraform-enterprise-helm.git
+    targetRevision: test
+    path: .
+    helm:
+      parameters:
+        # Core TFE Configuration
+        - name: env.variables.TFE_OPERATIONAL_MODE
+          value: "active-active"
+        - name: env.variables.TFE_HOSTNAME
+          value: "live-bunny.ptfe-dev.aws.ptfedev.com"
+        - name: env.variables.TFE_IACT_TIME_LIMIT
+          value: "60"
+        - name: env.variables.TFE_IACT_SUBNETS
+          value: "0.0.0.0/0"
+        - name: env.secrets.TFE_ENCRYPTION_PASSWORD
+          value: "SUPERDUPERSECRET"
+        
+        # Database Configuration
+        - name: env.variables.TFE_DATABASE_HOST
+          value: "arriving-goshawk-tfe20250909152256036400000002.cptm0imr5bns.us-west-2.rds.amazonaws.com:5432"
+        - name: env.variables.TFE_DATABASE_NAME
+          value: "blah"
+        - name: env.variables.TFE_DATABASE_USER
+          value: "blah"
+        - name: env.secrets.TFE_DATABASE_PASSWORD
+          value: "blah"
+        
+        # Redis Configuration
+        - name: env.variables.TFE_REDIS_HOST
+          value: "master.arriving-goshawk-tfe.lpinhy.usw2.cache.amazonaws.com:6379"
+        - name: env.variables.TFE_REDIS_USE_AUTH
+          value: "true"
+        - name: env.variables.TFE_REDIS_USE_MTLS
+          value: "true"
+        - name: env.secrets.TFE_REDIS_PASSWORD
+          value: ""
+        
+        # Redis TLS Configuration (using your new Redis TLS support)
+        - name: tlsRedis.certData
+          value: "blah"
+        - name: tlsRedis.keyData
+          value: "blah"
+        - name: tlsRedis.caCertData
+          value: "blah"
+        
+       # Redis TLS Configuration (using your new Redis TLS support)
+        - name: tlsRedisSidekiq.certData
+          value: "blah"
+        - name: tlsRedisSidekiq.keyData
+          value: "blah"
+        - name: tlsRedisSidekiq.caCertData
+          value: "blah"
+        
+        # S3 Configuration
+        - name: env.variables.TFE_OBJECT_STORAGE_S3_BUCKET
+          value: "arriving-goshawk-tfe-data"
+        - name: env.variables.TFE_OBJECT_STORAGE_S3_REGION
+          value: "us-west-2"
+        - name: env.variables.TFE_OBJECT_STORAGE_TYPE
+          value: "s3"
+        - name: env.variables.TFE_OBJECT_STORAGE_S3_USE_INSTANCE_PROFILE
+          value: "true"
+        # TLS Configuration
+        - name: env.TFE_TLS_VERSION
+          value: "tls_1_2_tls_1_3"
+        - name: tls.certData
+          value: "blah"
+        - name: tls.keyData
+          value: "blah"
+        # License Configuration
+        - name: env.secrets.TFE_LICENSE
+          value: "blah"
+        
+        # Image Configuration
+        - name: image.repository
+          value: "quay.io"
+        - name: image.name
+          value: "hashicorp/terraform-enterprise"
+        - name: image.tag
+          value: "f3885c9"
+        - name: image.pullPolicy
+          value: "IfNotPresent"
+        
+        # Resource Configuration
+        - name: resources.requests.memory
+          value: "2500Mi"
+        - name: resources.requests.cpu
+          value: "750m"
+        - name: resources.limits.memory
+          value: "7500Mi"
+        - name: resources.limits.cpu
+          value: "4000m"
+        
+        # Image Pull Secret
+        - name: imagePullSecrets[0].name
+          value: "terraform-enterprise"
+        
+        - name: service.type
+          value: "LoadBalancer"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: terraform-enterprise
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
