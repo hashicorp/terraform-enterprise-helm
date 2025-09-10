@@ -30,6 +30,16 @@ data:
   {{- if .Values.tls.caCertData }}
   TFE_TLS_CA_BUNDLE_FILE: {{ include "cacert.path" . }}
   {{- end }}
+  {{- if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}
+  TFE_REDIS_CLIENT_CERT_PATH: "{{ .Values.tlsRedis.certMountPath }}"
+  TFE_REDIS_CLIENT_KEY_PATH: "{{ .Values.tlsRedis.keyMountPath }}"
+  TFE_REDIS_CA_CERT_PATH: "{{ .Values.tlsRedis.caCertMountPath }}"
+  {{- end }}
+  {{- if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}
+  TFE_REDIS_SIDEKIQ_CLIENT_KEY_PATH: "{{ .Values.tlsRedisSidekiq.keyMountPath }}"
+  TFE_REDIS_SIDEKIQ_CLIENT_CERT_PATH: "{{ .Values.tlsRedisSidekiq.certMountPath }}"
+  TFE_REDIS_SIDEKIQ_CA_CERT_PATH: "{{ .Values.tlsRedisSidekiq.caCertMountPath }}"
+  {{- end }}
   {{- if .Values.tfe.metrics.enable }}
   TFE_METRICS_ENABLE: "{{ .Values.tfe.metrics.enable }}"
   TFE_METRICS_HTTP_PORT: "{{ .Values.tfe.metrics.httpPort }}"

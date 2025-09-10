@@ -33,6 +33,28 @@ tls:
 
 The contents of this file are appended to the terraform-enterprise container CA certificates file. Agent images are then instantiated with the entirety of this combined CA certificate file fully replacing the native container operating system's CA certificate file. This allows tfc-agent to communicate with any dependent services or endpoints that might signed with your private certificate authorities, including Terraform Enterprise itself.
 
+## Redis mTLS Certificates
+
+Terraform Enterprise supports mTLS connections to Redis instances for enhanced security. When using external Redis instances with mTLS enabled, you can configure the necessary certificates through the helm chart values. This feature supports both Redis Standalone and Redis Enterprise instances with separate certificate configurations.
+
+### Redis TLS Configuration
+
+```yaml
+tlsRedis:
+  certData: BASE_64_ENCODED_CLIENT_CERTIFICATE
+  keyData: BASE_64_ENCODED_CLIENT_PRIVATE_KEY
+  caCertData: BASE_64_ENCODED_CA_CERTIFICATE
+```
+
+### Redis Enterprise TLS Configuration
+
+```yaml
+tlsRedisSidekiq:
+  certData: BASE_64_ENCODED_CLIENT_CERTIFICATE
+  keyData: BASE_64_ENCODED_CLIENT_PRIVATE_KEY
+  caCertData: BASE_64_ENCODED_CA_CERTIFICATE
+```
+
 ## Metrics
 
 Terraform Enterprise exposes metrics in json or Prometheus format. The `.Values.tfe.metrics.enable` value exposes the container ports for the metrics service, configures Terraform Enterprise to launch the metrics service, and annotates the Terraform Enterprise pods with common annotations required for Prometheus discovery and automated metrics scraping. More information about metrics can be found [in the Terraform Enterprise Metrics documentation](https://developer.hashicorp.com/terraform/enterprise/admin/infrastructure/monitoring).
