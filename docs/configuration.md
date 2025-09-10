@@ -35,7 +35,7 @@ The contents of this file are appended to the terraform-enterprise container CA 
 
 ## Redis mTLS Certificates
 
-Terraform Enterprise supports mTLS connections to Redis instances for enhanced security. When using external Redis instances with mTLS enabled, you can configure the necessary certificates through the helm chart values. This feature supports both Redis and Redis Enterprise instances with separate certificate configurations.
+Terraform Enterprise supports mTLS connections to Redis instances for enhanced security. When using external Redis instances with mTLS enabled, you can configure the necessary certificates through the helm chart values. This feature supports both Redis Standalone and Redis Enterprise instances with separate certificate configurations.
 
 ### Redis TLS Configuration
 
