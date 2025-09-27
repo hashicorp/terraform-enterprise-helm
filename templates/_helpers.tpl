@@ -80,7 +80,7 @@ and base64 encodes the value.
 */}}
 {{- define "helpers.list-env-secrets" }}
 {{- range $key, $val := .Values.env.secrets }}
-{{ $key }}: {{ trim $val | b64enc }}
+{{ $key }}: {{ trim $val | b64enc | quote }}
 {{- end }}
 {{- end }}
 
