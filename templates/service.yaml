@@ -37,7 +37,7 @@ spec:
       targetPort: {{ .Values.tfe.adminHttpsPort }}
       appProtocol: {{ .Values.service.appProtocol }}
   selector:
-    app: terraform-enterprise
+    {{- include "k8s.selectorLabels" . | nindent 4 }}
 ---
 {{- if .Values.env.variables.TFE_HOSTNAME_SECONDARY }}
 apiVersion: v1
@@ -74,5 +74,5 @@ spec:
       targetPort: {{ .Values.tfe.adminHttpsPort }}
       appProtocol: {{ .Values.serviceSecondary.appProtocol }}
   selector:
-    app: terraform-enterprise    
+    {{- include "k8s.selectorLabels" . | nindent 4 }}    
 {{- end}}

@@ -130,6 +130,6 @@ spec:
       targetPort: 8080
       protocol: TCP
   selector:
-    app: terraform-enterprise
+    {{- include "k8s.selectorLabels" . | nindent 4 }}
 {{- end }}
 {{- end }}
