@@ -76,14 +76,12 @@ Prints the key-value pair from the 'env.variables' entry in the Values file.
 
 {{/*
 Prints the key-value pair from the 'env.secrets' entry in the Values file
-and base64 encodes the value. Smart detection:
-1. If value looks like base64 (only contains base64 chars and proper length), use as-is
-2. Otherwise, base64 encode it
+and base64 encodes the value. If the value starts with 'b64:', it's treated as already encoded.
 */}}
 {{- define "helpers.list-env-secrets" }}
 {{- range $key, $val := .Values.env.secrets }}
-{{- if and (regexMatch "^[A-Za-z0-9+/]*={0,2}$" $val) (gt (len $val) 8) (eq (mod (len $val) 4) 0) }}
-{{ $key }}: {{ $val }}
+{{- if hasPrefix "b64:" $val }}
+{{ $key }}: {{ $val | trimPrefix "b64:" }}
 {{- else }}
 {{ $key }}: {{ $val | b64enc }}
 {{- end }}
