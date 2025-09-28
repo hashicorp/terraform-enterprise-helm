@@ -3,6 +3,7 @@ Copyright (c) HashiCorp, Inc.
 SPDX-License-Identifier: MPL-2.0
 */}}
 
+{{- if not .Values.rollout.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -200,3 +201,4 @@ spec:
         - containerPort: {{.Values.tfe.metrics.httpPort}}
         - containerPort: {{.Values.tfe.metrics.httpsPort}}
         {{- end }}
+{{- end }}
