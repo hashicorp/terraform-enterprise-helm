@@ -1,0 +1,135 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- if .Values.rollout.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: terraform-enterprise
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "k8s.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "k8s.selectorLabels" . | nindent 6 }}
+  strategy:
+    blueGreen:
+      activeService: terraform-enterprise
+      previewService: terraform-enterprise-preview
+      autoPromotionEnabled: false
+      scaleDownDelaySeconds: 30
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.pod.annotations }}
+        {{- toYaml .Values.pod.annotations | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "k8s.selectorLabels" . | nindent 8 }}
+        {{- if .Values.pod.labels }}
+        {{- toYaml .Values.pod.labels | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ include "k8s.serviceAccountName" . }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: terraform-enterprise
+          image: "{{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- if .Values.env.secrets }}
+            {{- range $key, $value := .Values.env.secrets }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: terraform-enterprise-env-secrets
+                  key: {{ $key }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.env.variables }}
+            {{- range $key, $value := .Values.env.variables }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: terraform-enterprise-env-config
+          ports:
+            - name: http
+              containerPort: {{ .Values.tfe.privateHttpPort }}
+              protocol: TCP
+            - name: https
+              containerPort: {{ .Values.tfe.privateHttpsPort }}
+              protocol: TCP
+            - name: admin
+              containerPort: {{ .Values.tfe.adminHttpsPort }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /_health_check
+              port: {{ .Values.tfe.privateHttpPort }}
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /_health_check
+              port: {{ .Values.tfe.privateHttpPort }}
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- if .Values.tls.certificateSecret }}
+            - name: tls-certificate
+              mountPath: {{ .Values.tls.certMountPath }}
+              subPath: tls.crt
+              readOnly: true
+            - name: tls-certificate
+              mountPath: {{ .Values.tls.keyMountPath }}
+              subPath: tls.key
+              readOnly: true
+            {{- end }}
+      volumes:
+        {{- if .Values.tls.certificateSecret }}
+        - name: tls-certificate
+          secret:
+            secretName: terraform-enterprise-certificates
+
+---
+# Preview Service for Blue/Green deployments
+apiVersion: v1
+kind: Service
+metadata:
+  name: terraform-enterprise-preview
+  labels:
+    app: terraform-enterprise
+    service-type: preview
+spec:
+  type: LoadBalancer
+  ports:
+    - name: https-port
+      port: 443
+      targetPort: 8443
+      protocol: TCP
+    - name: http-port
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: terraform-enterprise
+{{- end }}
+{{- end }}
