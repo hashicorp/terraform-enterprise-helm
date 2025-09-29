@@ -435,7 +435,7 @@ csi:
 
 # Rollout configuration for Argo Rollouts
 rollout:
-  enabled: true
+  enabled: false
   strategy:
     blueGreen:
       activeService: terraform-enterprise
