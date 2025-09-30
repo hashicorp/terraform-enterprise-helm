@@ -432,13 +432,3 @@ csi:
     secretName: ""
     # Type of the Kubernetes secret. Example: Opaque
     type: ""
-
-# Rollout configuration for Argo Rollouts
-rollout:
-  enabled: false
-  strategy:
-    blueGreen:
-      activeService: terraform-enterprise
-      previewService: terraform-enterprise-preview
-      autoPromotionEnabled: false
-      scaleDownDelaySeconds: 30
