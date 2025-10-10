@@ -24,6 +24,10 @@ serviceAccount:
   annotations: {}
   labels: {}
 
+deployment:
+  # Configure deployment annotations
+  annotations: {}
+  labels: {}
 pod:
 # Configure pod annotations
   annotations: {}
