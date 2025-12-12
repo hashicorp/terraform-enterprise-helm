@@ -1,4 +1,8 @@
 name: Create or Update Tag
+
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:
