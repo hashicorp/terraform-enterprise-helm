@@ -1,0 +1,25 @@
+name: Create or Update Tag
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+          description: 'Provide tag to create or Update (e.g., v1.2.3)'
+          required: true
+      release_branch:
+          description: 'Provide branch to create tag on (e.g., release/1.1.x)'
+          required: false
+      sha_value:
+          description: 'For Advance Users: Provide SHA value to create tag'
+          required: false
+          default: ''
+
+jobs:
+  create-or-update-tag:
+    name: Create or Update Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Initial Setup Echo
+        run: |
+          echo "Tag to create or update: ${{ github.event.inputs.tag }}"
+          echo "Release Branch: ${{ github.event.inputs.release_branch }}"
+          echo "SHA Value: ${{ github.event.inputs.sha_value }}"
