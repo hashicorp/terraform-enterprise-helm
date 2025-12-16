@@ -25,7 +25,7 @@ jobs:
       TAG: ${{ github.event.inputs.tag }}
       RELEASE_BRANCH: ${{ github.event.inputs.release_branch }}
       SHA_VALUE: ${{ github.event.inputs.sha_value }}
-      GH_TOKEN: ${{ secrets.HELM_CHARTS_GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Initial Setup Echo
         run: |
@@ -38,7 +38,7 @@ jobs:
           fetch-depth: 0
       - name: Configure Git
         run: |
-          git config --global url.'https://${{ secrets.HELM_CHARTS_GITHUB_TOKEN }}:@github.com'.insteadOf 'https://github.com'
+          git config --global url.'https://${{ secrets.GITHUB_TOKEN }}:@github.com'.insteadOf 'https://github.com'
           git config --global user.email "team-tf-enterprise@hashicorp.com" && git config --global user.name "hc-tfe-release-bot"
       - name: Get Target SHA
         id: get_sha
