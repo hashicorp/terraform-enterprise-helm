@@ -13,7 +13,7 @@ on:
           description: 'Provide release branch to create tag on (e.g., release/1.1.x), leave empty if full SHA is provided'
           required: false
       sha_value:
-          description: 'For Advanced Users: Provide Full SHA value to create or update tag, leave empty if release branch is provided'
+          description: 'For Advance Users: Provide Full SHA value to create or update tag, leave empty if release branch is provided'
           required: false
           default: ''
 
