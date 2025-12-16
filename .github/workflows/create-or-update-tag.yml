@@ -7,13 +7,13 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-          description: 'Provide tag to create or Update (e.g., v1.2.3)'
+          description: 'Provide tag to Create or Update (e.g., v1.6.6)'
           required: true
       release_branch:
           description: 'Provide branch to create tag on (e.g., release/1.1.x)'
           required: false
       sha_value:
-          description: 'For Advance Users: Provide SHA value to create tag'
+          description: 'For Advanced Users: Provide Full SHA value to create or update tag'
           required: false
           default: ''
 
@@ -21,9 +21,80 @@ jobs:
   create-or-update-tag:
     name: Create or Update Tag
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.inputs.tag }}
+      RELEASE_BRANCH: ${{ github.event.inputs.release_branch }}
+      SHA_VALUE: ${{ github.event.inputs.sha_value }}
+      GH_TOKEN: ${{ secrets.HELM_CHARTS_GITHUB_TOKEN }}
     steps:
       - name: Initial Setup Echo
         run: |
-          echo "Tag to create or update: ${{ github.event.inputs.tag }}"
-          echo "Release Branch: ${{ github.event.inputs.release_branch }}"
-          echo "SHA Value: ${{ github.event.inputs.sha_value }}"
+          echo "Tag to create or update: $TAG"
+          echo "Release Branch: $RELEASE_BRANCH"
+          echo "SHA Value: $SHA_VALUE"
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+      - name: Configure Git
+        run: |
+          git config --global url.'https://${{ secrets.HELM_CHARTS_GITHUB_TOKEN }}:@github.com'.insteadOf 'https://github.com'
+          git config --global user.email "team-tf-enterprise@hashicorp.com" && git config --global user.name "hc-tfe-release-bot"
+      - name: Get Target SHA
+        id: get_sha
+        run: |
+          if [[ -n "$SHA_VALUE" ]]; then
+            echo "Using provided SHA value: $SHA_VALUE"
+            tag_new_sha="$SHA_VALUE"
+          elif [[ -n "$RELEASE_BRANCH" ]]; then
+            echo "Using provided release branch: $RELEASE_BRANCH"
+            git fetch origin "$RELEASE_BRANCH"
+            tag_new_sha=$(git rev-parse "origin/$RELEASE_BRANCH")
+            echo "Latest SHA on $RELEASE_BRANCH branch is: $tag_new_sha"
+          else
+            echo "Error: Either release_branch or sha_value must be provided."
+            exit 1
+          fi
+          
+          echo "tag_new_sha=$tag_new_sha" >> $GITHUB_OUTPUT
+      - name: Create or Update Tag
+        env:
+          TAG_NEW_SHA: ${{ steps.get_sha.outputs.tag_new_sha }}
+        run: |
+          existing_tag_sha=$(git rev-parse "$TAG" 2>/dev/null || echo "")
+          if [[ "$existing_tag_sha" == "$TAG_NEW_SHA" ]]; then
+            echo "Tag $TAG already exists at the desired SHA $TAG_NEW_SHA. No action needed."
+          else
+            git tag -f "$TAG" "$TAG_NEW_SHA"
+            git push origin "$TAG" -f
+            echo "Tag $TAG created/updated to point to SHA $TAG_NEW_SHA."
+          fi
+      - name: Verify Tag Creation/Update
+        env:
+          TAG_NEW_SHA: ${{ steps.get_sha.outputs.tag_new_sha }}
+        run: |
+          git fetch origin "refs/tags/$TAG:refs/tags/$TAG" --force
+          created_tag_sha=$(git rev-parse "$TAG")
+          if [[ "$created_tag_sha" != "$TAG_NEW_SHA" ]]; then
+            echo "Tag $TAG does not point to the expected SHA $TAG_NEW_SHA."
+            exit 1
+          else
+            echo "Tag $TAG successfully verified to point to SHA $created_tag_sha."
+          fi
+      - name: Create or Update Release Notes
+        env:
+          TAG_NEW_SHA: ${{ steps.get_sha.outputs.tag_new_sha }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release for tag $TAG already exists. Updating release to point to SHA $TAG_NEW_SHA."
+            gh api \
+              /repos/${{ github.repository }}/releases/generate-notes \
+              -f tag_name="$TAG" -f target_commitish="$TAG_NEW_SHA" \
+              --jq '.body' > release_notes.md
+            echo "Preview release notes:"
+            cat release_notes.md
+            gh release edit "$TAG" --notes-file release_notes.md
+          else
+            echo "Creating new release for tag $TAG"
+            gh release create "$TAG" --generate-notes
+          fi
