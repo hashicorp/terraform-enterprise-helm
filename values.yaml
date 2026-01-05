@@ -244,6 +244,14 @@ service:
 
   loadBalancerIP: null # If service.type is LoadBalancer, you can optionally set a specific external IP.
                        # Useful for static IP requirements or pre-existing IP reservations.
+  
+  loadBalancerSourceRanges: [] # Optional list of CIDR ranges allowed to access the LoadBalancer.
+                               # Example:
+                               #   - 203.0.113.10/32
+                               #   - 10.0.0.0/8
+                               #
+                               # If empty or unset, the LoadBalancer may be accessible from all sources
+                               # (provider-dependent; e.g., GKE defaults to 0.0.0.0/0).
 
 serviceSecondary:
   annotations: {}
@@ -277,6 +285,13 @@ serviceSecondary:
   loadBalancerIP: null # If service.type is LoadBalancer, you can optionally set a specific external IP.
                        # Useful for static IP requirements or pre-existing IP reservations.
 
+  loadBalancerSourceRanges: [] # Optional list of CIDR ranges allowed to access the LoadBalancer.
+                               # Example:
+                               #   - 203.0.113.10/32
+                               #   - 10.0.0.0/8
+                               #
+                               # If empty or unset, the LoadBalancer may be accessible from all sources
+                               # (provider-dependent; e.g., GKE defaults to 0.0.0.0/0).
 
 # Custom pod template to define your own specifications for the creation of the agent worker pods.
 # This should be YAML representing a valid corev1.PodTemplateSpec. This format is documented
