@@ -31,7 +31,7 @@ dependencies:
   version: "12.5.6"
   repository: "oci://registry-1.docker.io/bitnamicharts"
 - name: minio
-  version: "5.0.10"
+  version: "5.4.0"
   repository: "https://charts.min.io/"
 - name: redis
   version: "17.11.3"
