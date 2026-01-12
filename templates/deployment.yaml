@@ -144,7 +144,7 @@ spec:
         {{- end }}
         readinessProbe:
           httpGet:
-            path: {{ .Values.tfe.readinessProbePath | default "/_health_check" }}
+            path: {{ .Values.tfe.readinessProbePath | default "/api/v1/health/readiness" }}
             port: {{ .Values.tfe.privateHttpPort }}
             scheme: {{ .Values.tfe.readinessProbeScheme | default "HTTP"  }}
         resources:
