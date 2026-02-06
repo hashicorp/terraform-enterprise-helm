@@ -21,6 +21,12 @@ spec:
   {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerIP }}
   loadBalancerIP: {{ .Values.service.loadBalancerIP }}
   {{- end }}
+  {{- if eq .Values.service.type "LoadBalancer" }}
+  {{- with .Values.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
   ports:
     - name: https-port
       port: {{ .Values.service.port }}
@@ -57,6 +63,12 @@ spec:
   type: {{ .Values.serviceSecondary.type }}
   {{- if and (eq .Values.serviceSecondary.type "LoadBalancer") .Values.serviceSecondary.loadBalancerIP }}
   loadBalancerIP: {{ .Values.serviceSecondary.loadBalancerIP }}
+  {{- end }}
+  {{- if eq .Values.serviceSecondary.type "LoadBalancer" }}
+  {{- with .Values.serviceSecondary.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   {{- end }}
   ports:
     - name: https-port
