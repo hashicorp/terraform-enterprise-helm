@@ -15,6 +15,10 @@ envFile: ""
 #     TFE_DATABASE_HOST: "db.example.com"
 env: {}
 
+# -- Additional arguments to pass to the preupgrade-check binary.
+# Example: ["--json", "--timeout", "120"]
+args: []
+
 # -- Container image configuration
 image:
   repository: quay.io/hashicorp/terraform-enterprise

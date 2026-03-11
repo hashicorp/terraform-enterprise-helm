@@ -37,6 +37,10 @@ spec:
           image: {{ include "preupgrade-check.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/usr/local/bin/preupgrade-check"]
+          {{- with .Values.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           envFrom:
             - secretRef:
                 name: {{ include "preupgrade-check.fullname" . }}-env
