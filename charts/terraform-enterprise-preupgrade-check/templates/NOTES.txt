@@ -1,0 +1,20 @@
+===========================================================
+ TFE Pre-Upgrade Check
+===========================================================
+
+The pre-upgrade check job has been submitted.
+
+1. Wait for the check to complete:
+
+   kubectl wait --for=condition=complete \
+     job/{{ include "preupgrade-check.fullname" . }} \
+     -n {{ .Release.Namespace }} --timeout=300s
+
+2. View results:
+
+   kubectl logs job/{{ include "preupgrade-check.fullname" . }} \
+     -n {{ .Release.Namespace }}
+
+3. Clean up (or wait {{ .Values.job.ttlSecondsAfterFinished }}s for auto-cleanup):
+
+   helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}

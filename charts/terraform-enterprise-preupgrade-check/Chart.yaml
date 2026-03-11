@@ -1,0 +1,12 @@
+apiVersion: v2
+name: terraform-enterprise-preupgrade-check
+description: Run TFE pre-upgrade validation checks as a standalone Kubernetes Job
+type: application
+version: 0.1.0
+appVersion: "v202503-1"
+home: https://developer.hashicorp.com/terraform/enterprise
+sources:
+  - https://github.com/hashicorp/terraform-enterprise
+maintainers:
+  - name: HashiCorp
+    url: https://www.hashicorp.com

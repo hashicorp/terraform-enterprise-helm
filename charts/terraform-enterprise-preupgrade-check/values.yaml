@@ -1,0 +1,87 @@
+# -- Flat .env file content. Pass via --set-file envFile=/path/to/tfe.env
+# Lines starting with # and blank lines are ignored.
+# Values may be optionally quoted (single or double).
+# Parsing splits on the first '=' only, so base64 values with '=' are safe.
+# If both envFile and env are provided, envFile takes precedence.
+envFile: ""
+
+# -- TFE environment variables as key-value pairs.
+# These are placed into a Kubernetes Secret and injected via envFrom.
+# Use this instead of envFile if you prefer structured Helm values.
+# Example:
+#   env:
+#     TFE_HOSTNAME: "tfe.example.com"
+#     TFE_LICENSE: "02MV4UU..."
+#     TFE_DATABASE_HOST: "db.example.com"
+env: {}
+
+# -- Container image configuration
+image:
+  repository: quay.io/hashicorp/terraform-enterprise
+  # -- Defaults to Chart.appVersion if empty
+  tag: ""
+  pullPolicy: IfNotPresent
+  # -- Image pull secret references
+  pullSecrets: []
+  # - name: terraform-enterprise
+
+# -- TLS certificate configuration
+# The preupgrade-check binary validates TLS if TFE_TLS_CERT_FILE and
+# TFE_TLS_KEY_FILE are set in the environment. Provide certs here to
+# mount them at the standard TFE paths.
+tls:
+  # -- Name of an existing Kubernetes Secret (type kubernetes.io/tls)
+  # containing tls.crt and tls.key. Takes precedence over inline cert/key.
+  certSecret: ""
+  # -- Inline PEM-encoded certificate (chart creates a Secret)
+  cert: ""
+  # -- Inline PEM-encoded private key (chart creates a Secret)
+  key: ""
+  # -- Inline PEM-encoded CA bundle (optional, mounted alongside cert/key)
+  caCert: ""
+  # -- Directory where certs are mounted inside the container
+  mountPath: /etc/ssl/private/terraform-enterprise
+
+# -- Job configuration
+job:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 3600
+  activeDeadlineSeconds: 300
+
+# -- Pod resource requests and limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    memory: 256Mi
+
+# -- ServiceAccount configuration
+# Required for cloud IAM integration (AWS IRSA, GCP Workload Identity, etc.)
+serviceAccount:
+  # -- Create a ServiceAccount for the Job
+  create: false
+  # -- Name of an existing ServiceAccount to use (if create is false)
+  name: ""
+  # -- Annotations to add to the ServiceAccount (e.g., IAM role ARN)
+  annotations: {}
+
+# -- OpenShift compatibility
+# When enabled, applies the restricted security context required by OpenShift.
+openshift:
+  enabled: false
+
+# -- Additional pod annotations
+podAnnotations: {}
+
+# -- Additional pod labels
+podLabels: {}
+
+# -- Node selector constraints
+nodeSelector: {}
+
+# -- Tolerations for pod scheduling
+tolerations: []
+
+# -- Affinity rules for pod scheduling
+affinity: {}
