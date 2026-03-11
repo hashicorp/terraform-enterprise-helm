@@ -16,7 +16,10 @@ envFile: ""
 env: {}
 
 # -- Additional arguments to pass to the preupgrade-check binary.
-# Example: ["--json", "--timeout", "120"]
+# Examples:
+#   args: ["--json", "--timeout", "120"]
+#   args: ["--verbose"]                      # diagnostic logs on stderr
+#   args: ["--json", "--verbose"]             # JSON output + debug logs
 args: []
 
 # -- Container image configuration
