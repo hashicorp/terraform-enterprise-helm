@@ -8,9 +8,11 @@ kind: Service
 metadata:
   name: terraform-enterprise
   namespace: {{ .Release.Namespace }}
+  {{- if .Values.service.annotations }}
   {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
+  {{- end }}
   {{- end }}
   {{- with .Values.service.labels }}
   labels:
@@ -29,6 +31,7 @@ spec:
       {{- end }}
       targetPort: {{ .Values.tfe.privateHttpsPort }}
       appProtocol: {{ .Values.service.appProtocol }}
+    {{- if .Values.tfe.adminHttpsPort }}
     - name: admin-https-port
       port: {{ .Values.tfe.adminHttpsPort }}
       {{- if eq .Values.service.type "NodePort" }}
@@ -36,22 +39,28 @@ spec:
       {{- end }}
       targetPort: {{ .Values.tfe.adminHttpsPort }}
       appProtocol: {{ .Values.service.appProtocol }}
+    {{- end }}
   selector:
     app: terraform-enterprise
 ---
+{{- if .Values.serviceSecondary }}
 {{- if .Values.env.variables.TFE_HOSTNAME_SECONDARY }}
 apiVersion: v1
 kind: Service
 metadata:
   name: terraform-enterprise-secondary
   namespace: {{ .Release.Namespace }}
+  {{- if .Values.serviceSecondary.annotations }}
   {{- with .Values.serviceSecondary.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- end }}
+  {{- if .Values.service.labels }}
   {{- with .Values.serviceSecondary.labels }}
   labels:
     {{- toYaml . | nindent 4 }}
+  {{- end }}
   {{- end }}
 spec:
   type: {{ .Values.serviceSecondary.type }}
@@ -66,6 +75,7 @@ spec:
       {{- end }}
       targetPort: {{ .Values.tfe.privateHttpsPort }}
       appProtocol: {{ .Values.serviceSecondary.appProtocol }}
+    {{- if .Values.tfe.adminHttpsPort }}
     - name: admin-https-port
       port: {{ .Values.tfe.adminHttpsPort }}
       {{- if eq .Values.serviceSecondary.type "NodePort" }}
@@ -73,6 +83,8 @@ spec:
       {{- end }}
       targetPort: {{ .Values.tfe.adminHttpsPort }}
       appProtocol: {{ .Values.serviceSecondary.appProtocol }}
+    {{- end }}
   selector:
-    app: terraform-enterprise    
-{{- end}}
+    app: terraform-enterprise
+{{- end }}
+{{- end }}

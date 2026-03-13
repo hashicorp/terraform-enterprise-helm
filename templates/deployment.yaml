@@ -71,15 +71,19 @@ spec:
           secret:
             secretName: terraform-enterprise-ca-certificates
         {{- end }}
+        {{- if .Values.tlsRedis }}
         {{- if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}
         - name: certificates-redis
           secret:
             secretName: {{ .Values.tlsRedis.certificateSecret | default "terraform-enterprise-certificates-redis" }}
         {{- end }}
+        {{- end }}
+        {{- if .Values.tlsRedisSidekiq }}
         {{- if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}
         - name: certificates-redis-sidekiq
           secret:
             secretName: {{ .Values.tlsRedisSidekiq.certificateSecret | default "terraform-enterprise-certificates-redis-sidekiq" }}
+        {{- end }}
         {{- end }}
         {{- if .Values.csi.enabled }}
         - name: secrets-store
@@ -107,6 +111,14 @@ spec:
         {{ toYaml .Values.initContainers | nindent 8}}
       containers:
       - name: terraform-enterprise
+        {{- if .Values.container.command }}
+        command:
+          {{ .Values.container.command }}
+        {{- end }}
+        {{- if .Values.container.args }}
+        args:
+          {{ toYaml .Values.container.args | nindent 10}}
+        {{- end }}
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         securityContext:
@@ -169,6 +181,7 @@ spec:
             mountPath: {{ include "cacert.path" . }}
             subPath: {{ .Values.tls.caCertFileName }}
           {{- end }}
+          {{- if .Values.tlsRedis }}
           {{- if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}
           - name: certificates-redis
             mountPath: {{ .Values.tlsRedis.certMountPath }}
@@ -180,6 +193,8 @@ spec:
             mountPath: {{ .Values.tlsRedis.caCertMountPath }}
             subPath: tls.ca
           {{- end }}
+          {{- end }}
+          {{- if and .Values.tlsRedisSidekiq }}
           {{- if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}
           - name: certificates-redis-sidekiq
             mountPath: {{ .Values.tlsRedisSidekiq.certMountPath }}
@@ -190,6 +205,7 @@ spec:
           - name: certificates-redis-sidekiq
             mountPath: {{ .Values.tlsRedisSidekiq.caCertMountPath }}
             subPath: tls.ca
+          {{- end }}
           {{- end }}
           {{- if .Values.csi.enabled }}
           - name: secrets-store
@@ -202,7 +218,9 @@ spec:
         ports:
         - containerPort: {{ .Values.tfe.privateHttpPort }}
         - containerPort: {{ .Values.tfe.privateHttpsPort }}
+        {{- if .Values.tfe.adminHttpsPort }}
         - containerPort: {{ .Values.tfe.adminHttpsPort }}
+        {{- end }}
         {{- if .Values.tfe.metrics.enable }}
         - containerPort: {{.Values.tfe.metrics.httpPort}}
         - containerPort: {{.Values.tfe.metrics.httpsPort}}
