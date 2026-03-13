@@ -33,6 +33,10 @@ pod:
   annotations: {}
   labels: {}
 container:
+# Configure container command
+  command: null
+# Configure container command args as a list
+  args: null
 # Configure pod specific security context settings
   securityContext: {}
 
@@ -436,3 +440,9 @@ csi:
     secretName: ""
     # Type of the Kubernetes secret. Example: Opaque
     type: ""
+
+secret:
+  annotations: {}
+
+config:
+  annotations: {}

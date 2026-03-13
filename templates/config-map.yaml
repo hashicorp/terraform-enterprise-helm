@@ -7,6 +7,10 @@ kind: ConfigMap
 metadata:
   name: terraform-enterprise-env-config
   namespace: {{ .Release.Namespace }}
+  {{- if .Values.config.annotations }}
+  annotations:
+    {{- toYaml .Values.config.annotations | nindent 4 }}
+  {{- end }}
 data:
   {{- include "helpers.list-env-variables" . | indent 2 }}
   TFE_RUN_PIPELINE_DRIVER: kubernetes
@@ -17,7 +21,9 @@ data:
   TFE_VAULT_DISABLE_MLOCK: "true"
   TFE_HTTP_PORT: "{{ .Values.tfe.privateHttpPort }}"
   TFE_HTTPS_PORT: "{{ .Values.tfe.privateHttpsPort }}"
+  {{- if .Values.tfe.adminHttpsPort }}
   TFE_ADMIN_HTTPS_PORT: "{{ .Values.tfe.adminHttpsPort }}"
+  {{- end }}
   {{- if or (and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData) .Values.tlsSecondary.certificateSecret }}
   TFE_TLS_CERT_FILE_SECONDARY: "{{ .Values.tlsSecondary.certMountPath }}"
   TFE_TLS_KEY_FILE_SECONDARY:  "{{ .Values.tlsSecondary.keyMountPath }}"
@@ -27,15 +33,19 @@ data:
   {{- if .Values.tls.caCertData }}
   TFE_TLS_CA_BUNDLE_FILE: {{ include "cacert.path" . }}
   {{- end }}
+  {{- if .Values.tlsRedis }}
   {{- if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}
   TFE_REDIS_CLIENT_CERT_PATH: "{{ .Values.tlsRedis.certMountPath }}"
   TFE_REDIS_CLIENT_KEY_PATH: "{{ .Values.tlsRedis.keyMountPath }}"
   TFE_REDIS_CA_CERT_PATH: "{{ .Values.tlsRedis.caCertMountPath }}"
   {{- end }}
+  {{- end }}
+  {{- if .Values.tlsRedisSidekiq }}
   {{- if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}
   TFE_REDIS_SIDEKIQ_CLIENT_KEY_PATH: "{{ .Values.tlsRedisSidekiq.keyMountPath }}"
   TFE_REDIS_SIDEKIQ_CLIENT_CERT_PATH: "{{ .Values.tlsRedisSidekiq.certMountPath }}"
   TFE_REDIS_SIDEKIQ_CA_CERT_PATH: "{{ .Values.tlsRedisSidekiq.caCertMountPath }}"
+  {{- end }}
   {{- end }}
   {{- if .Values.tfe.metrics.enable }}
   TFE_METRICS_ENABLE: "{{ .Values.tfe.metrics.enable }}"
