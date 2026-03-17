@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 ---
+{{- if not .Values.preupgradeCheck.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -42,3 +43,4 @@ data:
   TFE_METRICS_HTTP_PORT: "{{ .Values.tfe.metrics.httpPort }}"
   TFE_METRICS_HTTPS_PORT: "{{ .Values.tfe.metrics.httpsPort }}"
   {{- end }}
+{{- end }}

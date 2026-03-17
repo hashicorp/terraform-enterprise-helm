@@ -436,3 +436,76 @@ csi:
     secretName: ""
     # Type of the Kubernetes secret. Example: Opaque
     type: ""
+
+# preupgradeCheck runs the TFE preupgrade-check binary as an independent, one-shot
+# Kubernetes Job to validate your infrastructure before performing a real upgrade.
+#
+# Because it suppresses the rendering of standard TFE resources, it is disabled
+# by default. It should ONLY be enabled when rendering the template manually.
+#
+# Intended workflow:
+#   1. Render and apply the preupgrade check Job using your target version:
+#
+#        helm template <release> hashicorp/terraform-enterprise \
+#          --version <new-version> \
+#          -f production-values.yaml \
+#          --set preupgradeCheck.enabled=true \
+#          | kubectl apply -n <namespace> -f -
+#
+#   2. Monitor the Job and inspect the logs:
+#
+#        kubectl wait --for=condition=complete \
+#          job/terraform-enterprise-preupgrade-check \
+#          -n <namespace> --timeout=300s
+#        kubectl logs -l job-name=terraform-enterprise-preupgrade-check \
+#          -n <namespace>
+#
+#   3. Clean up the manual validation resources:
+#
+#        kubectl delete job/terraform-enterprise-preupgrade-check \
+#          -n <namespace> --ignore-not-found
+#        kubectl delete secret/terraform-enterprise-preupgrade-check-overrides \
+#          -n <namespace> --ignore-not-found
+#
+#   4. If the check passes, proceed with your actual production upgrade:
+#
+#        helm upgrade <release> hashicorp/terraform-enterprise \
+#          --version <new-version> -f production-values.yaml
+#
+# The Job inherits the same ConfigMap, Secret, imagePullSecrets, and
+# serviceAccount as the TFE deployment — no duplication required.
+preupgradeCheck:
+  # Keep false in all stored values files. Set to true only via --set when
+  # running the pre-validation workflow above.
+  enabled: false
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+  # extraEnv: non-sensitive configuration overrides for the target version.
+  # Use this when the new TFE release requires a new env variable, a renamed
+  # variable, or a changed value that does not exist in the current deployment.
+  # These are injected as explicit env: entries, which take precedence over the
+  # existing terraform-enterprise-env-config ConfigMap via Kubernetes env
+  # override rules.
+  #
+  # Example — new required variable in v202504-1:
+  #   extraEnv:
+  #     TFE_NEW_FEATURE_FLAG: "true"
+  #     TFE_RENAMED_VAR: "value"    # replaces TFE_OLD_VAR_NAME
+  extraEnv: {}
+
+  # extraSecrets: sensitive configuration overrides for the target version.
+  # Same precedence behaviour as extraEnv but values are stored in a dedicated
+  # kubernetes Secret (terraform-enterprise-preupgrade-check-overrides) and
+  # injected via secretKeyRef — they are never stored in plaintext in the pod spec.
+  #
+  # Example — new required secret in v202504-1:
+  #   extraSecrets:
+  #     TFE_NEW_CREDENTIAL: "my-secret-value"
+  #     TFE_DATABASE_PASSWORD: "rotated-password"   # override existing value
+  extraSecrets: {}

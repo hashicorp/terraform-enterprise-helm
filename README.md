@@ -73,6 +73,45 @@ There are a number of common helm or kubectl commands you can use to monitor the
     kubectl exec -it terraform-enterprise-5946d99fc-l22s9 -- cat /var/log/terraform-enterprise/atlas.log
     ```
 
+## Pre-upgrade Validation
+
+Before performing a full Helm upgrade to a new version of Terraform Enterprise, you can run an independent, one-shot Kubernetes Job to validate your infrastructure and configuration. This ensures that the target version is compatible with your environment without modifying your active deployment.
+
+To run the pre-upgrade check:
+
+1. Render and apply the preupgrade check Job using your target version:
+   ```sh
+   helm template <release> hashicorp/terraform-enterprise \
+     --version <new-version> \
+     -f production-values.yaml \
+     --set preupgradeCheck.enabled=true \
+     | kubectl apply -n <namespace> -f -
+   ```
+
+2. Monitor the Job and inspect the logs:
+   ```sh
+   kubectl wait --for=condition=complete \
+     job/terraform-enterprise-preupgrade-check \
+     -n <namespace> --timeout=300s
+
+   kubectl logs -l job-name=terraform-enterprise-preupgrade-check \
+     -n <namespace>
+   ```
+
+3. Clean up the manual validation resources:
+   ```sh
+   kubectl delete job/terraform-enterprise-preupgrade-check \
+     -n <namespace> --ignore-not-found
+   kubectl delete secret/terraform-enterprise-preupgrade-check-overrides \
+     -n <namespace> --ignore-not-found
+   ```
+
+4. If the validation is successful, proceed with your actual production upgrade:
+   ```sh
+   helm upgrade <release> hashicorp/terraform-enterprise \
+     --version <new-version> -f production-values.yaml
+   ```
+
 ## Additional Documentation
 
 For more information about Terraform Enterprise and the capabilities of this helm chart please see the following additional documentation:

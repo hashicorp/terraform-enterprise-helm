@@ -2,6 +2,7 @@
 Copyright IBM Corp. 2023, 2025
 SPDX-License-Identifier: MPL-2.0
 */}}
+{{- if not .Values.preupgradeCheck.enabled }}
 
 {{- if .Values.agents.rbac.enabled }}
 ---
@@ -61,4 +62,5 @@ subjects:
   name: {{ .Release.Namespace }}
   {{- end }}
   namespace: {{ .Release.Namespace }}
+{{- end }}
 {{- end }}

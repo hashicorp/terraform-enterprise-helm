@@ -2,6 +2,7 @@
 Copyright IBM Corp. 2023, 2025
 SPDX-License-Identifier: MPL-2.0
 */}}
+{{- if not .Values.preupgradeCheck.enabled }}
 
 apiVersion: apps/v1
 kind: Deployment
@@ -207,3 +208,4 @@ spec:
         - containerPort: {{.Values.tfe.metrics.httpPort}}
         - containerPort: {{.Values.tfe.metrics.httpsPort}}
         {{- end }}
+{{- end }}

@@ -1,0 +1,119 @@
+{{/*
+Copyright IBM Corp. 2023, 2025
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- if .Values.preupgradeCheck.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: terraform-enterprise-preupgrade-check
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: terraform-enterprise-preupgrade-check
+    {{- include "k8s.labels" . | nindent 4 }}
+  annotations:
+    tfe/target-version: {{ .Values.image.tag | quote }}
+spec:
+  # Do not restart on failure. Inspect logs, fix the issue, then re-apply.
+  backoffLimit: 0
+  # Auto-delete the Job one hour after it finishes so it does not linger.
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: terraform-enterprise-preupgrade-check
+        job-name: terraform-enterprise-preupgrade-check
+      {{- if .Values.pod.annotations }}
+      annotations:
+        {{- toYaml .Values.pod.annotations | nindent 8 }}
+      {{- end }}
+    spec:
+      # Never restart — this is a one-shot validation run.
+      restartPolicy: Never
+
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- if .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ if .Values.serviceAccount.name }}{{ .Values.serviceAccount.name }}{{ else }}{{ .Release.Namespace }}{{ end }}
+      {{- end }}
+
+      # Pod-level security context (e.g. fsGroup, runAsUser). Mirrors the TFE deployment.
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+
+      containers:
+        - name: preupgrade-check
+          # Use the same image as the TFE deployment — the version being upgraded TO.
+          image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          # Container-level security context. On OpenShift, applies the same SCC-compatible
+          # constraints as the TFE deployment: drops all capabilities, disallows privilege
+          # escalation, and enforces RuntimeDefault seccomp. This mirrors the deployment.yaml
+          # logic so the Job is subject to the same SCC as the running TFE pod.
+          securityContext:
+          {{- if and .Values.openshift.enabled (not .Values.container.securityContext) }}
+            seccompProfile:
+              type: RuntimeDefault
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+          {{- else }}
+          {{- toYaml .Values.container.securityContext | nindent 12 }}
+          {{- end }}
+
+          # Override the default TFE entrypoint with the preupgrade-check binary.
+          command: ["/usr/local/bin/preupgrade-check"]
+
+          # Reuse the same ConfigMap and Secret as the TFE deployment so that no
+          # configuration needs to be duplicated in values.yaml.
+          envFrom:
+            - configMapRef:
+                name: terraform-enterprise-env-config
+            {{- if .Values.env.configMapRefs }}
+            {{- range .Values.env.configMapRefs }}
+            - configMapRef:
+                name: {{ .name }}
+            {{- end }}
+            {{- end }}
+            - secretRef:
+                name: terraform-enterprise-env-secrets
+            {{- if .Values.env.secretRefs }}
+            {{- range .Values.env.secretRefs }}
+            - secretRef:
+                name: {{ .name }}
+            {{- end }}
+            {{- end }}
+
+          # --- Configuration overrides for the new release ---------------------
+          # Explicit env: entries always take precedence over envFrom in
+          # Kubernetes, regardless of key ordering. Use these to supply new
+          # required variables, renamed variables, or changed values that the
+          # target version needs but the current deployment does not have.
+          #
+          # Non-sensitive overrides (preupgradeCheck.extraEnv):
+          {{- if or .Values.preupgradeCheck.extraEnv .Values.preupgradeCheck.extraSecrets (include "helpers.list-valueFrom-variables" .) }}
+          env:
+            {{- include "helpers.list-valueFrom-variables" . | indent 12 }}
+            {{- range $key, $val := .Values.preupgradeCheck.extraEnv }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- range $key, $_ := .Values.preupgradeCheck.extraSecrets }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: terraform-enterprise-preupgrade-check-overrides
+                  key: {{ $key }}
+            {{- end }}
+          {{- end }}
+
+          resources:
+            {{- toYaml .Values.preupgradeCheck.resources | nindent 12 }}
+{{- end }}
