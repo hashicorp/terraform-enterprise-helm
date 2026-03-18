@@ -3,14 +3,16 @@ Copyright IBM Corp. 2023, 2025
 SPDX-License-Identifier: MPL-2.0
 */}}
 
+{{- include "helpers.preupgrade-validate-config" . }}
 {{- if .Values.preupgradeCheck.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: terraform-enterprise-preupgrade-check
+  name: {{ include "helpers.preupgrade-job-name" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     app: terraform-enterprise-preupgrade-check
+    preupgrade-check.hashicorp.com/name: {{ include "helpers.preupgrade-job-name" . }}
     {{- include "k8s.labels" . | nindent 4 }}
   annotations:
     tfe/target-version: {{ .Values.image.tag | quote }}
@@ -18,12 +20,13 @@ spec:
   # Do not restart on failure. Inspect logs, fix the issue, then re-apply.
   backoffLimit: 0
   # Auto-delete the Job one hour after it finishes so it does not linger.
-  ttlSecondsAfterFinished: 3600
+  ttlSecondsAfterFinished: {{ .Values.preupgradeCheck.ttlSecondsAfterFinished }}
   template:
     metadata:
       labels:
         app: terraform-enterprise-preupgrade-check
-        job-name: terraform-enterprise-preupgrade-check
+        job-name: {{ include "helpers.preupgrade-job-name" . }}
+        preupgrade-check.hashicorp.com/name: {{ include "helpers.preupgrade-job-name" . }}
       {{- if .Values.pod.annotations }}
       annotations:
         {{- toYaml .Values.pod.annotations | nindent 8 }}
@@ -109,7 +112,7 @@ spec:
             - name: {{ $key }}
               valueFrom:
                 secretKeyRef:
-                  name: terraform-enterprise-preupgrade-check-overrides
+                  name: {{ include "helpers.preupgrade-overrides-secret-name" $ }}
                   key: {{ $key }}
             {{- end }}
           {{- end }}

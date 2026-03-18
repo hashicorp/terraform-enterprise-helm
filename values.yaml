@@ -450,6 +450,9 @@ csi:
 #          --version <new-version> \
 #          -f production-values.yaml \
 #          --set preupgradeCheck.enabled=true \
+#          --set preupgradeCheck.tfeNamespace=true \
+#          --show-only templates/preupgrade-check-job.yaml \
+#          --show-only templates/preupgrade-check-secret.yaml \
 #          | kubectl apply -n <namespace> -f -
 #
 #   2. Monitor the Job and inspect the logs:
@@ -457,7 +460,7 @@ csi:
 #        kubectl wait --for=condition=complete \
 #          job/terraform-enterprise-preupgrade-check \
 #          -n <namespace> --timeout=300s
-#        kubectl logs -l job-name=terraform-enterprise-preupgrade-check \
+#        kubectl logs -l app=terraform-enterprise-preupgrade-check \
 #          -n <namespace>
 #
 #   3. Clean up the manual validation resources:
@@ -474,10 +477,49 @@ csi:
 #
 # The Job inherits the same ConfigMap, Secret, imagePullSecrets, and
 # serviceAccount as the TFE deployment — no duplication required.
+# 
+# Fresh Namespace Validation:
+#   Recommended for lower risk and easier cleanup. This mode renders only the
+#   minimum preupgrade prerequisites (ConfigMap/Secret, and ServiceAccount when
+#   enabled) plus the validation Job.
+#
+#        helm install tfe-validation hashicorp/terraform-enterprise \
+#          -n tfe-validation --create-namespace \
+#          --version <new-version> \
+#          -f production-values.yaml \
+#          --set preupgradeCheck.enabled=true \
+#          --set preupgradeCheck.tfeNamespace=false
+#
+# Optional custom job name:
+#   Set preupgradeCheck.jobName to run multiple checks in parallel or to avoid
+#   immutable Job update conflicts on repeated checks.
+#   Example: preupgradeCheck.jobName=terraform-enterprise-preupgrade-check-v202601-1
+#
 preupgradeCheck:
   # Keep false in all stored values files. Set to true only via --set when
   # running the pre-validation workflow above.
   enabled: false
+
+  # true:  run preupgrade check in the existing TFE deployment namespace
+  #        (strict non-mutating). Renders only the preupgrade Job (+ optional
+  #        override Secret) and assumes terraform-enterprise-env-config/
+  #        terraform-enterprise-env-secrets already exist.
+  # false: run preupgrade check in a namespace without an existing TFE
+  #        deployment. Renders the minimum prerequisites required for the
+  #        preupgrade Job.
+  #
+  # Keep this true by default to make accidental execution in an existing
+  # namespace non-mutating.
+  tfeNamespace: true
+
+  # Optional custom preupgrade Job name.
+  # Must be a valid Kubernetes DNS label and 63 characters or fewer.
+  # Example: jobName: "terraform-enterprise-preupgrade-check-v202601-1"
+  jobName: ""
+
+  # Auto-delete completed preupgrade Jobs after this many seconds.
+  ttlSecondsAfterFinished: 3600
+
   resources:
     requests:
       cpu: "100m"
@@ -493,7 +535,7 @@ preupgradeCheck:
   # existing terraform-enterprise-env-config ConfigMap via Kubernetes env
   # override rules.
   #
-  # Example — new required variable in v202504-1:
+  # Example — new required variable in v2.0.0:
   #   extraEnv:
   #     TFE_NEW_FEATURE_FLAG: "true"
   #     TFE_RENAMED_VAR: "value"    # replaces TFE_OLD_VAR_NAME
@@ -504,7 +546,7 @@ preupgradeCheck:
   # kubernetes Secret (terraform-enterprise-preupgrade-check-overrides) and
   # injected via secretKeyRef — they are never stored in plaintext in the pod spec.
   #
-  # Example — new required secret in v202504-1:
+  # Example — new required secret in v2.0.0:
   #   extraSecrets:
   #     TFE_NEW_CREDENTIAL: "my-secret-value"
   #     TFE_DATABASE_PASSWORD: "rotated-password"   # override existing value

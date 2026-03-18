@@ -1,8 +1,9 @@
 # Copyright IBM Corp. 2023, 2025
 # SPDX-License-Identifier: MPL-2.0
 
+{{- include "helpers.preupgrade-validate-config" . }}
+{{- if or (not .Values.preupgradeCheck.enabled) (eq (include "helpers.preupgrade-render-prereqs" .) "true") }}
 ---
-{{- if not .Values.preupgradeCheck.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
