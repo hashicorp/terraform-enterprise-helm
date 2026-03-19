@@ -15,6 +15,8 @@ This reduces upgrade risk by failing fast in an isolated validation step.
 
 Enable this workflow by setting `preupgradeCheck.enabled=true` for the validation run.
 
+If you are running on Red Hat OpenShift, also set `openshift.enabled=true` in `override.yaml`.
+
 Use `preupgradeCheck.tfeNamespace` to choose execution mode:
 
 1. `true` (default): existing TFE namespace, strict non-mutating behavior for shared Terraform Enterprise resources. Renders only the preupgrade Job and optional override Secret.
