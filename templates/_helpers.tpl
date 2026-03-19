@@ -132,37 +132,41 @@ entries as `valueFrom` environment variables in the Values file.
 {{- end }}
 {{- end }}
 
-  {{/*
-  Preupgrade mode helpers.
-  */}}
-  {{- define "helpers.preupgrade-render-prereqs" -}}
-  {{- if and .Values.preupgradeCheck.enabled (not .Values.preupgradeCheck.tfeNamespace) -}}true{{- else -}}false{{- end -}}
-  {{- end }}
+{{/*
+Preupgrade mode helpers.
+*/}}
+{{/* Returns true when preupgrade should render minimal prereqs (fresh namespace mode). */}}
+{{- define "helpers.preupgrade-render-prereqs" -}}
+{{- if and .Values.preupgradeCheck.enabled (not .Values.preupgradeCheck.tfeNamespace) -}}true{{- else -}}false{{- end -}}
+{{- end }}
 
-  {{- define "helpers.preupgrade-validate-config" -}}
-  {{- if .Values.preupgradeCheck.enabled -}}
-  {{- if not (kindIs "bool" .Values.preupgradeCheck.tfeNamespace) -}}
-  {{- fail "preupgradeCheck.tfeNamespace must be a boolean" -}}
-  {{- end -}}
-  {{- if .Values.preupgradeCheck.jobName -}}
-  {{- if gt (len .Values.preupgradeCheck.jobName) 63 -}}
-  {{- fail "preupgradeCheck.jobName must be 63 characters or fewer" -}}
-  {{- end -}}
-  {{- if not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" .Values.preupgradeCheck.jobName) -}}
-  {{- fail "preupgradeCheck.jobName must be a valid Kubernetes DNS label (lowercase alphanumeric and '-')" -}}
-  {{- end -}}
-  {{- end -}}
-  {{- end -}}
-  {{- end }}
+{{/* Validates preupgrade config shape and job name constraints. */}}
+{{- define "helpers.preupgrade-validate-config" -}}
+{{- if .Values.preupgradeCheck.enabled -}}
+{{- if not (kindIs "bool" .Values.preupgradeCheck.tfeNamespace) -}}
+{{- fail "preupgradeCheck.tfeNamespace must be a boolean" -}}
+{{- end -}}
+{{- if .Values.preupgradeCheck.jobName -}}
+{{- if gt (len .Values.preupgradeCheck.jobName) 63 -}}
+{{- fail "preupgradeCheck.jobName must be 63 characters or fewer" -}}
+{{- end -}}
+{{- if not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" .Values.preupgradeCheck.jobName) -}}
+{{- fail "preupgradeCheck.jobName must be a valid Kubernetes DNS label (lowercase alphanumeric and '-')" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end }}
 
-  {{- define "helpers.preupgrade-job-name" -}}
-  {{- if and .Values.preupgradeCheck.enabled .Values.preupgradeCheck.jobName -}}
-  {{- .Values.preupgradeCheck.jobName -}}
-  {{- else -}}
-  terraform-enterprise-preupgrade-check
-  {{- end -}}
-  {{- end }}
+{{/* Resolves the preupgrade Job name (custom when provided, otherwise default). */}}
+{{- define "helpers.preupgrade-job-name" -}}
+{{- if and .Values.preupgradeCheck.enabled .Values.preupgradeCheck.jobName -}}
+{{- .Values.preupgradeCheck.jobName -}}
+{{- else -}}
+terraform-enterprise-preupgrade-check
+{{- end -}}
+{{- end }}
 
-  {{- define "helpers.preupgrade-overrides-secret-name" -}}
-  {{- printf "%s-overrides" (include "helpers.preupgrade-job-name" .) | trunc 63 | trimSuffix "-" -}}
-  {{- end }}
+{{/* Builds the override Secret name from the preupgrade Job name. */}}
+{{- define "helpers.preupgrade-overrides-secret-name" -}}
+{{- printf "%s-overrides" (include "helpers.preupgrade-job-name" .) | trunc 63 | trimSuffix "-" -}}
+{{- end }}
