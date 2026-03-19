@@ -1,76 +1,207 @@
 # Terraform Enterprise Upgrades and Version Management
 
-## helm upgrade
+## Pre-upgrade Validation
 
-The upgrade arguments must be a release and chart or update SHAs in the helm values. The chart argument can be either: a chart reference(`charts/terraform-enterprise`), a path to a chart directory, a packaged chart, or a fully qualified URL. For chart references, the latest version will be specified unless the `--version` flag is set.
+Before upgrading Terraform Enterprise, run a preupgrade check as a one-shot Kubernetes Job.
 
-This is a generic command to upgrade a release:
+What the preupgrade check does:
 
-    helm upgrade [RELEASE] [CHART] [flags]
+- Starts the Terraform Enterprise preupgrade-check binary in Kubernetes.
+- Validates that required runtime configuration is present and consumable for the target version.
+- Verifies core dependency connectivity and readiness.
+- Surfaces misconfiguration early so you can fix issues before applying a full Helm upgrade.
 
-If you want to wait until the pods become ready, you can use a `--wait` flag
+This reduces upgrade risk by failing fast in an isolated validation step.
 
-    helm upgrade <release-name> hashicrop/terraform-enterprise \
-     --version <target-helm-chart-version> \
-     --reuse-values \
-     --wait \
-     --namespace <namespace>
+Enable this workflow by setting `preupgradeCheck.enabled=true` for the validation run.
 
-To override values in a chart, use either the `--values` flag and pass in a file or use the `--set` flag and pass configuration from the command line, to force string values, use `--set-string`. You can use `--set-file` to set individual values from a file when the value itself is too long for the command line or is dynamically generated. If a namespace is set, make sure to use the `-n` flag along with the name of the namespace.
+Use `preupgradeCheck.tfeNamespace` to choose execution mode:
 
-    helm upgrade -f values.yaml -f override.yaml terraform-enterprise -n <NAMESPACE>
+1. `true` (default): existing TFE namespace, strict non-mutating behavior for shared Terraform Enterprise resources. Renders only the preupgrade Job and optional override Secret.
+2. `false`: namespace without an existing TFE deployment. Renders minimum prerequisites plus the preupgrade Job.
 
-If you want Helm to rollback installation if it fails, you can use the `--atomic flag`. Note that the `--wait` flag will be set automatically if `--atomic` is used.
+Why the commands differ by mode:
 
-    helm upgrade -f my-values.yaml ./path/to/my/chart --install --atomic -n <NAMESPACE> 
+- Existing namespace uses `kubectl apply` from `helm template --show-only` output so you can run validation without creating or mutating Helm release state in the live Terraform Enterprise namespace.
+- Fresh namespace uses `helm install` because the validation resources are isolated in a separate release, which gives clean lifecycle management and simple cleanup with `helm uninstall`.
+
+### Existing Namespace
+
+In this mode, the Job reads runtime config from existing in-cluster objects (for example, ConfigMaps and Secrets).
+
+If your required values are stored in existing objects, add refs or keyRefs under `env` in your `override.yaml` file for the preupgrade validation run. Example:
+
+```yaml
+env:
+  secretRefs:
+    - name: env-database-config
+    - name: env-redis-secrets
+  secretKeyRefs:
+    - name: TFE_DATABASE_PASSWORD
+      secretName: env-database-config
+      key: database_password
+```
+
+Run validation:
+
+```sh
+helm template <RELEASE> hashicorp/terraform-enterprise \
+  --version <NEW_VERSION> \
+    -f override.yaml \
+    --set preupgradeCheck.enabled=true \
+    --set preupgradeCheck.tfeNamespace=true \
+    --show-only templates/preupgrade-check-job.yaml \
+    --show-only templates/preupgrade-check-secret.yaml \
+    | kubectl apply -n <NAMESPACE> -f -
+```
+
+Check status and logs:
+
+```sh
+kubectl wait --for=condition=complete \
+    job/terraform-enterprise-preupgrade-check \
+    -n <NAMESPACE> --timeout=300s
+  kubectl logs -l app=terraform-enterprise-preupgrade-check -n <NAMESPACE>
+```
+
+Optional custom Job name:
+
+```sh
+--set preupgradeCheck.jobName=terraform-enterprise-preupgrade-check-2.0.0
+```
+
+Use this on the validation command if you need a unique Job name for reruns.
+
+If you need existing release values as a baseline:
+
+```sh
+helm get values <RELEASE> -n <NAMESPACE> -a > current-release-values.yaml
+```
+
+Clean up:
+
+```sh
+kubectl delete job/terraform-enterprise-preupgrade-check -n <NAMESPACE> --ignore-not-found
+kubectl delete secret/terraform-enterprise-preupgrade-check-overrides -n <NAMESPACE> --ignore-not-found
+```
+
+Proceed with upgrade:
+
+Follow the [Helm Upgrade](#helm-upgrade) instructions below after validation succeeds.
+
+### Fresh Namespace Validation
+
+Recommended for isolated testing and easy cleanup.
+
+```sh
+helm install tfe-validation hashicorp/terraform-enterprise \
+    -n tfe-validation --create-namespace \
+    --version <TARGET_VERSION> \
+    -f override.yaml \
+    --set preupgradeCheck.enabled=true \
+    --set preupgradeCheck.tfeNamespace=false
+```
+
+Cleanup:
+
+```sh
+helm uninstall tfe-validation -n tfe-validation
+```
+
+## Helm Upgrade
+
+The `helm upgrade` command requires a release name and a chart. The chart can be a chart reference (`hashicorp/terraform-enterprise`), a local chart directory, a packaged chart, or a URL.
+
+Generic upgrade syntax:
+
+```sh
+helm upgrade [RELEASE] [CHART] [flags]
+```
+
+To wait until resources are ready, use `--wait`:
+
+```sh
+helm upgrade <RELEASE_NAME> hashicorp/terraform-enterprise \
+  --version <TARGET_HELM_CHART_VERSION> \
+  --reuse-values \
+  --wait \
+  --namespace <NAMESPACE>
+```
+
+To override chart values, use `-f/--values` for files, `--set` for inline values, `--set-string` for forced strings, and `--set-file` for long or generated values.
+
+```sh
+helm upgrade terraform-enterprise hashicorp/terraform-enterprise \
+  -n <NAMESPACE> \
+  -f values.yaml \
+  -f override.yaml
+```
+
+For safer upgrades, use `--atomic` to roll back automatically on failure. Helm enables `--wait` automatically when `--atomic` is set.
+
+```sh
+helm upgrade terraform-enterprise hashicorp/terraform-enterprise \
+  -n <NAMESPACE> \
+  -f my-values.yaml \
+  --install \
+  --atomic
+```
 
 ## Helm rollback to previous release
 
-The first argument of the rollback command is the name of a release, and the second is a revision (version) number. If this argument is omitted, it will roll back to the previous release.
+The first rollback argument is the release name. The optional second argument is the revision. If you omit the revision, Helm rolls back to the previous release.
 
-To see revision numbers, run `helm history RELEASE`  or `helm ls`.
+To view revisions, run `helm history`:
 
-    helm rollback <RELEASE_NAME> -n <NAMESPACE>
+```sh
+helm history <RELEASE_NAME> -n <NAMESPACE>
+```
 
-Note: The helm rollback command is recommended because using the kubectl command will only rollback the deployment, but not other resources associated with helm release.
+Roll back to the previous release:
 
-But if you need to rollback to specific previous version, You can:
+```sh
+helm rollback <RELEASE_NAME> -n <NAMESPACE>
+```
 
-List revision numbers by running:
+Roll back to a specific revision:
 
-    helm history <RELEASE_NAME>
+```sh
+helm rollback <RELEASE_NAME> <REVISION> -n <NAMESPACE>
+```
 
-Then, rollback to the version you want using:
+Use `helm rollback` rather than `kubectl rollout undo` so the full Helm release state is restored, not just Deployment state.
 
-    helm rollback <RELEASE_NAME> [REVISION]
+## Upgrade Process Using an Image Tag
 
-## Process for Upgrading Terraform Enterprise with Helm using the image tag
+Inspect values from the current release:
 
-In the resulting folder, go to the directory named after your chart.
+```sh
+helm get values terraform-enterprise -n <NAMESPACE>
+```
 
-Inspect the values from the Terraform Enterprise K8s cluster, by running:
+Export current values to an override file:
 
-    helm get values terraform-enterprise -n <NAMESPACE>
+```sh
+helm get values terraform-enterprise -n <NAMESPACE> -a > override.yaml
+```
 
-After inspecting the helm values, print the output to an `override.yaml` file, by running:
+Update the image tag in `override.yaml`, then run upgrade:
 
-    helm get values terraform-enterprise -n <NAMESPACE>  > override.yaml
+```sh
+helm upgrade terraform-enterprise hashicorp/terraform-enterprise \
+  -n <NAMESPACE> \
+  -f values.yaml \
+  -f override.yaml
+```
 
-Inside the `override.yaml` file, update the image tag to the version you want for the Terraform Enterprise upgrade and save the file.
+Check revision history and rollout status:
 
-To upgrade Terraform Enterprise, run the following commands:
+```sh
+helm history terraform-enterprise -n <NAMESPACE>
+kubectl get pods -n <NAMESPACE>
+```
 
-    helm upgrade -f values.yaml -f override.yaml terraform-enterprise -n <NAMESPACE> .
-
-Check the status and version history by running:
-
-    helm history terraform-enterprise -n <NAMESPACE>
-
-Check the deployment status of the pods using the following command:
-
-    kubectl get nodes -n <NAMESPACE>
-
-You should see multiple revisions and an upgrade complete description, for example:
+Example history output:
 
 ```
 REVISION        UPDATED                         STATUS          CHART                           APP VERSION     DESCRIPTION
@@ -78,24 +209,32 @@ REVISION        UPDATED                         STATUS          CHART           
 2               Thu Mar 30 14:23:21 2023        deployed        terraform-enterprise-0.1.0      1.16.0          Upgrade complete
 ```
 
-Note: Depending on how quickly you check the status after running the upgrade, the pods may still be getting recreated.
+Note: Shortly after upgrade, pods may still be restarting.
 
-## Helm Rollback process for Terraform Enterprise using the image tag
+## Rollback Process Using an Image Tag
 
-To rollback a Terraform Enterprise release we'll use the same approach as upgrading, by using the image tag. Make sure you have a current `override.yaml` file, if not print out the following command:
+To roll back using the same values workflow, first ensure you have a current `override.yaml`:
 
-    helm get values terraform-enterprise -n <NAMESPACE>  > override.yaml
+```sh
+helm get values terraform-enterprise -n <NAMESPACE> -a > override.yaml
+```
 
-Once you've updated the image tag to the version you want to rollback to, execute the rollback process by running the following command:
+Then either:
 
-    helm rollback terraform-enterprise -n <NAMESPACE>
+- run `helm rollback` to a previous revision, or
+- update the image tag in `override.yaml` and run `helm upgrade`.
 
-Check the status and version history by running:
+Rollback by revision:
 
-    helm history terraform-enterprise -n <NAMESPACE>
+```sh
+helm rollback terraform-enterprise -n <NAMESPACE>
+```
 
-Check the deployment status of the pods using the following command:
+Check revision history and rollout status:
 
-    kubectl get nodes -n <NAMESPACE>
+```sh
+helm history terraform-enterprise -n <NAMESPACE>
+kubectl get pods -n <NAMESPACE>
+```
 
-Note: Depending on how quickly you check the status after running the upgrade, the pods may still be getting recreated.
+Note: Shortly after rollback, pods may still be restarting.
