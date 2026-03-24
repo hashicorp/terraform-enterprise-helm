@@ -73,12 +73,6 @@ There are a number of common helm or kubectl commands you can use to monitor the
     kubectl exec -it terraform-enterprise-5946d99fc-l22s9 -- cat /var/log/terraform-enterprise/atlas.log
     ```
 
-## Pre-upgrade Validation
-
-Pre-upgrade check documentation has moved to:
-
-- [docs/upgrades_and_rollback.md#pre-upgrade-validation](docs/upgrades_and_rollback.md#pre-upgrade-validation)
-
 ## Additional Documentation
 
 For more information about Terraform Enterprise and the capabilities of this helm chart please see the following additional documentation:
@@ -88,4 +82,3 @@ For more information about Terraform Enterprise and the capabilities of this hel
 * [Examples of Common Implementations](docs/implementations.md#implementation-examples)
 * [Terraform Enterprise Common Kubernetes Configuration](docs/kubernetes_configuration.md#terraform-enterprise-common-kubernetes-configuration)
 * [Terraform Enterprise Upgrades and Rollback](docs/upgrades_and_rollback.md)
-* [Terraform Enterprise Pre-upgrade Validation](docs/upgrades_and_rollback.md#pre-upgrade-validation)

@@ -46,15 +46,33 @@ env:
 
 Run validation:
 
+Use this command when you are not setting `preupgradeCheck.extraSecrets`:
+
 ```sh
 helm template <RELEASE> hashicorp/terraform-enterprise \
+  -n <NAMESPACE> \
   --version <NEW_VERSION> \
-    -f override.yaml \
-    --set preupgradeCheck.enabled=true \
-    --set preupgradeCheck.tfeNamespace=true \
-    --show-only templates/preupgrade-check-job.yaml \
-    --show-only templates/preupgrade-check-secret.yaml \
-    | kubectl apply -n <NAMESPACE> -f -
+  -f override.yaml \
+  --set preupgradeCheck.enabled=true \
+  --set preupgradeCheck.tfeNamespace=true \
+  --show-only templates/preupgrade-check-job.yaml \
+  | kubectl apply -n <NAMESPACE> -f -
+```
+
+If you are setting `preupgradeCheck.extraSecrets`, include the secret template as well:
+
+Use `preupgradeCheck.extraSecrets` when the target version needs sensitive values that are new, renamed, or different from what currently exists in your in-cluster Secrets.
+
+```sh
+helm template <RELEASE> hashicorp/terraform-enterprise \
+  -n <NAMESPACE> \
+  --version <NEW_VERSION> \
+  -f override.yaml \
+  --set preupgradeCheck.enabled=true \
+  --set preupgradeCheck.tfeNamespace=true \
+  --show-only templates/preupgrade-check-job.yaml \
+  --show-only templates/preupgrade-check-secret.yaml \
+  | kubectl apply -n <NAMESPACE> -f -
 ```
 
 Check status and logs:
@@ -95,6 +113,8 @@ Follow the [Helm Upgrade](#helm-upgrade) instructions below after validation suc
 
 Recommended for isolated testing and easy cleanup.
 
+The command below creates a new namespace named `tfe-validation`.
+
 ```sh
 helm install tfe-validation hashicorp/terraform-enterprise \
     -n tfe-validation --create-namespace \
@@ -102,6 +122,15 @@ helm install tfe-validation hashicorp/terraform-enterprise \
     -f override.yaml \
     --set preupgradeCheck.enabled=true \
     --set preupgradeCheck.tfeNamespace=false
+```
+
+Check status and logs before cleanup:
+
+```sh
+kubectl wait --for=condition=complete \
+  job/terraform-enterprise-preupgrade-check \
+  -n tfe-validation --timeout=300s
+kubectl logs -l app=terraform-enterprise-preupgrade-check -n tfe-validation
 ```
 
 Cleanup:
