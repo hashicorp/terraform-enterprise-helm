@@ -2,7 +2,7 @@
 
 ## Pre-upgrade Validation
 
-Before upgrading Terraform Enterprise, run a preupgrade check as a one-shot Kubernetes Job.
+Before upgrading Terraform Enterprise, run a preupgrade check as a standalone Kubernetes Job.
 
 What the preupgrade check does:
 
@@ -13,9 +13,7 @@ What the preupgrade check does:
 
 This reduces upgrade risk by failing fast in an isolated validation step.
 
-Enable this workflow by setting `preupgradeCheck.enabled=true` for the validation run.
-
-If you are running on Red Hat OpenShift, also set `openshift.enabled=true` in your values file e.g `override.yaml`.
+Note: the preupgrade check runs as a standalone validation Job and is non-destructive — it reads ConfigMaps, Secrets, and external endpoints to validate configuration and connectivity but does not modify the database, change live resources, or interrupt running workspaces, nodes, or active runs.
 
 ### Before You Start
 
@@ -41,12 +39,12 @@ In the preupgrade validation commands below:
 - `<RELEASE_NAME>` is your existing Helm release name, for example `terraform-enterprise`.
 - `<NAMESPACE>` is the namespace for that release.
 - `<TARGET_CHART_VERSION>` is the Helm chart version passed to `--version`. Choose the chart release whose `appVersion` matches the Terraform Enterprise version you want to validate.
-- `image.tag` in `override.yaml` is the target Terraform Enterprise application version you plan to validate and then upgrade to.
+- `image.tag` in your values file (for example, `override.yaml`) is the target Terraform Enterprise application version you plan to validate and then upgrade to.
 
-If you want to start from the currently deployed values, export them first. This is especially useful for fresh namespace validation, because that mode relies on your values file instead of existing in-cluster Terraform Enterprise objects.
+If you want to start from the currently deployed values, export them first. This is especially useful for fresh namespace validation, because that mode relies on your target values file instead of existing in-cluster Terraform Enterprise objects.
 
 ```sh
-helm get values <RELEASE_NAME> -n <NAMESPACE> -a > override.yaml
+helm get values <RELEASE_NAME> -n <NAMESPACE> -a -o yaml > override.yaml
 ```
 
 Update `override.yaml` with the target `image.tag` and any validation-only overrides before running the commands below.
@@ -70,7 +68,7 @@ env:
 
 Run validation:
 
-Use this command when you are not setting `preupgradeCheck.extraSecrets`:
+Enable the workflow by setting `preupgradeCheck.enabled=true` for the validation run. If you are running on Red Hat OpenShift, also set `openshift.enabled=true` in your `override.yaml` file.
 
 ```sh
 helm template <RELEASE_NAME> hashicorp/terraform-enterprise \
@@ -83,25 +81,11 @@ helm template <RELEASE_NAME> hashicorp/terraform-enterprise \
   | kubectl apply -n <NAMESPACE> -f -
 ```
 
-If you are setting `preupgradeCheck.extraSecrets`, include the secret template as well:
-
-Use `preupgradeCheck.extraSecrets` when the target version needs sensitive values that are new, renamed, or different from what currently exists in your in-cluster Secrets.
-
-```sh
-helm template <RELEASE_NAME> hashicorp/terraform-enterprise \
-  -n <NAMESPACE> \
-  --version <TARGET_CHART_VERSION> \
-  -f override.yaml \
-  --set preupgradeCheck.enabled=true \
-  --set preupgradeCheck.tfeNamespace=true \
-  --show-only templates/preupgrade-check-job.yaml \
-  --show-only templates/preupgrade-check-secret.yaml \
-  | kubectl apply -n <NAMESPACE> -f -
-```
+If the target version requires sensitive values that are new, renamed, or different from your in-cluster Secrets, set `preupgradeCheck.extraSecrets` in your values file and append `--show-only templates/preupgrade-check-secret.yaml \` to the `helm template` command above to include the secret template.
 
 Check status and logs:
 
-By default the Job is named `terraform-enterprise-preupgrade-check`. If you set `preupgradeCheck.jobName`, use that same value in the commands below.
+By default the Job is named `terraform-enterprise-preupgrade-check`. Use this value to wait for completion and retrieve logs.
 
 ```sh
 kubectl wait --for=condition=complete \
@@ -110,19 +94,7 @@ kubectl wait --for=condition=complete \
 kubectl logs -l preupgrade-check.hashicorp.com/name=terraform-enterprise-preupgrade-check -n <NAMESPACE>
 ```
 
-Optional custom Job name:
-
-Use a custom Job name when you want to rerun validation without waiting for the previous Job object to be deleted.
-
-```sh
---set preupgradeCheck.jobName=terraform-enterprise-preupgrade-check-2-0-0
-```
-
-The name must be a valid Kubernetes DNS label. If you use this option, substitute the same Job name in your `kubectl wait`, `kubectl logs`, and cleanup commands. If you are also setting `preupgradeCheck.extraSecrets`, the chart generates a Secret named `<JOB_NAME>-overrides`.
-
 Clean up:
-
-If you used a custom Job name, replace `terraform-enterprise-preupgrade-check` below with that name and replace the Secret name with `<JOB_NAME>-overrides`.
 
 ```sh
 kubectl delete job/terraform-enterprise-preupgrade-check -n <NAMESPACE> --ignore-not-found
@@ -135,9 +107,13 @@ Follow the [Helm Upgrade](#helm-upgrade) instructions below after validation suc
 
 ### Fresh Namespace Validation
 
-Set `preupgradeCheck.tfeNamespace=false` for this mode. Use it when you want isolation from the live namespace, or when you want to validate that your values file can supply the minimum prerequisites in a separate release.
+Set `preupgradeCheck.tfeNamespace=false` for this mode. Use it when you want isolation from the live namespace, or when you want to validate that your Helm values alone can supply all minimum prerequisites in a new deployment.
 
-The command below creates a new namespace named `tfe-validation`.
+**Note on configuration:** Because this mode runs in a separate namespace, the validation Job cannot read your existing in-cluster ConfigMaps and Secrets. You should reuse the `override.yaml` exported in the **Before You Start** step (`helm get values <RELEASE_NAME> -n <NAMESPACE> -a -o yaml > override.yaml`) as your starting point to avoid filling it out from scratch. However, if your live namespace relies on manually created Kubernetes Secrets (like database passwords or certificates), you must explicitly supply those values in your `override.yaml` for this validation run.
+
+Run validation:
+
+The command below creates a new namespace named `tfe-validation`. Enable the workflow by setting `preupgradeCheck.enabled=true` for the validation run. If you are running on Red Hat OpenShift, also set `openshift.enabled=true` in your `override.yaml` file.
 
 ```sh
 helm install tfe-validation hashicorp/terraform-enterprise \
@@ -162,6 +138,18 @@ Cleanup:
 ```sh
 helm uninstall tfe-validation -n tfe-validation
 ```
+
+### Advanced: Optional Custom Job Name
+
+Use a custom Job name when you want to rerun validation without waiting for the previous Job object to be deleted in an Existing Namespace run.
+
+```sh
+--set preupgradeCheck.jobName=terraform-enterprise-preupgrade-check-2-0-0
+```
+
+The name must be a valid Kubernetes DNS label. If you use this option, substitute the same Job name in your `kubectl wait`, `kubectl logs`, and cleanup commands. If you are also setting `preupgradeCheck.extraSecrets`, the chart generates a Secret named `<JOB_NAME>-overrides`.
+
+For cleanup, replace `terraform-enterprise-preupgrade-check` with that name and replace the Secret name with `<JOB_NAME>-overrides`.
 
 ## Helm Upgrade
 
@@ -237,7 +225,7 @@ helm get values terraform-enterprise -n <NAMESPACE>
 Export current values to an override file:
 
 ```sh
-helm get values terraform-enterprise -n <NAMESPACE> -a > override.yaml
+helm get values terraform-enterprise -n <NAMESPACE> -a -o yaml > override.yaml
 ```
 
 Update the image tag in `override.yaml`, then run upgrade:
@@ -271,7 +259,7 @@ Note: Shortly after upgrade, pods may still be restarting.
 To roll back using the same values workflow, first ensure you have a current `override.yaml`:
 
 ```sh
-helm get values terraform-enterprise -n <NAMESPACE> -a > override.yaml
+helm get values terraform-enterprise -n <NAMESPACE> -a -o yaml > override.yaml
 ```
 
 Then either:
