@@ -3,7 +3,7 @@ Copyright IBM Corp. 2023, 2025
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{- if .Values.agents.rbac.enabled }}
+{{- if and (not .Values.preupgradeCheck.enabled) .Values.agents.rbac.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role

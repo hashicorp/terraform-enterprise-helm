@@ -436,3 +436,39 @@ csi:
     secretName: ""
     # Type of the Kubernetes secret. Example: Opaque
     type: ""
+
+# preupgradeCheck runs the TFE preupgrade-check binary as a one-shot Kubernetes
+# Job before a real upgrade.
+#
+# For full commands and workflow, see docs/upgrades_and_rollback.md#pre-upgrade-validation.
+preupgradeCheck:
+  # Set true only for a preupgrade validation run.
+  enabled: false
+
+  # true: existing TFE namespace, strict non-mutating.
+  # Renders only the preupgrade Job (+ optional override Secret).
+  # false: namespace without existing TFE deployment.
+  # Renders minimum prerequisites + the preupgrade Job.
+  tfeNamespace: true
+
+  # Optional custom preupgrade Job name (DNS label, max 63 chars).
+  jobName: ""
+
+  # Auto-delete completed preupgrade Jobs after this many seconds.
+  ttlSecondsAfterFinished: 3600
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+  # Non-sensitive env overrides for target-version validation.
+  # These explicit env entries take precedence over imported ConfigMap values.
+  extraEnv: {}
+
+  # Sensitive env overrides for target-version validation.
+  # Stored in a dedicated Secret and injected with secretKeyRef.
+  extraSecrets: {}

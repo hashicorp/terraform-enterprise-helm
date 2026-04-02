@@ -1,0 +1,108 @@
+{{/*
+Copyright IBM Corp. 2023, 2025
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- include "helpers.preupgrade-validate-config" . }}
+{{- if .Values.preupgradeCheck.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "helpers.preupgrade-job-name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: terraform-enterprise-preupgrade-check
+    preupgrade-check.hashicorp.com/name: {{ include "helpers.preupgrade-job-name" . }}
+    {{- include "k8s.labels" . | nindent 4 }}
+  annotations:
+    tfe/target-version: {{ .Values.image.tag | quote }}
+spec:
+  backoffLimit: 0
+  # Auto-delete completed validation jobs.
+  ttlSecondsAfterFinished: {{ .Values.preupgradeCheck.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        app: terraform-enterprise-preupgrade-check
+        job-name: {{ include "helpers.preupgrade-job-name" . }}
+        preupgrade-check.hashicorp.com/name: {{ include "helpers.preupgrade-job-name" . }}
+      {{- if .Values.pod.annotations }}
+      annotations:
+        {{- toYaml .Values.pod.annotations | nindent 8 }}
+      {{- end }}
+    spec:
+      restartPolicy: Never
+
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- if .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ if .Values.serviceAccount.name }}{{ .Values.serviceAccount.name }}{{ else }}{{ .Release.Namespace }}{{ end }}
+      {{- end }}
+
+      # Keep pod-level security context aligned with the TFE deployment.
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+
+      containers:
+        - name: preupgrade-check
+          image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          # Match deployment container security defaults; apply SCC-safe defaults on OpenShift.
+          securityContext:
+          {{- if and .Values.openshift.enabled (not .Values.container.securityContext) }}
+            seccompProfile:
+              type: RuntimeDefault
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+          {{- else }}
+          {{- toYaml .Values.container.securityContext | nindent 12 }}
+          {{- end }}
+
+          command: ["/usr/local/bin/preupgrade-check"]
+
+          # Reuse baseline runtime config from the existing deployment.
+          envFrom:
+            - configMapRef:
+                name: terraform-enterprise-env-config
+            {{- if .Values.env.configMapRefs }}
+            {{- range .Values.env.configMapRefs }}
+            - configMapRef:
+                name: {{ .name }}
+            {{- end }}
+            {{- end }}
+            - secretRef:
+                name: terraform-enterprise-env-secrets
+            {{- if .Values.env.secretRefs }}
+            {{- range .Values.env.secretRefs }}
+            - secretRef:
+                name: {{ .name }}
+            {{- end }}
+            {{- end }}
+
+          {{- if or .Values.preupgradeCheck.extraEnv .Values.preupgradeCheck.extraSecrets (include "helpers.list-valueFrom-variables" .) }}
+          # Explicit env entries override envFrom values for target-version checks.
+          env:
+            {{- include "helpers.list-valueFrom-variables" . | indent 12 }}
+            {{- range $key, $val := .Values.preupgradeCheck.extraEnv }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- range $key, $_ := .Values.preupgradeCheck.extraSecrets }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "helpers.preupgrade-overrides-secret-name" $ }}
+                  key: {{ $key }}
+            {{- end }}
+          {{- end }}
+
+          resources:
+            {{- toYaml .Values.preupgradeCheck.resources | nindent 12 }}
+{{- end }}

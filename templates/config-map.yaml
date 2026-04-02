@@ -1,6 +1,7 @@
 # Copyright IBM Corp. 2023, 2025
 # SPDX-License-Identifier: MPL-2.0
 
+{{- if or (not .Values.preupgradeCheck.enabled) (eq (include "helpers.preupgrade-render-prereqs" .) "true") }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -42,3 +43,4 @@ data:
   TFE_METRICS_HTTP_PORT: "{{ .Values.tfe.metrics.httpPort }}"
   TFE_METRICS_HTTPS_PORT: "{{ .Values.tfe.metrics.httpsPort }}"
   {{- end }}
+{{- end }}
