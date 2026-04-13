@@ -17,6 +17,9 @@ csi:
       - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-license"
         objectType: "secretsmanager"
         objectAlias: "tfe-license"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-encryption"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-license"
       - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-database-password"
         objectType: "secretsmanager"
         objectAlias: "tfe-database-password"
@@ -38,6 +41,11 @@ csi:
       data:
         - key: value
           objectName: tfe-license
+    - secretName: tfe-encryption
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-encryption
     - secretName: tfe-database-password
       type: Opaque
       data:
