@@ -1,0 +1,78 @@
+# Example override values for using the AWS Secrets Store CSI provider with
+# Terraform Enterprise on EKS.
+#
+# Prerequisites:
+# - The Secrets Store CSI Driver is installed in the cluster.
+# - The AWS provider for the Secrets Store CSI Driver is installed.
+# - The Terraform Enterprise service account is authorized through IRSA or EKS Pod Identity.
+
+csi:
+  enabled: true
+  provider: aws
+  mountPath: /mnt/secrets-store
+  parameters:
+    region: us-east-1
+    usePodIdentity: "false"
+    objects: |
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-license"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-license"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-database-password"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-database-password"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-redis-password"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-redis-password"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-tls-cert"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-tls-cert"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-tls-privkey"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-tls-privkey"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-tls-ca-bundle"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-tls-ca-bundle"
+  secretObjects:
+    - secretName: tfe-license
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-license
+    - secretName: tfe-database-password
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-database-password
+    - secretName: tfe-redis-password
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-redis-password
+    - secretName: tfe-tls-cert
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-tls-cert
+    - secretName: tfe-tls-privkey
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-tls-privkey
+    - secretName: tfe-tls-ca-bundle
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-tls-ca-bundle
+
+env:
+  # Map each synced Kubernetes Secret key into the TFE container environment.
+  secretKeyRefs:
+    - name: TFE_LICENSE
+      secretName: tfe-license
+      key: value
+    - name: TFE_DATABASE_PASSWORD
+      secretName: tfe-database-password
+      key: value
+    - name: TFE_REDIS_PASSWORD
+      secretName: tfe-redis-password
+      key: value
