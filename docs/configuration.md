@@ -85,12 +85,81 @@ The custom pod template must be a valid `corev1.PodTemplateSpec` and should be p
 documented at <https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-template-v1/#PodTemplateSpec>.
 
 
-## Vault CSI Provider
-Terraform Enterprise now supports [Vault CSI provider](https://developer.hashicorp.com/vault/docs/platform/k8s/csi). This allows TFE pods to consume Vault secrets using CSI Secrets Store volumes.
+## CSI Secret Providers
+Terraform Enterprise supports mounting secrets through a Kubernetes [Secrets Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io/) `SecretProviderClass`. The chart keeps [Vault CSI provider](https://developer.hashicorp.com/vault/docs/platform/k8s/csi) as the default configuration path, and also allows passing provider-specific configuration for other CSI providers.
 
 The settings for this can be found in the `values.yaml` file under the `csi` section.
-If `csi.enabled` is set to true, the Vault CSI provider will be used to retrieve secrets, as it is the only supported provider. This requires using an external Vault.
+If `csi.enabled` is set to true:
+
+- `csi.provider: vault` with an empty `csi.parameters` preserves the existing Vault-specific configuration using `csi.vaultRole`, `csi.vaultAddress`, and `csi.secrets`.
+- Any other provider can be used by setting `csi.provider` and supplying the provider-specific `SecretProviderClass.spec.parameters` through `csi.parameters`.
 
 The Secrets Store CSI Driver also supports syncing to Kubernetes secret objects. The `secretObjects` section adds secret syncing for TFE if values are provided.
 
-**Note:** The Vault CSI Provider requires the [CSI Secret Store Driver](https://secrets-store-csi-driver.sigs.k8s.io/getting-started/installation.html) to be installed.
+Example:
+
+```yaml
+csi:
+  enabled: true
+  provider: aws
+  mountPath: /mnt/secrets-store
+  parameters:
+    region: us-east-1
+    usePodIdentity: "false"
+    objects: |
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-license"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-license"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-database-password"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-database-password"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-redis-password"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-redis-password"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-tls-cert"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-tls-cert"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-tls-privkey"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-tls-privkey"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-tls-ca-bundle"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-tls-ca-bundle"
+  secretObjects:
+    - secretName: tfe-license
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-license
+    - secretName: tfe-database-password
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-database-password
+    - secretName: tfe-redis-password
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-redis-password
+    - secretName: tfe-tls-cert
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-tls-cert
+    - secretName: tfe-tls-privkey
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-tls-privkey
+    - secretName: tfe-tls-ca-bundle
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-tls-ca-bundle
+```
+
+AWS example:
+
+See [docs/example/aws-csi-override.yaml](./example/aws-csi-override.yaml) for an example using the AWS provider with Secrets Manager and syncing selected keys into a Kubernetes secret.
+
+**Note:** The required `csi.parameters` keys and object format depend on the selected provider. The appropriate CSI provider and the [CSI Secret Store Driver](https://secrets-store-csi-driver.sigs.k8s.io/getting-started/installation.html) must already be installed in the cluster.
