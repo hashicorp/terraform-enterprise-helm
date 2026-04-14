@@ -39,43 +39,22 @@ In the preupgrade validation commands below:
 - `<RELEASE_NAME>` is your existing Helm release name, for example `terraform-enterprise`.
 - `<NAMESPACE>` is the namespace for that release.
 - `<TARGET_CHART_VERSION>` is the Helm chart version passed to `--version`. Choose the chart release whose `appVersion` matches the Terraform Enterprise version you want to validate.
-- `override.yaml` in the examples below is only an example filename. Use the same values override file that you already use for your Terraform Enterprise installation.
-- `image.tag` in that same values file is the target Terraform Enterprise application version you plan to validate and then upgrade to.
+- `override.yaml` is only an example filename. Use the same values override file that you already use for your Terraform Enterprise installation.
+- `<TARGET_TFE_VERSION>` is the Terraform Enterprise image tag you want to validate. Pass it with `--set image.tag=<TARGET_TFE_VERSION>` in the commands below.
 
-If you still have the values override file from your original installation, reuse that file for preupgrade validation and only add temporary validation-specific settings as needed. If you no longer have it, export the currently deployed values into a file and use that as your starting point. This is especially useful for fresh namespace validation, because that mode relies on your target values file instead of existing in-cluster Terraform Enterprise objects.
+If you still have the values override file from your original installation, reuse that file for preupgrade validation or export the currently deployed values into a file and use that as your starting point with the command below:
 
 ```sh
 helm get values <RELEASE_NAME> -n <NAMESPACE> -a -o yaml > override.yaml
 ```
 
-Update that same `override.yaml` with the target `image.tag` and any validation-only overrides before running the commands below. Run the pre-upgrade check with the same effective Terraform Enterprise configuration as your live deployment. In an existing namespace, this usually means reusing the same values override file and adding only the `env.configMapRefs`, `env.secretRefs`, `env.configMapKeyRefs`, `env.secretKeyRefs`, or mounted files needed for settings that are not already available to the Job.
-
 ### Existing Namespace
 
 Set `preupgradeCheck.tfeNamespace=true` for this mode. This is usually the quickest path because the Job reads runtime config from existing in-cluster objects such as ConfigMaps and Secrets.
 
-If your required values are stored in existing objects, add refs or keyRefs under `env` in that same `override.yaml` file for the preupgrade validation run. Example:
-
-```yaml
-env:
-  configMapRefs:
-    - name: env-runtime-config
-  secretRefs:
-    - name: env-database-config
-    - name: env-redis-secrets
-  configMapKeyRefs:
-    - name: TFE_HOSTNAME
-      configMapName: env-runtime-config
-      key: TFE_HOSTNAME
-  secretKeyRefs:
-    - name: TFE_DATABASE_PASSWORD
-      secretName: env-database-config
-      key: database_password
-```
-
 Run validation:
 
-Enable the workflow by setting `preupgradeCheck.enabled=true` for the validation run. If you are running on Red Hat OpenShift, also set `openshift.enabled=true` in that same `override.yaml` file.
+Step 1: render the Job manifest.
 
 ```sh
 helm template <RELEASE_NAME> hashicorp/terraform-enterprise \
@@ -84,11 +63,20 @@ helm template <RELEASE_NAME> hashicorp/terraform-enterprise \
   -f override.yaml \
   --set preupgradeCheck.enabled=true \
   --set preupgradeCheck.tfeNamespace=true \
+  --set image.tag=<TARGET_TFE_VERSION> \
   --show-only templates/preupgrade-check-job.yaml \
-  | kubectl apply -n <NAMESPACE> -f -
+  > preupgrade.yaml
 ```
 
-If the target version requires sensitive values that are new, renamed, or different from your in-cluster Secrets, set `preupgradeCheck.extraSecrets` in your values file and append `--show-only templates/preupgrade-check-secret.yaml \` to the `helm template` command above to include the secret template.
+If you are running on Red Hat OpenShift and your live values file does not already set it, append `--set openshift.enabled=true` to the command above.
+
+If the target version requires sensitive values that are new, renamed, or different from your in-cluster Secrets, put `preupgradeCheck.extraSecrets` in a separate values file, add that file with an additional `-f` flag, and include `--show-only templates/preupgrade-check-secret.yaml` when rendering `preupgrade.yaml`.
+
+Step 2: apply the rendered manifest.
+
+```sh
+kubectl apply -n <NAMESPACE> -f preupgrade.yaml
+```
 
 Check status and logs:
 
@@ -98,6 +86,7 @@ By default the Job is named `terraform-enterprise-preupgrade-check`. Use this va
 kubectl wait --for=condition=complete \
   job/terraform-enterprise-preupgrade-check \
   -n <NAMESPACE> --timeout=300s
+
 kubectl logs -l preupgrade-check.hashicorp.com/name=terraform-enterprise-preupgrade-check -n <NAMESPACE>
 ```
 
@@ -105,6 +94,7 @@ Clean up:
 
 ```sh
 kubectl delete job/terraform-enterprise-preupgrade-check -n <NAMESPACE> --ignore-not-found
+
 kubectl delete secret/terraform-enterprise-preupgrade-check-overrides -n <NAMESPACE> --ignore-not-found
 ```
 
@@ -114,13 +104,13 @@ Follow the [Helm Upgrade](#helm-upgrade) instructions below after validation suc
 
 ### Fresh Namespace Validation
 
-Set `preupgradeCheck.tfeNamespace=false` for this mode. Use it when you want isolation from the live namespace, or when you want to validate that your Helm values alone can supply all minimum prerequisites in a new deployment.
+Set `preupgradeCheck.tfeNamespace=false` for this mode. Use it when you want isolation from the live namespace, or when you want to validate that your Helm values alone can supply all minimum prerequisites in a new deployment. This flag changes the chart to render the fresh-namespace validation resources. It does not create the namespace by itself.
 
-**Note on configuration:** Because this mode runs in a separate namespace, the validation Job cannot read your existing in-cluster ConfigMaps and Secrets. Reuse the same values override file you normally use for Terraform Enterprise as your starting point. If you no longer have it, export the values from the running release (`helm get values <RELEASE_NAME> -n <NAMESPACE> -a -o yaml > override.yaml`) and use that as your starting point instead of building a new file from scratch. However, if your live namespace relies on manually created Kubernetes Secrets, such as database passwords or certificates, you must explicitly supply those values in your `override.yaml` for this validation run.
+**Note on configuration:** Because this mode runs in a separate namespace, the validation Job cannot read your existing in-cluster ConfigMaps and Secrets. Reuse the same values override file you normally use for Terraform Enterprise as your starting point or export the values from the running release (`helm get values <RELEASE_NAME> -n <NAMESPACE> -a -o yaml > override.yaml`) and use that as your starting point instead of building a new file from scratch. However, if your live namespace relies on manually created Kubernetes Secrets, such as database passwords or certificates, you must explicitly supply those values for this validation run through your values file or additional values inputs.
 
 Run validation:
 
-The command below creates a new namespace named `tfe-validation`. Enable the workflow by setting `preupgradeCheck.enabled=true` for the validation run. If you are running on Red Hat OpenShift, also set `openshift.enabled=true` in that same `override.yaml` file.
+The command below installs the chart into a new namespace named `tfe-validation`. The namespace is created by Helm because the command includes `-n tfe-validation --create-namespace`.
 
 ```sh
 helm install tfe-validation hashicorp/terraform-enterprise \
@@ -128,8 +118,11 @@ helm install tfe-validation hashicorp/terraform-enterprise \
   --version <TARGET_CHART_VERSION> \
   -f override.yaml \
   --set preupgradeCheck.enabled=true \
-  --set preupgradeCheck.tfeNamespace=false
+  --set preupgradeCheck.tfeNamespace=false \
+  --set image.tag=<TARGET_TFE_VERSION>
 ```
+
+If you are running on Red Hat OpenShift and your live values file does not already set it, append `--set openshift.enabled=true` to the command above.
 
 Check status and logs before cleanup:
 
@@ -137,6 +130,7 @@ Check status and logs before cleanup:
 kubectl wait --for=condition=complete \
   job/terraform-enterprise-preupgrade-check \
   -n tfe-validation --timeout=300s
+
 kubectl logs -l preupgrade-check.hashicorp.com/name=terraform-enterprise-preupgrade-check -n tfe-validation
 ```
 
