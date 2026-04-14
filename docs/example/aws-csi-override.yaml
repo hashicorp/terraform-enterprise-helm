@@ -6,16 +6,16 @@ csi:
     region: us-east-1
     usePodIdentity: "false"
     objects: |
-      - objectName: "arn:aws:secretsmanager:us-east-1:050752626041:secret:sandbox-tfe-license-544c-z0Rv08"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:sandbox-tfe-license-544c-z0Rv08"
         objectType: "secretsmanager"
         objectAlias: "tfe-license"
-      - objectName: "arn:aws:secretsmanager:us-east-1:050752626041:secret:sandbox-tfe-encryption-password-544c-ef1ltK"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:sandbox-tfe-encryption-password-544c-ef1ltK"
         objectType: "secretsmanager"
         objectAlias: "tfe-encryption"
-      - objectName: "arn:aws:secretsmanager:us-east-1:050752626041:secret:sandbox-tfe-database-password-544c-GWvUj5"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:sandbox-tfe-database-password-544c-GWvUj5"
         objectType: "secretsmanager"
         objectAlias: "tfe-database-password"
-      - objectName: "arn:aws:secretsmanager:us-east-1:050752626041:secret:sandbox-tfe-redis-password-544c-SWr8Q6"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:sandbox-tfe-redis-password-544c-SWr8Q6"
         objectType: "secretsmanager"
         objectAlias: "tfe-redis-password"
   secretObjects:
