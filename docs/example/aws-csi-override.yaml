@@ -1,6 +1,7 @@
 csi:
   enabled: true
   provider: aws
+  secretProviderClass: terraform-enterprise-aws-secrets
   mountPath: /mnt/secrets-store
   parameters:
     region: us-east-1

@@ -416,6 +416,7 @@ csi:
   enabled: false
   annotations: {}
   labels: {}
+  # If not using Vault, provide a name to better identify the provider. 
   secretProviderClass: terraform-enterprise-vault-secrets
   provider: vault
   # Provider-specific SecretProviderClass parameters.
