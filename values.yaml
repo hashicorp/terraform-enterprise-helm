@@ -421,15 +421,21 @@ csi:
   # Provider-specific SecretProviderClass parameters.
   # When set, these are rendered directly and override the legacy Vault-specific fields below.
   # Example for a non-Vault provider:
+  # provider: aws
+  # mountPath: /mnt/secrets-store
   # parameters:
+  #   region: us-east-1
   #   usePodIdentity: "false"
-  #   keyvaultName: my-keyvault
-  #   tenantId: 00000000-0000-0000-0000-000000000000
   #   objects: |
-  #     array:
-  #       - |
-  #         objectName: example-secret
-  #         objectType: secret
+  #     - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-license-544c-z0Rv08"
+  #       objectType: "secretsmanager"
+  #       objectAlias: "tfe-license"
+  # secretObjects:
+  #   - secretName: tfe-license
+  #     type: Opaque
+  #     data:
+  #       - key: value
+  #         objectName: tfe-license
   parameters: {}
   # Legacy Vault-only fields retained for backward compatibility when csi.provider is vault
   # and csi.parameters is empty.
