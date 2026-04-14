@@ -107,30 +107,29 @@ csi:
     region: us-east-1
     usePodIdentity: "false"
     objects: |
-      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-license"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:sandbox-tfe-license-544c-z0Rv08"
         objectType: "secretsmanager"
         objectAlias: "tfe-license"
-      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-database-password"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:sandbox-tfe-encryption-password-544c-ef1ltK"
+        objectType: "secretsmanager"
+        objectAlias: "tfe-encryption"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:sandbox-tfe-database-password-544c-GWvUj5"
         objectType: "secretsmanager"
         objectAlias: "tfe-database-password"
-      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-redis-password"
+      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:sandbox-tfe-redis-password-544c-SWr8Q6"
         objectType: "secretsmanager"
         objectAlias: "tfe-redis-password"
-      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-tls-cert"
-        objectType: "secretsmanager"
-        objectAlias: "tfe-tls-cert"
-      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-tls-privkey"
-        objectType: "secretsmanager"
-        objectAlias: "tfe-tls-privkey"
-      - objectName: "arn:aws:secretsmanager:us-east-1:123456789012:secret:tfe-tls-ca-bundle"
-        objectType: "secretsmanager"
-        objectAlias: "tfe-tls-ca-bundle"
   secretObjects:
     - secretName: tfe-license
       type: Opaque
       data:
         - key: value
           objectName: tfe-license
+    - secretName: tfe-encryption
+      type: Opaque
+      data:
+        - key: value
+          objectName: tfe-encryption
     - secretName: tfe-database-password
       type: Opaque
       data:
@@ -141,21 +140,6 @@ csi:
       data:
         - key: value
           objectName: tfe-redis-password
-    - secretName: tfe-tls-cert
-      type: Opaque
-      data:
-        - key: value
-          objectName: tfe-tls-cert
-    - secretName: tfe-tls-privkey
-      type: Opaque
-      data:
-        - key: value
-          objectName: tfe-tls-privkey
-    - secretName: tfe-tls-ca-bundle
-      type: Opaque
-      data:
-        - key: value
-          objectName: tfe-tls-ca-bundle
 ```
 
 AWS example:
