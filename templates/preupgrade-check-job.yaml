@@ -42,9 +42,44 @@ spec:
       serviceAccountName: {{ if .Values.serviceAccount.name }}{{ .Values.serviceAccount.name }}{{ else }}{{ .Release.Namespace }}{{ end }}
       {{- end }}
 
-      # Keep pod-level security context aligned with the TFE deployment.
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
+
+      volumes:
+        - name: certificates
+          secret:
+            secretName: {{ .Values.tls.certificateSecret }}
+        {{- if or (and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData) .Values.tlsSecondary.certificateSecret }}
+        - name: certificates-secondary
+          secret:
+            secretName: {{ .Values.tlsSecondary.certificateSecret | default "terraform-enterprise-certificates-secondary" }}
+        {{- end }}
+        {{- if .Values.tls.caCertData }}
+        - name: ca-certificates
+          secret:
+            secretName: terraform-enterprise-ca-certificates
+        {{- end }}
+        {{- if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}
+        - name: certificates-redis
+          secret:
+            secretName: {{ .Values.tlsRedis.certificateSecret | default "terraform-enterprise-certificates-redis" }}
+        {{- end }}
+        {{- if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}
+        - name: certificates-redis-sidekiq
+          secret:
+            secretName: {{ .Values.tlsRedisSidekiq.certificateSecret | default "terraform-enterprise-certificates-redis-sidekiq" }}
+        {{- end }}
+        {{- if .Values.csi.enabled }}
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "{{ .Values.csi.secretProviderClass }}"
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
       containers:
         - name: preupgrade-check
@@ -105,4 +140,55 @@ spec:
 
           resources:
             {{- toYaml .Values.preupgradeCheck.resources | nindent 12 }}
+
+          volumeMounts:
+            {{- if or (and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData) .Values.tlsSecondary.certificateSecret }}
+            - name: certificates-secondary
+              mountPath: {{ .Values.tlsSecondary.certMountPath }}
+              subPath: tls.crt
+            - name: certificates-secondary
+              mountPath: {{ .Values.tlsSecondary.keyMountPath }}
+              subPath: tls.key
+            {{- end }}
+            - name: certificates
+              mountPath: {{ .Values.tls.certMountPath }}
+              subPath: tls.crt
+            - name: certificates
+              mountPath: {{ .Values.tls.keyMountPath }}
+              subPath: tls.key
+            {{- if .Values.tls.caCertData }}
+            - name: ca-certificates
+              mountPath: {{ include "cacert.path" . }}
+              subPath: {{ .Values.tls.caCertFileName }}
+            {{- end }}
+            {{- if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}
+            - name: certificates-redis
+              mountPath: {{ .Values.tlsRedis.certMountPath }}
+              subPath: tls.crt
+            - name: certificates-redis
+              mountPath: {{ .Values.tlsRedis.keyMountPath }}
+              subPath: tls.key
+            - name: certificates-redis
+              mountPath: {{ .Values.tlsRedis.caCertMountPath }}
+              subPath: tls.ca
+            {{- end }}
+            {{- if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}
+            - name: certificates-redis-sidekiq
+              mountPath: {{ .Values.tlsRedisSidekiq.certMountPath }}
+              subPath: tls.crt
+            - name: certificates-redis-sidekiq
+              mountPath: {{ .Values.tlsRedisSidekiq.keyMountPath }}
+              subPath: tls.key
+            - name: certificates-redis-sidekiq
+              mountPath: {{ .Values.tlsRedisSidekiq.caCertMountPath }}
+              subPath: tls.ca
+            {{- end }}
+            {{- if .Values.csi.enabled }}
+            - name: secrets-store
+              mountPath: "{{ .Values.csi.mountPath }}"
+              readOnly: true
+            {{- end }}
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
 {{- end }}
