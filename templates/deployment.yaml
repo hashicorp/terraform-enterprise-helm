@@ -108,6 +108,14 @@ spec:
         {{ toYaml .Values.initContainers | nindent 8}}
       containers:
       - name: terraform-enterprise
+        {{- if .Values.container.command }}
+        command:
+          {{ .Values.container.command }}
+        {{- end }}
+        {{- if .Values.container.args }}
+        args:
+          {{ toYaml .Values.container.args | nindent 10}}
+        {{- end }}
         image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         securityContext:
