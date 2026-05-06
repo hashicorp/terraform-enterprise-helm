@@ -110,7 +110,7 @@ spec:
       - name: terraform-enterprise
         {{- if .Values.container.command }}
         command:
-          {{ .Values.container.command }}
+          {{ toYaml .Values.container.command | nindent 10 }}
         {{- end }}
         {{- if .Values.container.args }}
         args:

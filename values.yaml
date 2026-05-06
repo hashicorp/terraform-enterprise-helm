@@ -35,6 +35,13 @@ pod:
 container:
 # Configure pod specific security context settings
   securityContext: {}
+  # Optional override for the container startup command.
+  # If set, this replaces the image default command.
+  # Custom wrappers must end by exec'ing /usr/local/bin/terraform-enterprise-run
+  # so the normal Terraform Enterprise bootstrap/startup path is preserved.
+  # command: []
+  # Optional args passed to the container command.
+  # args: []
 
 # The deployment's strategy is not set by default. This should be a YAML map corresponding to a
 # Kubernetes [DeploymentStrategy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#deploymentstrategy-v1-apps) object.
