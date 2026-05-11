@@ -212,6 +212,25 @@ ingress:
     #   hosts:
     #   - "*.ptfe-dev.aws.ptfedev.com"
 
+# ingressAdminConsole allows an ingress service to be created for the Terraform Enterprise
+# admin console, exposing it separately from the main application ingress.
+ingressAdminConsole:
+  enabled: false
+  className: "" # nginx
+  annotations: {}
+    # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+  hosts:
+    - host: "" # "*.ptfe-dev.aws.ptfedev.com"
+      paths:
+        - path: /
+          pathType: Prefix
+          serviceName: "terraform-enterprise"
+          portNumber: 8446
+  tls: []
+    # - secretName: terraform-enterprise-admin-console-certificates
+    #   hosts:
+    #   - "*.ptfe-dev.aws.ptfedev.com"
+
  # Injector service specific configurations
 service:
   annotations: {}
