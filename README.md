@@ -81,3 +81,4 @@ For more information about Terraform Enterprise and the capabilities of this hel
 * [Terraform Enterprise Application Configuration Options](docs/configuration.md#terraform-enterprise-application-configuration-options)
 * [Examples of Common Implementations](docs/implementations.md#implementation-examples)
 * [Terraform Enterprise Common Kubernetes Configuration](docs/kubernetes_configuration.md#terraform-enterprise-common-kubernetes-configuration)
+* [Terraform Enterprise Upgrades and Rollback](docs/upgrades_and_rollback.md)

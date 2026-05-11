@@ -1,3 +1,4 @@
 docs/example/terraform-enterprise-prereqs/charts
 .DS_Store
 overrides.yaml
+.vscode

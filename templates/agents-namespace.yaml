@@ -3,7 +3,7 @@ Copyright IBM Corp. 2023, 2025
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{- if .Values.agents.namespace.enabled }}
+{{- if and (not .Values.preupgradeCheck.enabled) .Values.agents.namespace.enabled }}
 ---
 apiVersion: v1
 kind: Namespace

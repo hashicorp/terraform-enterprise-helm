@@ -2,6 +2,7 @@
 Copyright IBM Corp. 2023, 2025
 SPDX-License-Identifier: MPL-2.0
 */}}
+{{- if not .Values.preupgradeCheck.enabled }}
 
 apiVersion: v1
 kind: Service
@@ -85,6 +86,6 @@ spec:
       appProtocol: {{ .Values.serviceSecondary.appProtocol }}
     {{- end }}
   selector:
-    app: terraform-enterprise
+    app: terraform-enterprise    
 {{- end }}
 {{- end }}

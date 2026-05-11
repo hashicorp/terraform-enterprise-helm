@@ -36,9 +36,9 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
+          token: ${{ secrets.TFE_GITHUB_TOKEN }} 
       - name: Configure Git
         run: |
-          git config --global url.'https://${{ secrets.TFE_GITHUB_TOKEN }}:@github.com'.insteadOf 'https://github.com'
           git config --global user.email "team-tf-enterprise@hashicorp.com" && git config --global user.name "hc-tfe-release-bot"
       - name: Get Target SHA
         id: get_sha

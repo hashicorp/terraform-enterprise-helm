@@ -1,0 +1,194 @@
+{{/*
+Copyright IBM Corp. 2023, 2025
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- include "helpers.preupgrade-validate-config" . }}
+{{- if .Values.preupgradeCheck.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "helpers.preupgrade-job-name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: terraform-enterprise-preupgrade-check
+    preupgrade-check.hashicorp.com/name: {{ include "helpers.preupgrade-job-name" . }}
+    {{- include "k8s.labels" . | nindent 4 }}
+  annotations:
+    tfe/target-version: {{ .Values.image.tag | quote }}
+spec:
+  backoffLimit: 0
+  # Auto-delete completed validation jobs.
+  ttlSecondsAfterFinished: {{ .Values.preupgradeCheck.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        app: terraform-enterprise-preupgrade-check
+        job-name: {{ include "helpers.preupgrade-job-name" . }}
+        preupgrade-check.hashicorp.com/name: {{ include "helpers.preupgrade-job-name" . }}
+      {{- if .Values.pod.annotations }}
+      annotations:
+        {{- toYaml .Values.pod.annotations | nindent 8 }}
+      {{- end }}
+    spec:
+      restartPolicy: Never
+
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- if .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ if .Values.serviceAccount.name }}{{ .Values.serviceAccount.name }}{{ else }}{{ .Release.Namespace }}{{ end }}
+      {{- end }}
+
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+
+      volumes:
+        - name: certificates
+          secret:
+            secretName: {{ .Values.tls.certificateSecret }}
+        {{- if or (and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData) .Values.tlsSecondary.certificateSecret }}
+        - name: certificates-secondary
+          secret:
+            secretName: {{ .Values.tlsSecondary.certificateSecret | default "terraform-enterprise-certificates-secondary" }}
+        {{- end }}
+        {{- if .Values.tls.caCertData }}
+        - name: ca-certificates
+          secret:
+            secretName: terraform-enterprise-ca-certificates
+        {{- end }}
+        {{- if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}
+        - name: certificates-redis
+          secret:
+            secretName: {{ .Values.tlsRedis.certificateSecret | default "terraform-enterprise-certificates-redis" }}
+        {{- end }}
+        {{- if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}
+        - name: certificates-redis-sidekiq
+          secret:
+            secretName: {{ .Values.tlsRedisSidekiq.certificateSecret | default "terraform-enterprise-certificates-redis-sidekiq" }}
+        {{- end }}
+        {{- if .Values.csi.enabled }}
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "{{ .Values.csi.secretProviderClass }}"
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+
+      containers:
+        - name: preupgrade-check
+          image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          # Match deployment container security defaults; apply SCC-safe defaults on OpenShift.
+          securityContext:
+          {{- if and .Values.openshift.enabled (not .Values.container.securityContext) }}
+            seccompProfile:
+              type: RuntimeDefault
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+          {{- else }}
+          {{- toYaml .Values.container.securityContext | nindent 12 }}
+          {{- end }}
+
+          command: ["/usr/local/bin/preupgrade-check"]
+
+          # Reuse baseline runtime config from the existing deployment.
+          envFrom:
+            - configMapRef:
+                name: terraform-enterprise-env-config
+            {{- if .Values.env.configMapRefs }}
+            {{- range .Values.env.configMapRefs }}
+            - configMapRef:
+                name: {{ .name }}
+            {{- end }}
+            {{- end }}
+            - secretRef:
+                name: terraform-enterprise-env-secrets
+            {{- if .Values.env.secretRefs }}
+            {{- range .Values.env.secretRefs }}
+            - secretRef:
+                name: {{ .name }}
+            {{- end }}
+            {{- end }}
+
+          {{- if or .Values.preupgradeCheck.extraEnv .Values.preupgradeCheck.extraSecrets (include "helpers.list-valueFrom-variables" .) }}
+          # Explicit env entries override envFrom values for target-version checks.
+          env:
+            {{- include "helpers.list-valueFrom-variables" . | indent 12 }}
+            {{- range $key, $val := .Values.preupgradeCheck.extraEnv }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- range $key, $_ := .Values.preupgradeCheck.extraSecrets }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "helpers.preupgrade-overrides-secret-name" $ }}
+                  key: {{ $key }}
+            {{- end }}
+          {{- end }}
+
+          resources:
+            {{- toYaml .Values.preupgradeCheck.resources | nindent 12 }}
+
+          volumeMounts:
+            {{- if or (and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData) .Values.tlsSecondary.certificateSecret }}
+            - name: certificates-secondary
+              mountPath: {{ .Values.tlsSecondary.certMountPath }}
+              subPath: tls.crt
+            - name: certificates-secondary
+              mountPath: {{ .Values.tlsSecondary.keyMountPath }}
+              subPath: tls.key
+            {{- end }}
+            - name: certificates
+              mountPath: {{ .Values.tls.certMountPath }}
+              subPath: tls.crt
+            - name: certificates
+              mountPath: {{ .Values.tls.keyMountPath }}
+              subPath: tls.key
+            {{- if .Values.tls.caCertData }}
+            - name: ca-certificates
+              mountPath: {{ include "cacert.path" . }}
+              subPath: {{ .Values.tls.caCertFileName }}
+            {{- end }}
+            {{- if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}
+            - name: certificates-redis
+              mountPath: {{ .Values.tlsRedis.certMountPath }}
+              subPath: tls.crt
+            - name: certificates-redis
+              mountPath: {{ .Values.tlsRedis.keyMountPath }}
+              subPath: tls.key
+            - name: certificates-redis
+              mountPath: {{ .Values.tlsRedis.caCertMountPath }}
+              subPath: tls.ca
+            {{- end }}
+            {{- if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}
+            - name: certificates-redis-sidekiq
+              mountPath: {{ .Values.tlsRedisSidekiq.certMountPath }}
+              subPath: tls.crt
+            - name: certificates-redis-sidekiq
+              mountPath: {{ .Values.tlsRedisSidekiq.keyMountPath }}
+              subPath: tls.key
+            - name: certificates-redis-sidekiq
+              mountPath: {{ .Values.tlsRedisSidekiq.caCertMountPath }}
+              subPath: tls.ca
+            {{- end }}
+            {{- if .Values.csi.enabled }}
+            - name: secrets-store
+              mountPath: "{{ .Values.csi.mountPath }}"
+              readOnly: true
+            {{- end }}
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+{{- end }}
