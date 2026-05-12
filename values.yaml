@@ -106,12 +106,6 @@ tfe:
   ## Readiness probe settings customize the terraform-enterprise health check path, eg: to use the full service dependency check
   # readinessProbePath: "/_health_check?full"
   # readinessProbeScheme: "HTTP"
-  ## Readiness probe timing settings. Tune these to accommodate slow startup environments
-  ## (e.g. EKS with NLB provisioning delay or high SNAT contention).
-  ## initialDelaySeconds: seconds to wait before the first probe (default: 0)
-  ## periodSeconds: how often to probe (default: 10)
-  ## failureThreshold: consecutive failures before marking unready (default: 3)
-  ## timeoutSeconds: seconds before a probe times out (default: 1)
   # readinessProbeInitialDelaySeconds: 60
   # readinessProbePeriodSeconds: 10
   # readinessProbeFailureThreshold: 30
