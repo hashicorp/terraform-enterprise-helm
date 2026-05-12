@@ -148,6 +148,18 @@ spec:
             path: {{ .Values.tfe.readinessProbePath | default "/api/v1/health/readiness" }}
             port: {{ .Values.tfe.privateHttpPort }}
             scheme: {{ .Values.tfe.readinessProbeScheme | default "HTTP"  }}
+          {{- if .Values.tfe.readinessProbeInitialDelaySeconds }}
+          initialDelaySeconds: {{ .Values.tfe.readinessProbeInitialDelaySeconds }}
+          {{- end }}
+          {{- if .Values.tfe.readinessProbePeriodSeconds }}
+          periodSeconds: {{ .Values.tfe.readinessProbePeriodSeconds }}
+          {{- end }}
+          {{- if .Values.tfe.readinessProbeFailureThreshold }}
+          failureThreshold: {{ .Values.tfe.readinessProbeFailureThreshold }}
+          {{- end }}
+          {{- if .Values.tfe.readinessProbeTimeoutSeconds }}
+          timeoutSeconds: {{ .Values.tfe.readinessProbeTimeoutSeconds }}
+          {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
