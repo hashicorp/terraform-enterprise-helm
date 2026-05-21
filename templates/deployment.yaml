@@ -55,6 +55,9 @@ spec:
       {{- end }}
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- if .Values.waitForDrain.enabled }}
+      terminationGracePeriodSeconds: 86400
+      {{- end }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
       volumes:
@@ -147,6 +150,15 @@ spec:
             path: {{ .Values.tfe.readinessProbePath | default "/api/v1/health/readiness" }}
             port: {{ .Values.tfe.privateHttpPort }}
             scheme: {{ .Values.tfe.readinessProbeScheme | default "HTTP"  }}
+        {{- if .Values.waitForDrain.enabled }}
+        lifecycle:
+          preStop:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "tfectl node drain && while pgrep -x task-worker > /dev/null 2>&1; do sleep 5; done"
+        {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
