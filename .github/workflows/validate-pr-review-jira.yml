@@ -149,10 +149,12 @@ jobs:
           description: |
             This story tracks PR review for a ready-for-review GitHub pull request.
 
-            Repository: ${{ github.repository }}
-            Pull request: #${{ steps.pr.outputs.number }} ${{ steps.pr.outputs.title }}
-            URL: ${{ steps.pr.outputs.url }}
-            Author: ${{ steps.pr.outputs.author }}
+            ### Pull Request Details
+
+            - **Repository:** ${{ github.repository }}
+            - **Pull request:** #${{ steps.pr.outputs.number }} ${{ steps.pr.outputs.title }}
+            - **URL:** ${{ steps.pr.outputs.url }}
+            - **Author:** ${{ steps.pr.outputs.author }}
           extraFields: |
             {
               "parent": { "key": "TF-36978" },
