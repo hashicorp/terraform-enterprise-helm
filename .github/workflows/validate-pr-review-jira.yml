@@ -3,7 +3,7 @@ name: Validate PR Review Jira Story
 on:
   push:
     branches:
-      - kosy/jira-sync-test-pr
+      - kosy/jira-sync-test-pr*
 
 permissions:
   contents: read
