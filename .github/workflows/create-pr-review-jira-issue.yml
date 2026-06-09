@@ -34,15 +34,63 @@ jobs:
       # This workflow is intentionally minimal because it runs on
       # pull_request_target in a public repository. It should only read GitHub
       # event payload data and call Jira with the three required Jira secrets.
-      - name: Search Jira for an existing PR review story
-        id: search
-        uses: hashicorp/gh-action-jira-search@96aebbb9218932983bfbe6984e4c1e3ec3bf710e # v0.3.1
+      - name: Validate Jira authentication
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-        with:
-          jql: 'project = "${{ inputs.project }}" AND labels = "${{ github.event.repository.name }}-pr-${{ github.event.pull_request.number }}"'
+        run: |
+          set -euo pipefail
+
+          auth_status="$(curl --silent --show-error --write-out '%{http_code}' \
+            --output /dev/null \
+            --url "${JIRA_BASE_URL%/}/rest/api/3/myself" \
+            --user "$JIRA_USER_EMAIL:$JIRA_API_TOKEN" \
+            --header 'Accept: application/json')"
+
+          if [[ "$auth_status" != "200" ]]; then
+            echo "::error::Jira authentication failed with status ${auth_status}. Check JIRA_BASE_URL, JIRA_USER_EMAIL, and JIRA_API_TOKEN."
+            exit 1
+          fi
+
+      - name: Search Jira for an existing PR review story
+        id: search
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_PROJECT: ${{ inputs.project }}
+          UNIQUE_LABEL: ${{ github.event.repository.name }}-pr-${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          response_file="$(mktemp)"
+          trap 'rm -f "$response_file"' EXIT
+
+          search_payload="$(jq -n \
+            --arg project "$JIRA_PROJECT" \
+            --arg unique_label "$UNIQUE_LABEL" \
+            '{
+              jql: ("project = " + $project + " AND labels = \"" + $unique_label + "\""),
+              maxResults: 1,
+              fields: ["key"]
+            }')"
+
+          search_status="$(curl --silent --show-error --write-out '%{http_code}' \
+            --output "$response_file" \
+            --request POST \
+            --url "${JIRA_BASE_URL%/}/rest/api/3/search/jql" \
+            --user "$JIRA_USER_EMAIL:$JIRA_API_TOKEN" \
+            --header 'Accept: application/json' \
+            --header 'Content-Type: application/json' \
+            --data "$search_payload")"
+
+          if [[ "$search_status" != "200" ]]; then
+            echo "::error::Jira search failed with status ${search_status}."
+            exit 1
+          fi
+
+          echo "issue=$(jq -r '.issues[0].key // ""' "$response_file")" >> "$GITHUB_OUTPUT"
 
       - name: Build Jira summary
         if: ${{ steps.search.outputs.issue == '' }}
@@ -78,10 +126,12 @@ jobs:
           description: |
             This story tracks PR review for a ready-for-review GitHub pull request.
 
-            Repository: ${{ github.repository }}
-            Pull request: #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}
-            URL: ${{ github.event.pull_request.html_url }}
-            Author: ${{ github.event.pull_request.user.login }}
+            ### Pull Request Details
+
+            - **Repository:** ${{ github.repository }}
+            - **Pull request:** #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}
+            - **URL:** ${{ github.event.pull_request.html_url }}
+            - **Author:** ${{ github.event.pull_request.user.login }}
           extraFields: |
             {
               "parent": { "key": "${{ inputs.parent-key }}" },
