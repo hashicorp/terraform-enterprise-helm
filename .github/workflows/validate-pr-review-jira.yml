@@ -102,7 +102,7 @@ jobs:
           search_status="$(curl --silent --show-error --write-out '%{http_code}' \
             --output "$response_file" \
             --request POST \
-            --url "${JIRA_BASE_URL%/}/rest/api/3/search" \
+            --url "${JIRA_BASE_URL%/}/rest/api/3/search/jql" \
             --user "$JIRA_USER_EMAIL:$JIRA_API_TOKEN" \
             --header 'Accept: application/json' \
             --header 'Content-Type: application/json' \
