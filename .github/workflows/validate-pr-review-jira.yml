@@ -44,6 +44,40 @@ jobs:
             core.setOutput('url', pr.html_url)
             core.setOutput('author', pr.user.login)
 
+      - name: Validate Jira secrets and authentication
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          missing=()
+          for secret_name in JIRA_BASE_URL JIRA_USER_EMAIL JIRA_API_TOKEN; do
+            if [[ -z "${!secret_name:-}" ]]; then
+              missing+=("$secret_name")
+            fi
+          done
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error::Missing required Jira secrets: ${missing[*]}"
+            exit 1
+          fi
+
+          auth_response_file="$(mktemp)"
+          trap 'rm -f "$auth_response_file"' EXIT
+
+          auth_status="$(curl --silent --show-error --write-out '%{http_code}' \
+            --output "$auth_response_file" \
+            --url "${JIRA_BASE_URL%/}/rest/api/3/myself" \
+            --user "$JIRA_USER_EMAIL:$JIRA_API_TOKEN" \
+            --header 'Accept: application/json')"
+
+          if [[ "$auth_status" != "200" ]]; then
+            echo "::error::Jira authentication check failed with status ${auth_status}."
+            exit 1
+          fi
+
       - name: Search Jira for an existing PR review story
         id: search
         env:
