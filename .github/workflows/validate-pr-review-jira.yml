@@ -1,0 +1,106 @@
+name: Validate PR Review Jira Story
+
+on:
+  push:
+    branches:
+      - kosy/jira-sync-test-pr
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: validate-pr-review-jira-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-pr-review-jira-story:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Look up validation PR
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.ref.replace('refs/heads/', '')
+            const { owner, repo } = context.repo
+
+            const { data: pulls } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head: `${owner}:${branch}`,
+              base: 'kosy/jira-sync-test-base',
+            })
+
+            if (pulls.length !== 1) {
+              core.setFailed(`Expected exactly one open validation PR for ${branch}, found ${pulls.length}.`)
+              return
+            }
+
+            const pr = pulls[0]
+            core.setOutput('number', String(pr.number))
+            core.setOutput('title', pr.title)
+            core.setOutput('url', pr.html_url)
+            core.setOutput('author', pr.user.login)
+
+      - name: Search Jira for an existing PR review story
+        id: search
+        uses: hashicorp/gh-action-jira-search@96aebbb9218932983bfbe6984e4c1e3ec3bf710e # v0.3.1
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        with:
+          jql: 'project = "TF" AND labels = "${{ github.event.repository.name }}-pr-${{ steps.pr.outputs.number }}"'
+
+      - name: Build Jira summary
+        if: ${{ steps.search.outputs.issue == '' }}
+        id: summary
+        env:
+          REPOSITORY_NAME: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          PR_TITLE: ${{ steps.pr.outputs.title }}
+        run: |
+          set -euo pipefail
+
+          summary_prefix="[PR Review] ${REPOSITORY_NAME} #${PR_NUMBER}: "
+          max_title_length=$((255 - ${#summary_prefix}))
+          summary_title="$PR_TITLE"
+
+          if (( ${#summary_title} > max_title_length )); then
+            summary_title="${summary_title:0:$((max_title_length - 3))}..."
+          fi
+
+          echo "value=${summary_prefix}${summary_title}" >> "$GITHUB_OUTPUT"
+
+      - name: Create Jira PR review story
+        if: ${{ steps.search.outputs.issue == '' }}
+        uses: hashicorp/gh-action-jira-create@84c84ad564106f548729912dbda38d66ef117bb7 # v0.3.0
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        with:
+          project: TF
+          issuetype: Story
+          summary: ${{ steps.summary.outputs.value }}
+          description: |
+            This story tracks PR review for a ready-for-review GitHub pull request.
+
+            Repository: ${{ github.repository }}
+            Pull request: #${{ steps.pr.outputs.number }} ${{ steps.pr.outputs.title }}
+            URL: ${{ steps.pr.outputs.url }}
+            Author: ${{ steps.pr.outputs.author }}
+          extraFields: |
+            {
+              "parent": { "key": "TF-36978" },
+              "labels": [
+                "github-pr-review",
+                "${{ github.event.repository.name }}-pr-${{ steps.pr.outputs.number }}"
+              ]
+            }
+
+      - name: Skip existing Jira PR review story
+        if: ${{ steps.search.outputs.issue != '' }}
+        run: echo "A Jira PR review story already exists for this pull request."
