@@ -1,0 +1,24 @@
+name: Create PR Review Jira Story
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+
+permissions:
+  contents: read
+
+jobs:
+  call-workflow:
+    if: ${{ github.event.pull_request.draft == false }}
+    uses: ./.github/workflows/create-pr-review-jira-issue.yml
+    with:
+      project: TF
+      issue-type: Story
+      parent-key: TF-36978
+    secrets:
+      JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+      JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+      JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}

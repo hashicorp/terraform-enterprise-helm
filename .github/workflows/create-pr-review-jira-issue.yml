@@ -1,0 +1,146 @@
+name: Create PR Review Jira Story Workflow
+
+on:
+  workflow_call:
+    inputs:
+      project:
+        required: true
+        type: string
+      issue-type:
+        required: true
+        type: string
+      parent-key:
+        required: true
+        type: string
+    secrets:
+      JIRA_BASE_URL:
+        required: true
+      JIRA_USER_EMAIL:
+        required: true
+      JIRA_API_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-review-jira-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  create-pr-review-jira-story:
+    runs-on: ubuntu-latest
+    steps:
+      # This workflow is intentionally minimal because it runs on
+      # pull_request_target in a public repository. It should only read GitHub
+      # event payload data and call Jira with the three required Jira secrets.
+      - name: Validate Jira authentication
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          auth_status="$(curl --silent --show-error --write-out '%{http_code}' \
+            --output /dev/null \
+            --url "${JIRA_BASE_URL%/}/rest/api/3/myself" \
+            --user "$JIRA_USER_EMAIL:$JIRA_API_TOKEN" \
+            --header 'Accept: application/json')"
+
+          if [[ "$auth_status" != "200" ]]; then
+            echo "::error::Jira authentication failed with status ${auth_status}. Check JIRA_BASE_URL, JIRA_USER_EMAIL, and JIRA_API_TOKEN."
+            exit 1
+          fi
+
+      - name: Search Jira for an existing PR review story
+        id: search
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_PROJECT: ${{ inputs.project }}
+          UNIQUE_LABEL: ${{ github.event.repository.name }}-pr-${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          response_file="$(mktemp)"
+          trap 'rm -f "$response_file"' EXIT
+
+          search_payload="$(jq -n \
+            --arg project "$JIRA_PROJECT" \
+            --arg unique_label "$UNIQUE_LABEL" \
+            '{
+              jql: ("project = " + $project + " AND labels = \"" + $unique_label + "\""),
+              maxResults: 1,
+              fields: ["key"]
+            }')"
+
+          search_status="$(curl --silent --show-error --write-out '%{http_code}' \
+            --output "$response_file" \
+            --request POST \
+            --url "${JIRA_BASE_URL%/}/rest/api/3/search/jql" \
+            --user "$JIRA_USER_EMAIL:$JIRA_API_TOKEN" \
+            --header 'Accept: application/json' \
+            --header 'Content-Type: application/json' \
+            --data "$search_payload")"
+
+          if [[ "$search_status" != "200" ]]; then
+            echo "::error::Jira search failed with status ${search_status}."
+            exit 1
+          fi
+
+          echo "issue=$(jq -r '.issues[0].key // ""' "$response_file")" >> "$GITHUB_OUTPUT"
+
+      - name: Build Jira summary
+        if: ${{ steps.search.outputs.issue == '' }}
+        id: summary
+        env:
+          REPOSITORY_NAME: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -euo pipefail
+
+          summary_prefix="[PR Review] ${REPOSITORY_NAME} #${PR_NUMBER}: "
+          max_title_length=$((255 - ${#summary_prefix}))
+          summary_title="$PR_TITLE"
+
+          if (( ${#summary_title} > max_title_length )); then
+            summary_title="${summary_title:0:$((max_title_length - 3))}..."
+          fi
+
+          echo "value=${summary_prefix}${summary_title}" >> "$GITHUB_OUTPUT"
+
+      - name: Create Jira PR review story
+        if: ${{ steps.search.outputs.issue == '' }}
+        uses: hashicorp/gh-action-jira-create@84c84ad564106f548729912dbda38d66ef117bb7 # v0.3.0
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        with:
+          project: ${{ inputs.project }}
+          issuetype: ${{ inputs.issue-type }}
+          summary: ${{ steps.summary.outputs.value }}
+          description: |
+            This story tracks PR review for a ready-for-review GitHub pull request.
+
+            ### Pull Request Details
+
+            - **Repository:** ${{ github.repository }}
+            - **Pull request:** #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}
+            - **URL:** ${{ github.event.pull_request.html_url }}
+            - **Author:** ${{ github.event.pull_request.user.login }}
+          extraFields: |
+            {
+              "parent": { "key": "${{ inputs.parent-key }}" },
+              "labels": [
+                "github-pr-review",
+                "${{ github.event.repository.name }}-pr-${{ github.event.pull_request.number }}"
+              ]
+            }
+
+      - name: Skip existing Jira PR review story
+        if: ${{ steps.search.outputs.issue != '' }}
+        run: echo "A Jira PR review story already exists for this pull request."
