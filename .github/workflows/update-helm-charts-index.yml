@@ -26,16 +26,5 @@ jobs:
             --ref main \
             -f SOURCE_TAG="${{ github.ref_name }}" \
             -f SOURCE_REPO="${{ github.repository }}"
-      - name: Send Slack Notification
-        if: ${{ always() }}
-        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: incoming-webhook
-        with:
-          payload: |
-            {
-              "text": "${{ steps.update.conclusion == 'success' && ':tada: terraform-enterprise-helm charts index update triggered successfully. View the <https://github.com/hashicorp/helm-charts/actions/workflows/publish-charts.yml|run>.' || ':red_circle: The terraform-enterprise-helm charts index update trigger failed.' }}"
-            }
 permissions:
   contents: read
