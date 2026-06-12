@@ -30,9 +30,12 @@ dependencies:
 - name: postgresql
   version: "12.5.6"
   repository: "oci://registry-1.docker.io/bitnamicharts"
+  condition: postgresql.enabled
 - name: minio
   version: "5.4.0"
   repository: "https://charts.min.io/"
+  condition: minio.enabled
 - name: redis
   version: "17.11.3"
   repository: "oci://registry-1.docker.io/bitnamicharts"
+  condition: redis.enabled
