@@ -8,9 +8,11 @@
 
 ## Helm Chart Impact
 
-- Does this PR make a substantial change to the Helm chart architecture? If yes, describe.
+Architecture impact:
+<!-- Does this PR make a substantial change to the Helm chart architecture? If yes, describe. -->
 
-- Does this PR change rendered Kubernetes resources, chart defaults, upgrade/rollback behavior, or security-sensitive areas such as RBAC, secrets, ingress/networking, storage, or availability? If yes, describe.
+Rendered resource / operational / security impact:
+<!-- Does this PR change rendered Kubernetes resources, chart defaults, upgrade/rollback behavior, or security-sensitive areas such as RBAC, secrets, ingress/networking, storage, or availability? If yes, describe. -->
 
 ## Testing
 
