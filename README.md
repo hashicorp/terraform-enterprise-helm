@@ -25,6 +25,12 @@ The versions required are:
 
 Complete documentation and instructions for the installation of Terraform Enterprise can be found on the [Terraform Enterprise developer site](https://developer.hashicorp.com/terraform/enterprise/flexible-deployments/install).
 
+## Custom container startup overrides
+
+The chart supports optional `container.command` and `container.args` values to allow environment-specific startup customization.
+
+Be aware that setting `container.command` replaces the container image's default startup command. Terraform Enterprise normally starts through `/usr/local/bin/terraform-enterprise-run`. If you provide a custom wrapper script or command, it must end by exec'ing `/usr/local/bin/terraform-enterprise-run`, otherwise the normal Terraform Enterprise bootstrap and startup flow will be skipped.
+
 ## Helpful Commands
 There are a number of common helm or kubectl commands you can use to monitor the installation and the runtime of Terraform Enterprise. We list some of them here. We assume that the namespace is `terraform-enterprise`. If you have a different namespace, replace it with yours.
 
