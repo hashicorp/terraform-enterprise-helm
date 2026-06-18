@@ -1,0 +1,1 @@
+Temporary file for validating the Jira PR author skip workflow.
