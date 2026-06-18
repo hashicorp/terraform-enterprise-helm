@@ -12,7 +12,14 @@ permissions:
 
 jobs:
   call-workflow:
-    if: ${{ github.event.pull_request.draft == false }}
+    if: >-
+      ${{
+        github.event.pull_request.draft == false &&
+        !contains(
+          fromJSON(vars.JIRA_PR_SKIP_AUTHORS_JSON || '[]'),
+          github.event.pull_request.user.login
+        )
+      }}
     uses: ./.github/workflows/create-pr-review-jira-issue.yml
     with:
       project: TF
