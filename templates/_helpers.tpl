@@ -76,11 +76,17 @@ Prints the key-value pair from the 'env.variables' entry in the Values file.
 
 {{/*
 Prints the key-value pair from the 'env.secrets' entry in the Values file
-and base64 encodes the value.
+and base64 encodes the value. If the value starts with 'b64:', it is treated
+as already base64-encoded and the prefix is stripped (useful for passing
+secrets through tooling that mangles raw special characters, e.g. Helm --set).
 */}}
 {{- define "helpers.list-env-secrets" }}
 {{- range $key, $val := .Values.env.secrets }}
+{{- if hasPrefix "b64:" $val }}
+{{ $key }}: {{ $val | trimPrefix "b64:" }}
+{{- else }}
 {{ $key }}: {{ trim $val | b64enc }}
+{{- end }}
 {{- end }}
 {{- end }}
 
