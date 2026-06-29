@@ -3,6 +3,9 @@ name: Helm Chart CI
 on:
   push:
 
+permissions:
+  contents: read
+
 jobs:
   helm_chart_ci:
     runs-on: ubuntu-latest
