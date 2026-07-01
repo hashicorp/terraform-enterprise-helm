@@ -85,11 +85,13 @@ tolerations: []
 affinity: {}
 
 postgresql:
+  enabled: true
   auth:
     postgresPassword: "Terraform-Enterprise!"
     database: tfe
 
 minio:
+  enabled: true
   image:
     tag: RELEASE.2025-10-15T17-29-55Z
   rootUser: tfeclusteradmin
@@ -110,5 +112,6 @@ minio:
       secretKey: Terraform-Enterprise!
       policy: readwrite
 redis:
+  enabled: true
   auth:
     enabled: false
