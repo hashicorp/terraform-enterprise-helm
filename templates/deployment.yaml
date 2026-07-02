@@ -157,7 +157,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - "tfectl node drain && while pgrep -x task-worker > /dev/null 2>&1; do sleep 5; done"
+                - "sleep 15 && tfectl node drain && while pgrep -x task-worker > /dev/null 2>&1; do sleep 5; done"
         {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
