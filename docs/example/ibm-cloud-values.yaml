@@ -29,8 +29,9 @@ env:
     TFE_LICENSE: <your-license>
     TFE_DATABASE_PASSWORD: <your-icd-password>
 
-# Create the required extensions before TFE starts. Use the same TFE image as above
-# (it includes psql), so no separate image is needed.
+# Optional automation: this init container creates the extensions before TFE starts so
+# operators do not have to. You can also create them manually before install (see docs).
+# Use the same TFE image as above; it includes psql, so no separate image is needed.
 initContainers:
   - name: create-pg-extensions
     image: images.releases.hashicorp.com/hashicorp/terraform-enterprise:2.0.5
