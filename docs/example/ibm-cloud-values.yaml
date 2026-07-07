@@ -6,6 +6,7 @@
 # create them, so both pieces are required. See the connect-database docs for details.
 # Replace the placeholder values.
 
+# On IBM Cloud catalog deployments, use the entitled image cp.icr.io/cp/ibm-terraform/ibm-terraform instead.
 image:
   repository: images.releases.hashicorp.com
   name: hashicorp/terraform-enterprise
