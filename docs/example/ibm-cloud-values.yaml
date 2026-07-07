@@ -2,12 +2,13 @@
 #
 # IBM Cloud only allows PostgreSQL extensions in the `ibm_extension` schema and TFE
 # cannot create them itself, so the init container below creates them before TFE
-# starts, and TFE_DATABASE_EXTRA_SCHEMAS points TFE at that schema. See the
-# connect-database docs for the full explanation. Replace the placeholder values.
+# starts. TFE_DATABASE_EXTRA_SCHEMAS only tells TFE where to find them, it does not
+# create them, so both pieces are required. See the connect-database docs for details.
+# Replace the placeholder values.
 
 image:
-  repository: cp.icr.io/cp/ibm-terraform
-  name: ibm-terraform
+  repository: images.releases.hashicorp.com
+  name: hashicorp/terraform-enterprise
   tag: "2.0.5"
 
 env:
@@ -28,11 +29,11 @@ env:
     TFE_LICENSE: <your-license>
     TFE_DATABASE_PASSWORD: <your-icd-password>
 
-# Create the required extensions before TFE starts. Reuses the TFE image (it has psql);
-# keep this image tag in sync with image.tag above.
+# Create the required extensions before TFE starts. Use the same TFE image as above
+# (it includes psql), so no separate image is needed.
 initContainers:
   - name: create-pg-extensions
-    image: cp.icr.io/cp/ibm-terraform/ibm-terraform:2.0.5
+    image: images.releases.hashicorp.com/hashicorp/terraform-enterprise:2.0.5
     command: ["/bin/sh", "-c"]
     args:
       - >
