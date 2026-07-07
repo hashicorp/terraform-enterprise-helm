@@ -1,3 +1,7 @@
+CHANGELOG:
+
+<!--  Please add a changelog entry that will be used for our release notes, or add "no-impact". -->
+
 ## Summary
 
 <!-- What changed in 1-3 sentences? -->
