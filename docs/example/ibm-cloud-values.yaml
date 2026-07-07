@@ -1,24 +1,9 @@
-# Example values for Terraform Enterprise on IBM Cloud with IBM Cloud Databases
-# for PostgreSQL.
+# Terraform Enterprise on IBM Cloud with IBM Cloud Databases for PostgreSQL.
 #
-# Problem this solves:
-# IBM Cloud Databases for PostgreSQL only allows extensions to be installed into
-# a dedicated `ibm_extension` schema, and Terraform Enterprise cannot create them
-# there itself. Without help, Terraform Enterprise fails to start with a
-# "missing required extensions" error.
-#
-# This example automates the fix with the chart's existing initContainers
-# passthrough, so it needs no chart change:
-#   1. An init container creates the required extensions before Terraform
-#      Enterprise starts. It reuses the Terraform Enterprise image, which already
-#      ships psql, so no extra image needs mirroring for air-gapped installs, and
-#      it reads the database connection from the chart's own env config and
-#      secret, so it needs no separate credential.
-#   2. TFE_DATABASE_EXTRA_SCHEMAS=ibm_extension puts that schema on the search
-#      path so Terraform Enterprise finds the extensions.
-#
-# The extension-creation step was verified against IBM Cloud Databases for
-# PostgreSQL on 2026-07-07 (TF-38200). Replace the placeholder values below.
+# IBM Cloud only allows PostgreSQL extensions in the `ibm_extension` schema and TFE
+# cannot create them itself, so the init container below creates them before TFE
+# starts, and TFE_DATABASE_EXTRA_SCHEMAS points TFE at that schema. See the
+# connect-database docs for the full explanation. Replace the placeholder values.
 
 image:
   repository: cp.icr.io/cp/ibm-terraform
@@ -30,14 +15,12 @@ env:
     TFE_HOSTNAME: <your-tfe-hostname>
     TFE_OPERATIONAL_MODE: external
 
-    # IBM Cloud Databases for PostgreSQL connection.
     TFE_DATABASE_HOST: <your-icd-host>:<port>
     TFE_DATABASE_NAME: ibmclouddb
     TFE_DATABASE_USER: admin
     TFE_DATABASE_PARAMETERS: sslmode=require
 
-    # Put the ibm_extension schema on the search path so Terraform Enterprise
-    # finds the extensions the init container creates.
+    # where the init container creates the extensions
     TFE_DATABASE_EXTRA_SCHEMAS: ibm_extension
 
   secrets:
@@ -45,9 +28,8 @@ env:
     TFE_LICENSE: <your-license>
     TFE_DATABASE_PASSWORD: <your-icd-password>
 
-# Create the required PostgreSQL extensions before Terraform Enterprise starts.
-# Keep this image in sync with image.* above. It reuses the Terraform Enterprise
-# image because that image already includes psql.
+# Create the required extensions before TFE starts. Reuses the TFE image (it has psql);
+# keep this image tag in sync with image.tag above.
 initContainers:
   - name: create-pg-extensions
     image: cp.icr.io/cp/ibm-terraform/ibm-terraform:2.0.5
