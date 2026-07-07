@@ -10,7 +10,7 @@
 image:
   repository: images.releases.hashicorp.com
   name: hashicorp/terraform-enterprise
-  tag: "2.0.5"
+  tag: "2.0.4"
 
 env:
   variables:
@@ -35,7 +35,7 @@ env:
 # Use the same TFE image as above; it includes psql, so no separate image is needed.
 initContainers:
   - name: create-pg-extensions
-    image: images.releases.hashicorp.com/hashicorp/terraform-enterprise:2.0.5
+    image: images.releases.hashicorp.com/hashicorp/terraform-enterprise:2.0.4
     command: ["/bin/sh", "-c"]
     args:
       - >
