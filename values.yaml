@@ -103,8 +103,8 @@ tfe:
   privateHttpsPort: 8443
   # Specifies the port that the system API endpoints listen on for HTTPS requests.
   adminHttpsPort: 8446
-  ## Readiness probe settings customize the terraform-enterprise health check path, eg: to use the full service dependency check
-  # readinessProbePath: "/_health_check?full"
+  ## Readiness probe settings customize the Terraform Enterprise readiness endpoint.
+  # readinessProbePath: "/api/v1/health/readiness"
   # readinessProbeScheme: "HTTP"
   # readinessProbeInitialDelaySeconds: 60
   # readinessProbePeriodSeconds: 10
@@ -224,7 +224,7 @@ service:
     # - For Google Cloud, use the NEG (Network Endpoint Group) annotation:
     #   cloud.google.com/neg: '{"ingress": true}'
     # - For Azure, configure the health probe request path for HTTPS health checks:
-    #   service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/_health_check"
+    #   service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/api/v1/health/readiness"
   labels: {}
     # Add labels to the service created for Terraform Enterprise. Helpful if your metrics collection
     # depends on ServiceMonitors instead of pod annotations.
@@ -256,7 +256,7 @@ serviceSecondary:
     # - For Google Cloud, use the NEG (Network Endpoint Group) annotation:
     #   cloud.google.com/neg: '{"ingress": true}'
     # - For Azure, configure the health probe request path for HTTPS health checks:
-    #   service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/_health_check"
+    #   service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/api/v1/health/readiness"
   labels: {}
     # Add labels to the service created for Terraform Enterprise. Helpful if your metrics collection
     # depends on ServiceMonitors instead of pod annotations.
