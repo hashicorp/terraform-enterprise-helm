@@ -125,7 +125,7 @@ We need to establish communication with Terraform Enterprise to continue. This w
 
 * Installing the included CA certificate into your local CA certificates or key store
 * Creating a host file entry for the load balancer for Terraform Enterprise
-* Testing your connection to Terraform Enterprise by inspecting the `_health_check` endpoint of Terraform Enterprise with `curl`
+* Testing your connection to Terraform Enterprise by inspecting the readiness endpoint with `curl`
 * Creating an administrative account and authenticating to Terraform Enterprise in the browser.
 
 Feel free to generate a new TLS key set and a CA certificate if you do not wish to install the included CA certificate. Alternatively, you could execute this configuration and testing procedure inside an isolated virtual machine.
@@ -156,8 +156,8 @@ Now add a host file entry on your workstation for this external ip address:
 
 and validate this address with curl:
 ```shell
-> curl https://terraform-enterprise.terraform-enterprise.svc.cluster.local/_health_check
-OK
+> curl --fail --silent --output /dev/null --write-out '%{http_code}\n' https://terraform-enterprise.terraform-enterprise.svc.cluster.local/api/v1/health/readiness
+200
 ```
 
 ## Test Drive Terraform Enterprise!
