@@ -1,5 +1,5 @@
 ## Unreleased
-* Add `tfe.adminConsole.accessMode` to configure the Admin Console access posture (`TFE_ADMIN_CONSOLE_ACCESS_MODE`: `port`, `both`, `disabled`) without injecting raw environment variables. Omitting it preserves the legacy dedicated-port behaviour. In `both` mode the default ingress already routes `/platform/admin` to the service.
+* Add `tfe.adminConsole.accessMode` to configure the Admin Console access posture (`TFE_ADMIN_CONSOLE_ACCESS_MODE`: `port`, `both`, `disabled`) without injecting raw environment variables. Omitting it preserves the legacy dedicated-port behaviour. In `both` mode the default ingress already routes `/platform/admin` to the service. See the security note in `docs/configuration.md`: `both` exposes the privileged admin surface on the primary hostname with no network restriction, so restrict it at the ingress and/or via `TFE_ADMIN_CONSOLE_STANDARD_ALLOW_CIDRS`/`TFE_ADMIN_CONSOLE_STANDARD_TRUSTED_PROXIES`.
 
 ## 1.1.1 (December 5th, 2023)
 * Support container securityContext configuration from values [#57](https://github.com/hashicorp/terraform-enterprise-helm/pull/57) 

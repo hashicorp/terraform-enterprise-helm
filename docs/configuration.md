@@ -101,10 +101,34 @@ primary host to the Terraform Enterprise service (a `/` `Prefix` rule), so
 `/platform/admin/` is reachable without configuring a separate Admin Console
 ingress.
 
+> **Security — `both` exposes the privileged admin surface with no network
+> restriction.** Because the default ingress routes every path to the TFE
+> service, enabling `both` publishes the privileged Admin Console UI and Admin
+> API on your primary hostname to anything that can reach the ingress. If you
+> previously isolated the dedicated admin port with a firewall or
+> `NetworkPolicy`, that protection no longer applies. A Kubernetes
+> `NetworkPolicy` operates at L3/L4 and **cannot** restrict by URL path, so it
+> cannot protect `/platform/admin` while keeping the rest of `:443` open — the
+> restriction must be applied at the ingress/HTTP layer. Before enabling `both`:
+>
+> - restrict `/platform/admin` at the ingress controller (for example, an IP
+>   allow-list annotation scoped to that path), and/or
+> - set the TFE-side allow-list via `env.variables`:
+>   `TFE_ADMIN_CONSOLE_STANDARD_ALLOW_CIDRS` (permitted client sources) together
+>   with `TFE_ADMIN_CONSOLE_STANDARD_TRUSTED_PROXIES` (your ingress/LB addresses,
+>   required so the allow-list matches the real client rather than the ingress).
+
 ```yaml
 tfe:
   adminConsole:
     accessMode: both
+env:
+  variables:
+    # Restore a network restriction on the shared :443 admin surface. Trusted
+    # proxies are required behind an ingress so the allow-list matches the
+    # client, not the ingress source address.
+    TFE_ADMIN_CONSOLE_STANDARD_ALLOW_CIDRS: "10.20.0.0/16"
+    TFE_ADMIN_CONSOLE_STANDARD_TRUSTED_PROXIES: "192.0.2.0/24"
 ```
 
 ## Custom agent worker pod template

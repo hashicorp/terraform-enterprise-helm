@@ -119,6 +119,20 @@ tfe:
   # served at /platform/admin on the primary hostname, which the default ingress
   # (a `/` Prefix rule) already routes to the TFE service - no separate Admin
   # Console ingress is required.
+  #
+  # SECURITY: "both" serves the privileged Admin Console UI and Admin API on your
+  # primary hostname over standard HTTPS, alongside the dedicated admin port.
+  # Because the default ingress routes all paths to the TFE service, enabling
+  # "both" publishes the admin surface to anything that can reach the ingress,
+  # with NO network restriction. If you previously relied on firewalling /
+  # NetworkPolicy on the dedicated admin port, that isolation no longer applies.
+  # A Kubernetes NetworkPolicy cannot restrict by URL path, so it cannot protect
+  # /platform/admin while leaving the rest of :443 open. Before enabling "both",
+  # restrict access at the ingress layer (e.g. ingress-controller IP allow-list
+  # annotations on the /platform/admin path) and/or set the TFE-side allow-list
+  # env vars TFE_ADMIN_CONSOLE_STANDARD_ALLOW_CIDRS and
+  # TFE_ADMIN_CONSOLE_STANDARD_TRUSTED_PROXIES (via env.variables; the latter is
+  # required so the allow-list matches the real client rather than the ingress).
   adminConsole:
     accessMode: ""
   ## Readiness probe settings customize the terraform-enterprise health check path, eg: to use the full service dependency check
