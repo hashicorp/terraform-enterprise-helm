@@ -1,3 +1,6 @@
+## 2.0.4 (July 17th, 2025)
+* Support custom configuration for readiness probe timing [#180](https://github.com/hashicorp/terraform-enterprise-helm/pull/180)
+
 ## 1.1.1 (December 5th, 2023)
 * Support container securityContext configuration from values [#57](https://github.com/hashicorp/terraform-enterprise-helm/pull/57) 
 
