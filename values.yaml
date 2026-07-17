@@ -61,8 +61,9 @@ resources:
 # secrets management system. The values given below are for testing purposes only.
 tls:
   # Defaults to true (certificates volume and volumeMounts are added) when unset,
-  # for backwards compatibility. Set to false to omit them entirely, e.g. when TLS
-  # termination happens outside the pod.
+  # for backwards compatibility. Set to false to omit them, e.g. when the TLS cert
+  # and key files are mounted by other means, such as a CSI driver using
+  # extraVolumes/extraVolumeMounts.
   # enabled: true
   certificateSecret: terraform-enterprise-certificates
   caCertBaseDir: /etc/ssl/certs
