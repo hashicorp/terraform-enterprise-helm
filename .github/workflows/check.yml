@@ -24,6 +24,11 @@ jobs:
         run: |
           helm lint .
 
+      # Step 3b: Template coverage for the Admin Console access-mode truth table.
+      - name: Test Admin Console access mode
+        run: |
+          ./ci/test-admin-console-access-mode.sh .
+
       # Step 4: Install kubeconform
       - name: Install kubeconform
         run: |

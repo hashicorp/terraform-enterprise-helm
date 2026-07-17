@@ -103,6 +103,24 @@ tfe:
   privateHttpsPort: 8443
   # Specifies the port that the system API endpoints listen on for HTTPS requests.
   adminHttpsPort: 8446
+  # Admin Console access posture. Renders TFE_ADMIN_CONSOLE_ACCESS_MODE.
+  #
+  # Supported values (access-mode truth table):
+  #
+  #   accessMode   dedicated :adminHttpsPort   primary host /platform/admin
+  #   ----------   -------------------------   ----------------------------
+  #   "port"       UI + API                    off
+  #   "both"       UI + API                    UI + API
+  #   "disabled"   off                         off
+  #   "" (unset)   legacy: UI + API            off
+  #
+  # Leave empty ("") to preserve the legacy behaviour (dedicated port only). Any
+  # other value fails template rendering. In "both" mode the Admin Console is
+  # served at /platform/admin on the primary hostname, which the default ingress
+  # (a `/` Prefix rule) already routes to the TFE service - no separate Admin
+  # Console ingress is required.
+  adminConsole:
+    accessMode: ""
   ## Readiness probe settings customize the terraform-enterprise health check path, eg: to use the full service dependency check
   # readinessProbePath: "/_health_check?full"
   # readinessProbeScheme: "HTTP"

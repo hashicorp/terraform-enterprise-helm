@@ -77,6 +77,36 @@ items:
 ...
 ```
 
+## Admin Console access mode
+
+The `.Values.tfe.adminConsole.accessMode` value sets the Admin Console access
+posture by rendering `TFE_ADMIN_CONSOLE_ACCESS_MODE` into the application
+ConfigMap. Supported values are `port`, `both`, and `disabled`. Omitting the
+value (the default empty string) preserves the legacy behaviour, in which the
+Admin Console is served on the dedicated admin HTTPS port only.
+
+| `accessMode`   | Dedicated admin port (`tfe.adminHttpsPort`) | Primary hostname `/platform/admin` |
+| -------------- | ------------------------------------------- | ---------------------------------- |
+| `port`         | UI + API                                    | off                                |
+| `both`         | UI + API                                    | UI + API                           |
+| `disabled`     | off                                         | off                                |
+| _unset_ (`""`) | legacy: UI + API                            | off                                |
+
+Any value other than `port`, `both`, `disabled`, or empty fails chart rendering
+with an actionable error.
+
+In `both` mode the Admin Console is served at `/platform/admin` on the primary
+hostname over standard HTTPS. The default ingress routes all paths on the
+primary host to the Terraform Enterprise service (a `/` `Prefix` rule), so
+`/platform/admin/` is reachable without configuring a separate Admin Console
+ingress.
+
+```yaml
+tfe:
+  adminConsole:
+    accessMode: both
+```
+
 ## Custom agent worker pod template
 
 Terraform Enterprise now supports the inclusion of a custom pod template via `agentWorkerPodTemplate` in the Values file.

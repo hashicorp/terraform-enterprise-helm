@@ -19,6 +19,12 @@ data:
   TFE_HTTP_PORT: "{{ .Values.tfe.privateHttpPort }}"
   TFE_HTTPS_PORT: "{{ .Values.tfe.privateHttpsPort }}"
   TFE_ADMIN_HTTPS_PORT: "{{ .Values.tfe.adminHttpsPort }}"
+  {{- with .Values.tfe.adminConsole.accessMode }}
+  {{- if not (has . (list "port" "both" "disabled")) }}
+  {{- fail (printf "tfe.adminConsole.accessMode must be one of \"port\", \"both\", \"disabled\" (or empty to keep the legacy default); got %q" .) }}
+  {{- end }}
+  TFE_ADMIN_CONSOLE_ACCESS_MODE: "{{ . }}"
+  {{- end }}
   {{- if or (and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData) .Values.tlsSecondary.certificateSecret }}
   TFE_TLS_CERT_FILE_SECONDARY: "{{ .Values.tlsSecondary.certMountPath }}"
   TFE_TLS_KEY_FILE_SECONDARY:  "{{ .Values.tlsSecondary.keyMountPath }}"
