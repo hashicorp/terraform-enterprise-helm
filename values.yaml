@@ -106,6 +106,10 @@ tfe:
   ## Readiness probe settings customize the terraform-enterprise health check path, eg: to use the full service dependency check
   # readinessProbePath: "/_health_check?full"
   # readinessProbeScheme: "HTTP"
+  # readinessProbeInitialDelaySeconds: 60
+  # readinessProbePeriodSeconds: 10
+  # readinessProbeFailureThreshold: 30
+  # readinessProbeTimeoutSeconds: 5
 
 # nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
 nodeSelector: {}
