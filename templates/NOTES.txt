@@ -86,7 +86,7 @@ SPDX-License-Identifier: MPL-2.0
   │  Redis Sidekiq TLS  : {{ if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}✓ enabled{{ else }}✗ disabled{{ end }}
   └─────────────────────────────────────────────────────────────┘
 
-  ┌─ Additional Features ───────────────────────────────────────────┐
+  ┌─ Additional Features ───────────────────────────────────────┐
   │  Metrics   : {{ if .Values.tfe.metrics.enable }}✓ HTTP :{{ .Values.tfe.metrics.httpPort }}  HTTPS :{{ .Values.tfe.metrics.httpsPort }}{{ else }}✗ disabled{{ end }}
   │  OpenShift : {{ if .Values.openshift.enabled }}✓ enabled{{ else }}✗ disabled{{ end }}
   │  CSI/Vault : {{ if .Values.csi.enabled }}✓ {{ .Values.csi.secretProviderClass }}{{ else }}✗ disabled{{ end }}
