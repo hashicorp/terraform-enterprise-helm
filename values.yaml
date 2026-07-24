@@ -125,7 +125,7 @@ tfe:
   # If you rely on network segmentation of :8443 for admin access control, consider
   # IP allow-listing /platform/admin when enabling "both" mode.
   adminConsole:
-    # accessMode: ""
+    accessMode: ""
   ## Readiness probe settings customize the Terraform Enterprise readiness endpoint.
   # readinessProbePath: "/api/v1/health/readiness"
   # readinessProbeScheme: "HTTP"
