@@ -71,6 +71,20 @@ tfe:
 
 > **Security Note:** In `both` mode, the Admin Console is accessible on the primary `:443` listener in addition to the dedicated `:8443` port. If you rely on network segmentation of `:8443` to restrict administrative access, consider IP allow-listing the `/platform/admin` prefix when enabling `both` mode.
 
+### Service Port Behavior
+
+The Kubernetes Service automatically adjusts which ports are exposed based on the access mode:
+
+| Access Mode | Standard HTTPS Port (443) | Admin HTTPS Port (8443) |
+|-------------|---------------------------|-------------------------|
+| `port` | ✅ Exposed | ✅ Exposed |
+| `path` | ✅ Exposed | ❌ Not exposed |
+| `both` | ✅ Exposed | ✅ Exposed |
+| `disabled` | ✅ Exposed | ❌ Not exposed |
+| unset | ✅ Exposed | ✅ Exposed (legacy) |
+
+When `accessMode` is set to `path` or `disabled`, the admin HTTPS port (8443) is not exposed in the Service, as the Admin Console is either served only on the standard HTTPS path or completely disabled.
+
 ## Helpful Commands
 There are a number of common helm or kubectl commands you can use to monitor the installation and the runtime of Terraform Enterprise. We list some of them here. We assume that the namespace is `terraform-enterprise`. If you have a different namespace, replace it with yours.
 
