@@ -1,0 +1,18 @@
+# Test values for unset TFE_ADMIN_CONSOLE_ACCESS_MODE
+# Expected: TFE_ADMIN_CONSOLE_ACCESS_MODE should NOT be present in ConfigMap (falls back to legacy behavior)
+
+image:
+  repository: images.releases.hashicorp.com
+  name: hashicorp/terraform-enterprise
+  tag: v202501-1
+
+tfe:
+  adminConsole: {}
+    # accessMode not set - should fall back to legacy TFE_ADMIN_CONSOLE_DISABLED behavior
+
+env:
+  variables:
+    TFE_HOSTNAME: "test.example.com"
+  secrets:
+    TFE_ENCRYPTION_PASSWORD: "test-password"
+    TFE_LICENSE: "test-license"

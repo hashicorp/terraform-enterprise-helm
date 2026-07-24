@@ -25,6 +25,52 @@ The versions required are:
 
 Complete documentation and instructions for the installation of Terraform Enterprise can be found on the [Terraform Enterprise developer site](https://developer.hashicorp.com/terraform/enterprise/flexible-deployments/install).
 
+## Admin Console Access Mode
+
+The Admin Console access mode controls how the Admin Console UI and Admin API are exposed. This is configured via the `tfe.adminConsole.accessMode` value in your Helm values file.
+
+### Supported Values
+
+| Value | `:8443` (dedicated port) | `:443/platform/admin` (standard HTTPS) | Use Case |
+|-------|--------------------------|----------------------------------------|----------|
+| `port` | UI + API | off | Preserve dedicated-port behavior, keep admin workflows separate |
+| `path` | off | UI + API | Serve Admin Console only on standard HTTPS path (for environments blocking non-standard ports) |
+| `both` | UI + API | UI + API | Enable both access methods simultaneously |
+| `disabled` | off | off | Completely disable Admin Console UI and API |
+| unset | UI + API (legacy) | off | Falls back to `TFE_ADMIN_CONSOLE_DISABLED` behavior |
+
+### Examples
+
+**Default Helm deployment (no separate admin ingress needed):**
+```yaml
+tfe:
+  adminConsole:
+    accessMode: "both"  # Admin Console accessible on both :8443 and :443/platform/admin
+```
+
+**Dedicated port only (traditional behavior):**
+```yaml
+tfe:
+  adminConsole:
+    accessMode: "port"  # Admin Console only on :8443
+```
+
+**Standard HTTPS path only (for restricted environments):**
+```yaml
+tfe:
+  adminConsole:
+    accessMode: "path"  # Admin Console only on :443/platform/admin
+```
+
+**Disable Admin Console:**
+```yaml
+tfe:
+  adminConsole:
+    accessMode: "disabled"  # No Admin Console access
+```
+
+> **Security Note:** In `both` mode, the Admin Console is accessible on the primary `:443` listener in addition to the dedicated `:8443` port. If you rely on network segmentation of `:8443` to restrict administrative access, consider IP allow-listing the `/platform/admin` prefix when enabling `both` mode.
+
 ## Helpful Commands
 There are a number of common helm or kubectl commands you can use to monitor the installation and the runtime of Terraform Enterprise. We list some of them here. We assume that the namespace is `terraform-enterprise`. If you have a different namespace, replace it with yours.
 

@@ -103,6 +103,29 @@ tfe:
   privateHttpsPort: 8443
   # Specifies the port that the system API endpoints listen on for HTTPS requests.
   adminHttpsPort: 8446
+  # Admin Console access mode controls how the Admin Console UI and Admin API are exposed.
+  # Supported values:
+  # - "port": UI + API on :8443 only (dedicated port, standard HTTPS path off)
+  # - "path": UI + API on :443/platform/admin only (dedicated port off)
+  # - "both": UI + API on both :8443 and :443/platform/admin
+  # - "disabled": Admin Console UI and API completely disabled
+  # - unset (omit or empty): Falls back to legacy TFE_ADMIN_CONSOLE_DISABLED behavior
+  #
+  # Access mode truth table:
+  # | MODE     | CONSOLE_DISABLED | :8443        | :443/platform/admin |
+  # |----------|------------------|--------------|---------------------|
+  # | disabled | ignored          | off          | off                 |
+  # | port     | ignored          | UI + API     | off                 |
+  # | both     | ignored          | UI + API     | UI + API            |
+  # | path     | ignored          | off          | UI + API            |
+  # | unset    | false (default)  | UI + API     | off                 |
+  # | unset    | true             | API only     | off                 |
+  #
+  # Note: In "both" mode, the Admin Console is accessible on the primary :443 listener.
+  # If you rely on network segmentation of :8443 for admin access control, consider
+  # IP allow-listing /platform/admin when enabling "both" mode.
+  adminConsole:
+    # accessMode: ""
   ## Readiness probe settings customize the Terraform Enterprise readiness endpoint.
   # readinessProbePath: "/api/v1/health/readiness"
   # readinessProbeScheme: "HTTP"
