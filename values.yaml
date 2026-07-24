@@ -44,6 +44,12 @@ container:
 #     maxSurge: 1
 #     maxUnavailable: 0
 
+# minReadySeconds specifies the minimum number of seconds a newly created pod must be ready
+# (without any containers crashing) before it is considered available. This gives in-process
+# components such as Sidekiq workers time to fully initialize before Kubernetes removes the
+# next old pod during a rolling update. Not set by default (Kubernetes default is 0).
+# minReadySeconds: 30
+
 # Resource limits are not set by default, to give the user the ability to set specific resource limits.
 # If you do want to specify resource limits, uncomment the following lines and adjust them as necessary.
 resources:
