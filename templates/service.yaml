@@ -30,7 +30,7 @@ spec:
       {{- end }}
       targetPort: {{ .Values.tfe.privateHttpsPort }}
       appProtocol: {{ .Values.service.appProtocol }}
-    {{- if and .Values.tfe.adminConsole.accessMode (ne .Values.tfe.adminConsole.accessMode "path") (ne .Values.tfe.adminConsole.accessMode "disabled") }}
+    {{- if not (or (eq .Values.tfe.adminConsole.accessMode "path") (eq .Values.tfe.adminConsole.accessMode "disabled")) }}
     - name: admin-https-port
       port: {{ .Values.tfe.adminHttpsPort }}
       {{- if eq .Values.service.type "NodePort" }}
@@ -69,7 +69,7 @@ spec:
       {{- end }}
       targetPort: {{ .Values.tfe.privateHttpsPort }}
       appProtocol: {{ .Values.serviceSecondary.appProtocol }}
-    {{- if and .Values.tfe.adminConsole.accessMode (ne .Values.tfe.adminConsole.accessMode "path") (ne .Values.tfe.adminConsole.accessMode "disabled") }}
+    {{- if not (or (eq .Values.tfe.adminConsole.accessMode "path") (eq .Values.tfe.adminConsole.accessMode "disabled")) }}
     - name: admin-https-port
       port: {{ .Values.tfe.adminHttpsPort }}
       {{- if eq .Values.serviceSecondary.type "NodePort" }}
