@@ -1,5 +1,5 @@
-# Test values for TFE_ADMIN_CONSOLE_ACCESS_MODE=both
-# Expected: TFE_ADMIN_CONSOLE_ACCESS_MODE should be set to "both" in ConfigMap
+# Base test values for TFE_ADMIN_CONSOLE_ACCESS_MODE validation
+# The accessMode value will be set via --set flag in the validation script
 
 image:
   repository: images.releases.hashicorp.com
@@ -8,7 +8,7 @@ image:
 
 tfe:
   adminConsole:
-    accessMode: "both"
+    accessMode: ""
 
 env:
   variables:
