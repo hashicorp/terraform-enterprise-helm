@@ -3,6 +3,7 @@ Copyright IBM Corp. 2023, 2025
 SPDX-License-Identifier: MPL-2.0
 */}}
 
+{{- if not .Values.preupgradeCheck.enabled }}
 ╔══════════════════════════════════════════════════════════════════╗
 ║                    Terraform Enterprise                          ║
 ╚══════════════════════════════════════════════════════════════════╝
@@ -31,14 +32,14 @@ SPDX-License-Identifier: MPL-2.0
 {{- if eq .Values.service.type "NodePort" }}
   HTTPS port   : {{ .Values.service.nodePort }}
   Admin port   : {{ .Values.service.adminNodePort }}
-{{- else if eq .Values.service.type "LoadBalancer" }}
+{{- else if or (eq .Values.service.type "LoadBalancer") (eq .Values.service.type "ClusterIP") }}
   HTTPS port   : {{ .Values.service.port }}
   Admin port   : {{ .Values.tfe.adminHttpsPort }}
 {{- end }}
 {{- if .Values.env.variables.TFE_HOSTNAME_SECONDARY }}
 
-  Secondary    : {{ .Values.env.variables.TFE_HOSTNAME_SECONDARY }}
-  Svc          : terraform-enterprise-secondary :{{ .Values.serviceSecondary.port }}
+  Secondary Hostname    : {{ .Values.env.variables.TFE_HOSTNAME_SECONDARY }}
+  Secondary Service     : terraform-enterprise-secondary :{{ .Values.serviceSecondary.port }}
 {{- end }}
 {{- if .Values.ingress.enabled }}
 
@@ -118,3 +119,4 @@ SPDX-License-Identifier: MPL-2.0
 
   Read these notes again:
     $ helm -n {{ .Release.Namespace }} get notes {{ .Release.Name }}
+{{- end }}
