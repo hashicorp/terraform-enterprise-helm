@@ -16,8 +16,24 @@
 # the extensions; it does not create them. Both pieces are required. See the
 # connect-database docs for details.
 
-# On IBM Cloud catalog deployments, use the entitled image
-# cp.icr.io/cp/ibm-terraform/ibm-terraform instead.
+# Choose the image source that matches your deployment path:
+#
+# Standard (images.releases.hashicorp.com):
+#   image:
+#     repository: images.releases.hashicorp.com
+#     name: hashicorp/terraform-enterprise
+#     tag: "2.0.4"
+#
+# IBM Cloud catalog / entitled registry (cp.icr.io):
+#   image:
+#     repository: cp.icr.io/cp/ibm-terraform
+#     name: ibm-terraform
+#     tag: "2.0.4"
+#   imagePullSecrets:
+#     - name: <your-ibm-entitlement-pull-secret>
+#
+# Uncomment and fill in whichever block applies. The init container image below
+# must use the same registry, name, and tag.
 image:
   repository: images.releases.hashicorp.com
   name: hashicorp/terraform-enterprise
@@ -64,14 +80,16 @@ env:
 # Optional automation: this init container creates the extensions before TFE starts.
 # You can also create them manually before install (see docs).
 #
-# The init container uses the same image as TFE above; it ships psql, so no separate
-# image needs to be mirrored for air-gapped installs. Keep the image reference below
-# in sync with the image.repository/name/tag above, including any private registry
-# prefix (e.g. cp.icr.io/cp/ibm-terraform/ibm-terraform:<tag> for IBM catalog installs).
+# The init container uses the TFE image (it ships psql), so no separate image needs
+# to be mirrored for air-gapped installs. The image here MUST match the image block
+# above — same registry, name, and tag — or the init container will pull from a
+# different source and fail in restricted-network environments.
+#
+# Standard:  images.releases.hashicorp.com/hashicorp/terraform-enterprise:2.0.4
+# IBM catalog: cp.icr.io/cp/ibm-terraform/ibm-terraform:2.0.4
 initContainers:
   - name: create-pg-extensions
-    # Keep in sync with image.repository/name/tag above.
-    image: images.releases.hashicorp.com/hashicorp/terraform-enterprise:2.0.4
+    image: images.releases.hashicorp.com/hashicorp/terraform-enterprise:2.0.4  # update if using IBM catalog
     command: ["/bin/sh", "-c"]
     args:
       - >
