@@ -29,21 +29,17 @@ SPDX-License-Identifier: MPL-2.0
 {{- end }}
 
   Service type : {{ .Values.service.type }}
-{{- if eq .Values.service.type "NodePort" }}
-  HTTPS port   : {{ .Values.service.nodePort }}
-  Admin port   : {{ .Values.service.adminNodePort }}
-{{- else if or (eq .Values.service.type "LoadBalancer") (eq .Values.service.type "ClusterIP") }}
-  HTTPS port   : {{ .Values.service.port }}
-  Admin port   : {{ .Values.tfe.adminHttpsPort }}
-{{- end }}
 {{- if .Values.env.variables.TFE_HOSTNAME_SECONDARY }}
 
   Secondary Hostname    : {{ .Values.env.variables.TFE_HOSTNAME_SECONDARY }}
   Secondary Service     : terraform-enterprise-secondary :{{ .Values.serviceSecondary.port }}
 {{- end }}
 {{- if .Values.ingress.enabled }}
-
-  Ingress      : ENABLED  class={{ .Values.ingress.className | default "default" }}
+{{- if .Values.ingress.className }}
+  Ingress      : ENABLED  class={{ .Values.ingress.className }}
+{{- else }}
+  Ingress      : ENABLED  class=(none – cluster default ingress controller)
+{{- end }}
   Hosts        :{{ range .Values.ingress.hosts }} {{ .host }}{{ end }}
 {{- end }}
 
@@ -73,18 +69,27 @@ SPDX-License-Identifier: MPL-2.0
   └─────────────────────────────────────────────────────────────┘
 
   ┌─ Redis ─────────────────────────────────────────────────────┐
-  │  Host     : {{ if .Values.env.variables.TFE_REDIS_HOST }}✓ configured{{ else }}✗ not set{{ end }}
-  │  TLS      : {{ if .Values.env.variables.TFE_REDIS_USE_TLS }}✓ enabled{{ else }}✗ disabled{{ end }}
-  │  mTLS     : {{ if .Values.env.variables.TFE_REDIS_USE_MTLS }}✓ enabled{{ else }}✗ disabled{{ end }}
-  │  Password : {{ if .Values.env.secrets.TFE_REDIS_PASSWORD }}✓ configured{{ else }}✗ not set{{ end }}
-  │  Sidekiq  : {{ if .Values.env.variables.TFE_REDIS_SIDEKIQ_HOST }}✓ configured{{ else }}✗ not set{{ end }}
+  │  Host            : {{ if .Values.env.variables.TFE_REDIS_HOST }}✓ configured{{ else }}✗ not set{{ end }}
+  │  TLS             : {{ if .Values.env.variables.TFE_REDIS_USE_TLS }}✓ enabled{{ else }}✗ disabled{{ end }}
+  │  mTLS            : {{ if .Values.env.variables.TFE_REDIS_USE_MTLS }}✓ enabled{{ else }}✗ disabled{{ end }}
+  │  Password        : {{ if .Values.env.secrets.TFE_REDIS_PASSWORD }}✓ configured{{ else }}✗ not set{{ end }}
+  │  Sidekiq Host    : {{ if .Values.env.variables.TFE_REDIS_SIDEKIQ_HOST }}✓ configured{{ else }}✗ not set{{ end }}
+{{- if .Values.env.variables.TFE_REDIS_SIDEKIQ_HOST }}
+  │  Sidekiq TLS     : {{ if .Values.env.variables.TFE_REDIS_SIDEKIQ_USE_TLS }}✓ enabled{{ else }}✗ disabled{{ end }}
+  │  Sidekiq Auth    : {{ if .Values.env.variables.TFE_REDIS_SIDEKIQ_USE_AUTH }}✓ enabled{{ else }}✗ disabled{{ end }}
+  │  Sidekiq Password: {{ if .Values.env.secrets.TFE_REDIS_SIDEKIQ_PASSWORD }}✓ configured{{ else }}✗ not set{{ end }}
+{{- end }}
   └─────────────────────────────────────────────────────────────┘
 
   ┌─ TLS ───────────────────────────────────────────────────────┐
   │  Certificate secret : {{ .Values.tls.certificateSecret }}
   │  CA cert            : {{ if .Values.tls.caCertData }}✓ provided ({{ include "cacert.path" . }}){{ else }}✗ not configured{{ end }}
-  │  Redis TLS          : {{ if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}✓ enabled{{ else }}✗ disabled{{ end }}
-  │  Redis Sidekiq TLS  : {{ if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}✓ enabled{{ else }}✗ disabled{{ end }}
+{{- if or .Values.env.variables.TFE_REDIS_USE_TLS .Values.env.variables.TFE_REDIS_USE_MTLS }}
+  │  Redis certificate  : {{ if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}✓ provisioned{{ else }}✗ not configured{{ end }}
+{{- end }}
+{{- if .Values.env.variables.TFE_REDIS_SIDEKIQ_HOST }}
+  │  Redis Sidekiq certificate  : {{ if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}✓ provisioned{{ else }}✗ not configured{{ end }}
+{{- end }}
   └─────────────────────────────────────────────────────────────┘
 
   ┌─ Additional Features ───────────────────────────────────────┐
