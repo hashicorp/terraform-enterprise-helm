@@ -1,0 +1,127 @@
+{{/*
+Copyright IBM Corp. 2023, 2025
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- if not .Values.preupgradeCheck.enabled }}
+╔══════════════════════════════════════════════════════════════════╗
+║                    Terraform Enterprise                          ║
+╚══════════════════════════════════════════════════════════════════╝
+
+  Release         : {{ .Release.Name }}
+  Namespace       : {{ .Release.Namespace }}
+  Chart           : {{ .Chart.Name }}-{{ .Chart.Version }}
+  App version     : {{ .Chart.AppVersion }}
+  Image           : {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
+  Replicas        : {{ .Values.replicaCount }}
+  Service account : {{ if .Values.serviceAccount.name }}{{ .Values.serviceAccount.name }}{{ else }}{{ .Release.Namespace }}{{ end }}
+
+╔══════════════════════════════════════════════════════════════════╗
+║                          ACCESS                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+{{- if .Values.env.variables.TFE_HOSTNAME }}
+
+  → https://{{ .Values.env.variables.TFE_HOSTNAME }}
+{{- else }}
+
+  ⚠ TFE_HOSTNAME is not set — TFE will not be reachable until you
+    configure env.variables.TFE_HOSTNAME in your values.
+{{- end }}
+
+  Service type : {{ .Values.service.type }}
+{{- if .Values.env.variables.TFE_HOSTNAME_SECONDARY }}
+
+  Secondary Hostname    : {{ .Values.env.variables.TFE_HOSTNAME_SECONDARY }}
+  Secondary Service     : terraform-enterprise-secondary :{{ .Values.serviceSecondary.port }}
+{{- end }}
+{{- if .Values.ingress.enabled }}
+{{- if .Values.ingress.className }}
+  Ingress      : ENABLED  class={{ .Values.ingress.className }}
+{{- else }}
+  Ingress      : ENABLED  class=(none – cluster default ingress controller)
+{{- end }}
+  Hosts        :{{ range .Values.ingress.hosts }} {{ .host }}{{ end }}
+{{- end }}
+
+╔══════════════════════════════════════════════════════════════════╗
+║                        CONFIGURATION                             ║
+╚══════════════════════════════════════════════════════════════════╝
+
+  ┌─ Database ──────────────────────────────────────────────────┐
+  │  Host     : {{ if .Values.env.variables.TFE_DATABASE_HOST }}✓ configured{{ else }}✗ not set{{ end }}
+  │  Name     : {{ if .Values.env.variables.TFE_DATABASE_NAME }}✓ configured{{ else }}✗ not set{{ end }}
+  │  User     : {{ if .Values.env.variables.TFE_DATABASE_USER }}✓ configured{{ else }}✗ not set{{ end }}
+  │  Password : {{ if .Values.env.secrets.TFE_DATABASE_PASSWORD }}✓ configured{{ else }}✗ not set{{ end }}
+  └─────────────────────────────────────────────────────────────┘
+
+  ┌─ Object Storage ────────────────────────────────────────────┐
+  │  Type   : {{ if .Values.env.variables.TFE_OBJECT_STORAGE_TYPE }}{{ .Values.env.variables.TFE_OBJECT_STORAGE_TYPE }}{{ else }}✗ not set{{ end }}
+{{- if eq .Values.env.variables.TFE_OBJECT_STORAGE_TYPE "s3" }}
+  │  Bucket : {{ if .Values.env.variables.TFE_OBJECT_STORAGE_S3_BUCKET }}✓ configured{{ else }}✗ not set{{ end }}
+  │  Region : {{ if .Values.env.variables.TFE_OBJECT_STORAGE_S3_REGION }}✓ configured{{ else }}✗ not set{{ end }}
+{{- else if eq .Values.env.variables.TFE_OBJECT_STORAGE_TYPE "azure" }}
+  │  Account: {{ if .Values.env.variables.TFE_OBJECT_STORAGE_AZURE_ACCOUNT_NAME }}✓ configured{{ else }}✗ not set{{ end }}
+  │  Ctr    : {{ if .Values.env.variables.TFE_OBJECT_STORAGE_AZURE_CONTAINER }}✓ configured{{ else }}✗ not set{{ end }}
+{{- else if eq .Values.env.variables.TFE_OBJECT_STORAGE_TYPE "google" }}
+  │  Bucket : {{ if .Values.env.variables.TFE_OBJECT_STORAGE_GOOGLE_BUCKET }}✓ configured{{ else }}✗ not set{{ end }}
+  │  Project: {{ if .Values.env.variables.TFE_OBJECT_STORAGE_GOOGLE_PROJECT }}✓ configured{{ else }}✗ not set{{ end }}
+{{- end }}
+  └─────────────────────────────────────────────────────────────┘
+
+  ┌─ Redis ─────────────────────────────────────────────────────┐
+  │  Host            : {{ if .Values.env.variables.TFE_REDIS_HOST }}✓ configured{{ else }}✗ not set{{ end }}
+  │  TLS             : {{ if .Values.env.variables.TFE_REDIS_USE_TLS }}✓ enabled{{ else }}✗ disabled{{ end }}
+  │  mTLS            : {{ if .Values.env.variables.TFE_REDIS_USE_MTLS }}✓ enabled{{ else }}✗ disabled{{ end }}
+  │  Password        : {{ if .Values.env.secrets.TFE_REDIS_PASSWORD }}✓ configured{{ else }}✗ not set{{ end }}
+  │  Sidekiq Host    : {{ if .Values.env.variables.TFE_REDIS_SIDEKIQ_HOST }}✓ configured{{ else }}✗ not set{{ end }}
+{{- if .Values.env.variables.TFE_REDIS_SIDEKIQ_HOST }}
+  │  Sidekiq TLS     : {{ if .Values.env.variables.TFE_REDIS_SIDEKIQ_USE_TLS }}✓ enabled{{ else }}✗ disabled{{ end }}
+  │  Sidekiq Auth    : {{ if .Values.env.variables.TFE_REDIS_SIDEKIQ_USE_AUTH }}✓ enabled{{ else }}✗ disabled{{ end }}
+  │  Sidekiq Password: {{ if .Values.env.secrets.TFE_REDIS_SIDEKIQ_PASSWORD }}✓ configured{{ else }}✗ not set{{ end }}
+{{- end }}
+  └─────────────────────────────────────────────────────────────┘
+
+  ┌─ TLS ───────────────────────────────────────────────────────┐
+  │  Certificate secret : {{ .Values.tls.certificateSecret }}
+  │  CA cert            : {{ if .Values.tls.caCertData }}✓ provided ({{ include "cacert.path" . }}){{ else }}✗ not configured{{ end }}
+{{- if or .Values.env.variables.TFE_REDIS_USE_TLS .Values.env.variables.TFE_REDIS_USE_MTLS }}
+  │  Redis certificate  : {{ if and .Values.tlsRedis.certData .Values.tlsRedis.keyData .Values.tlsRedis.caCertData }}✓ provisioned{{ else }}✗ not configured{{ end }}
+{{- end }}
+{{- if .Values.env.variables.TFE_REDIS_SIDEKIQ_HOST }}
+  │  Redis Sidekiq certificate  : {{ if and .Values.tlsRedisSidekiq.certData .Values.tlsRedisSidekiq.keyData .Values.tlsRedisSidekiq.caCertData }}✓ provisioned{{ else }}✗ not configured{{ end }}
+{{- end }}
+  └─────────────────────────────────────────────────────────────┘
+
+  ┌─ Additional Features ───────────────────────────────────────┐
+  │  Metrics   : {{ if .Values.tfe.metrics.enable }}✓ HTTP :{{ .Values.tfe.metrics.httpPort }}  HTTPS :{{ .Values.tfe.metrics.httpsPort }}{{ else }}✗ disabled{{ end }}
+  │  OpenShift : {{ if .Values.openshift.enabled }}✓ enabled{{ else }}✗ disabled{{ end }}
+  │  CSI/Vault : {{ if .Values.csi.enabled }}✓ {{ .Values.csi.secretProviderClass }}{{ else }}✗ disabled{{ end }}
+  │  PDB       : {{ if .Values.pdb.enabled }}✓ min available={{ .Values.pdb.replicaCount }}{{ else }}✗ disabled{{ end }}
+  └─────────────────────────────────────────────────────────────┘
+
+╔══════════════════════════════════════════════════════════════════╗
+║                         AGENTS                                   ║
+╚══════════════════════════════════════════════════════════════════╝
+
+  Namespace   : {{ include "helpers.agent-namespace" . }}
+  Concurrency : {{ .Values.env.variables.TFE_CAPACITY_CONCURRENCY | default "(default)" }}
+
+╔══════════════════════════════════════════════════════════════════╗
+║                       USEFUL COMMANDS                            ║
+╚══════════════════════════════════════════════════════════════════╝
+
+  Release status:
+    $ helm -n {{ .Release.Namespace }} status {{ .Release.Name }}
+
+  Current values:
+    $ helm -n {{ .Release.Namespace }} get values {{ .Release.Name }}
+
+  Pod status:
+    $ kubectl -n {{ .Release.Namespace }} get pods -l app=terraform-enterprise
+
+  Stream application logs:
+    $ kubectl -n {{ .Release.Namespace }} logs -l app=terraform-enterprise -f
+
+  Read these notes again:
+    $ helm -n {{ .Release.Namespace }} get notes {{ .Release.Name }}
+{{- end }}
