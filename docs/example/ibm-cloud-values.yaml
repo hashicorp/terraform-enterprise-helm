@@ -1,0 +1,106 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: MPL-2.0
+
+# Terraform Enterprise on IBM Cloud — IBM Cloud Databases for PostgreSQL overlay.
+#
+# This is an OVERLAY file. Apply it on top of a complete base values file that
+# supplies all required configuration (TLS, object storage, Redis, etc.). For example:
+#
+#   helm install terraform-enterprise . \
+#     -f base-values.yaml \
+#     -f docs/example/ibm-cloud-values.yaml
+#
+# IBM Cloud Databases for PostgreSQL only allows PostgreSQL extensions in the
+# `ibm_extension` schema. TFE cannot create them itself, so the init container below
+# creates them before TFE starts. TFE_DATABASE_EXTRA_SCHEMAS tells TFE where to find
+# the extensions; it does not create them. Both pieces are required. See the
+# connect-database docs for details.
+
+# Choose the image source that matches your deployment path:
+#
+# Standard (images.releases.hashicorp.com):
+#   image:
+#     repository: images.releases.hashicorp.com
+#     name: hashicorp/terraform-enterprise
+#     tag: "2.0.4"
+#
+# IBM Cloud catalog / entitled registry (cp.icr.io):
+#   image:
+#     repository: cp.icr.io/cp/ibm-terraform
+#     name: ibm-terraform
+#     tag: "2.0.4"
+#   imagePullSecrets:
+#     - name: <your-ibm-entitlement-pull-secret>
+#
+# Uncomment and fill in whichever block applies. The init container image below
+# must use the same registry, name, and tag.
+image:
+  repository: images.releases.hashicorp.com
+  name: hashicorp/terraform-enterprise
+  tag: "2.0.4"
+
+env:
+  variables:
+    TFE_HOSTNAME: <your-tfe-hostname>
+    TFE_OPERATIONAL_MODE: external
+
+    # TFE_DATABASE_HOST must be in host:port format. The init container uses
+    # shell parameter expansion to split the two, so a host-only value will
+    # produce an invalid psql -p argument and the init container will fail.
+    TFE_DATABASE_HOST: <your-icd-host>:<port>
+    TFE_DATABASE_NAME: ibmclouddb
+    TFE_DATABASE_USER: admin
+    TFE_DATABASE_PARAMETERS: sslmode=require
+
+    # TFE_DATABASE_EXTRA_SCHEMAS tells TFE where to find the extensions.
+    # The init container below is what actually creates them in this schema.
+    TFE_DATABASE_EXTRA_SCHEMAS: ibm_extension
+
+    # Object storage — required; add the keys that match your storage backend.
+    # TFE_OBJECT_STORAGE_TYPE: <s3|azure|google>
+    # TFE_OBJECT_STORAGE_S3_BUCKET: <your-cos-bucket>
+    # TFE_OBJECT_STORAGE_S3_ENDPOINT: <your-cos-endpoint>
+    # TFE_OBJECT_STORAGE_S3_REGION: <your-cos-region>
+    # TFE_OBJECT_STORAGE_S3_ACCESS_KEY_ID: <your-cos-access-key-id>
+
+    # Redis — required when TFE_OPERATIONAL_MODE is active-active.
+    # TFE_REDIS_HOST: <your-redis-host>:<port>
+
+  secrets:
+    TFE_ENCRYPTION_PASSWORD: <your-encryption-password>
+    TFE_LICENSE: <your-license>
+    TFE_DATABASE_PASSWORD: <your-icd-password>
+    # TFE_OBJECT_STORAGE_S3_SECRET_ACCESS_KEY: <your-cos-secret-key>
+
+# TLS — required. Either supply cert/key data inline or reference a pre-created
+# Kubernetes secret. See the chart values docs for tls.certData / tls.certificateSecret.
+# tls:
+#   certificateSecret: <your-tls-secret-name>
+
+# Optional automation: this init container creates the extensions before TFE starts.
+# You can also create them manually before install (see docs).
+#
+# The init container uses the TFE image (it ships psql), so no separate image needs
+# to be mirrored for air-gapped installs. The image here MUST match the image block
+# above — same registry, name, and tag — or the init container will pull from a
+# different source and fail in restricted-network environments.
+#
+# Standard:  images.releases.hashicorp.com/hashicorp/terraform-enterprise:2.0.4
+# IBM catalog: cp.icr.io/cp/ibm-terraform/ibm-terraform:2.0.4
+initContainers:
+  - name: create-pg-extensions
+    image: images.releases.hashicorp.com/hashicorp/terraform-enterprise:2.0.4  # update if using IBM catalog
+    command: ["/bin/sh", "-c"]
+    args:
+      - >
+        PGSSLMODE=require PGPASSWORD="$TFE_DATABASE_PASSWORD"
+        psql -h "${TFE_DATABASE_HOST%%:*}" -p "${TFE_DATABASE_HOST##*:}"
+        -U "$TFE_DATABASE_USER" -d "$TFE_DATABASE_NAME"
+        -c 'CREATE EXTENSION IF NOT EXISTS hstore;'
+        -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+        -c 'CREATE EXTENSION IF NOT EXISTS citext;'
+    envFrom:
+      - configMapRef:
+          name: terraform-enterprise-env-config
+      - secretRef:
+          name: terraform-enterprise-env-secrets
