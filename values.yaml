@@ -12,10 +12,11 @@ imagePullSecrets:
 - name: terraform-enterprise
 
 # Image sets the repo, name and tag of the Terraform Enterprise image to use.
+# tag: a Terraform Enterprise image tag. If not specified, defaults to the value of Chart.AppVersion
 image:
  repository: images.releases.hashicorp.com
  name: hashicorp/terraform-enterprise
- tag: <vYYYYMM-#>
+ # tag:
  pullPolicy: Always
 
 serviceAccount:
