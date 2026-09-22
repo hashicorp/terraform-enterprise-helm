@@ -15,7 +15,7 @@ imagePullSecrets:
 image:
  repository: images.releases.hashicorp.com
  name: hashicorp/terraform-enterprise
- tag: <vYYYYMM-#>
+ # tag: # x.y.z Terraform Enterprise release tag. defaults to the chart appVersion
  pullPolicy: Always
 
 serviceAccount:
