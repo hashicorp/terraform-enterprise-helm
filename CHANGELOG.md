@@ -1,24 +1,5 @@
 # Changelog
 
-Notable user-facing changes to this chart are documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-Chart versions use [Semantic Versioning](https://semver.org/spec/v2.0.0.html)-compatible
-version numbers.
-
-Dates are GitHub Release publication dates in UTC. When a historical GitHub
-Release or tag no longer identifies the published chart, the date is from the
-HashiCorp Helm repository.
-
-Version headings link to the corresponding GitHub Release. Historical versions
-with unreliable release or tag history link directly to the published chart
-package instead.
-
-`appVersion` records the Terraform Enterprise application release associated
-with the chart. It is informational and does not define a compatibility range.
-
-## Unreleased
-
 ## [2.0.8](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.8) (2026-09-23)
 
 **Terraform Enterprise appVersion:** `2.0.8`
