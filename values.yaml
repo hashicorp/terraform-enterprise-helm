@@ -510,4 +510,4 @@ preStop:
   enabled: false
   # terminationGracePeriodSeconds controls how long Kubernetes waits for the preStop
   # hook and the container to exit before sending SIGKILL.
-  terminationGracePeriodSeconds: 300
+  terminationGracePeriodSeconds: 600
