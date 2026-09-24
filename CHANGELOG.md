@@ -1,24 +1,34 @@
 # Changelog
 
-All notable changes to this chart are documented in this file.
+Notable user-facing changes to this chart are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-Chart versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Chart versions use [Semantic Versioning](https://semver.org/spec/v2.0.0.html)-compatible
+version numbers.
 
 Dates are GitHub Release publication dates in UTC. When a historical GitHub
 Release or tag no longer identifies the published chart, the date is from the
-HashiCorp Helm repository and the entry links immutable source commits.
+HashiCorp Helm repository.
 
 `appVersion` records the Terraform Enterprise application release associated
 with the chart. It is informational and does not define a compatibility range.
 
 ## Unreleased
 
+## 2.0.8 - 2026-09-23
+
+**Terraform Enterprise appVersion:** `2.0.8`
+
+No user-facing chart changes.
+
 ## 2.0.7 - 2026-09-15
 
 **Terraform Enterprise appVersion:** `2.0.7`
 
 No user-facing chart changes.
+
+The chart package exists at its direct URL but is absent from the current
+HashiCorp Helm repository index.
 
 ## 2.0.6 - 2026-08-31
 
@@ -85,8 +95,8 @@ tag was moved after this package was published.
 
 **Terraform Enterprise appVersion:** `1.2.3`
 
-The date is from the HashiCorp Helm repository because the corresponding
-GitHub tag and Release were moved after publication.
+The date is from the HashiCorp Helm repository because the GitHub Release
+retains the publication timestamp of an earlier `1.6.7` artifact.
 
 ### Changed
 
@@ -167,7 +177,8 @@ No user-facing chart changes.
 
 - Added Secrets Store CSI Driver integration with the Vault provider through
   the `csi.*` values, a `SecretProviderClass`, and a CSI volume mounted in the
-  Terraform Enterprise container.
+  Terraform Enterprise container, with optional synchronization into Kubernetes
+  Secrets through `csi.secretObjects`.
 - Added `env.secretKeyRefs` and `env.configMapKeyRefs` for injecting individual
   environment variables from external Secrets and ConfigMaps.
 
@@ -205,13 +216,21 @@ No user-facing chart changes.
   `tfe.readinessProbePath` and `tfe.readinessProbeScheme`.
 - Added `agents.namespace.name` for selecting or creating a custom agent
   namespace.
-- Added configurable `service.appProtocol`, defaulting to `tcp`, and documented
-  the Azure health probe annotation.
+- Added configuration examples for a separate Sidekiq Redis instance through
+  the `TFE_REDIS_SIDEKIQ_*` environment variables.
+
+### Changed
+
+- Made `service.appProtocol` configurable, changed its default from `https` to
+  `tcp` to restore Azure compatibility, and documented the Azure health probe
+  annotation.
 
 ### Fixed
 
 - Fixed chart rendering when readiness probe values are omitted by defaulting
   the path to `/_health_check` and the scheme to `HTTP`.
+- Updated `docs/example/override.yaml` to include `TFE_LICENSE` and place
+  `TFE_DATABASE_PASSWORD` and `TFE_ENCRYPTION_PASSWORD` under `env.secrets`.
 
 ## 1.3.3 - 2024-10-23
 
@@ -291,11 +310,13 @@ No user-facing chart changes.
 ### Added
 
 - Added annotations to the chart-managed ServiceAccount.
+- Added configuration examples for `TFE_IACT_SUBNETS` and
+  `TFE_IACT_TIME_LIMIT`.
 
-### Changed
+### Fixed
 
-- Added explicit Namespace metadata to namespaced resources and corrected the
-  default Terraform Enterprise image name.
+- Added missing Namespace metadata to the Deployment, Ingress, and Service, and
+  corrected the default Terraform Enterprise image name.
 
 ## 1.0.0 - 2023-09-18
 
@@ -307,6 +328,9 @@ the `v0.1.2...v1.0.0` source diff.
 
 ### Added
 
+- Added configuration examples for
+  `TFE_RUN_PIPELINE_KUBERNETES_DEBUG_ENABLED` and
+  `TFE_RUN_PIPELINE_KUBERNETES_DEBUG_JOBS_TTL`.
 - Added Terraform Enterprise metrics configuration and ports.
 
 ### Changed
