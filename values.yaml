@@ -499,3 +499,15 @@ preupgradeCheck:
   # Sensitive env overrides for target-version validation.
   # Stored in a dedicated Secret and injected with secretKeyRef.
   extraSecrets: {}
+
+# preStop lifecycle hook settings for graceful pod termination.
+#
+# Note: This feature requires Terraform Enterprise version 2.1.0 or higher
+# (utilizes `tfectl node drain` and `tfectl node tasks`).
+preStop:
+  # Whether to enable the preStop hook to drain the TFE node and wait until
+  # in-flight work finishes before terminating the pod.
+  enabled: false
+  # terminationGracePeriodSeconds controls how long Kubernetes waits for the preStop
+  # hook and the container to exit before sending SIGKILL.
+  terminationGracePeriodSeconds: 600
