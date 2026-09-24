@@ -10,18 +10,22 @@ Dates are GitHub Release publication dates in UTC. When a historical GitHub
 Release or tag no longer identifies the published chart, the date is from the
 HashiCorp Helm repository.
 
+Version headings link to the corresponding GitHub Release. Historical versions
+with unreliable release or tag history link directly to the published chart
+package instead.
+
 `appVersion` records the Terraform Enterprise application release associated
 with the chart. It is informational and does not define a compatibility range.
 
 ## Unreleased
 
-## 2.0.8 - 2026-09-23
+## [2.0.8](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.8) (2026-09-23)
 
 **Terraform Enterprise appVersion:** `2.0.8`
 
 No user-facing chart changes.
 
-## 2.0.7 - 2026-09-15
+## [2.0.7](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.7) (2026-09-15)
 
 **Terraform Enterprise appVersion:** `2.0.7`
 
@@ -30,19 +34,19 @@ No user-facing chart changes.
 The chart package exists at its direct URL but is absent from the current
 HashiCorp Helm repository index.
 
-## 2.0.6 - 2026-08-31
+## [2.0.6](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.6) (2026-08-31)
 
 **Terraform Enterprise appVersion:** `2.0.6`
 
 No user-facing chart changes.
 
-## 2.0.5 - 2026-08-05
+## [2.0.5](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.5) (2026-08-05)
 
 **Terraform Enterprise appVersion:** `2.0.5`
 
 No user-facing chart changes.
 
-## 2.0.4 - 2026-07-17
+## [2.0.4](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.4) (2026-07-17)
 
 **Terraform Enterprise appVersion:** `2.0.4`
 
@@ -53,7 +57,7 @@ No user-facing chart changes.
   `tfe.readinessProbeFailureThreshold`, and
   `tfe.readinessProbeTimeoutSeconds`.
 
-## 1.6.10 - 2026-07-06
+## [1.6.10](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.10) (2026-07-06)
 
 **Terraform Enterprise appVersion:** `1.2.4`
 
@@ -62,7 +66,7 @@ branch.
 
 No user-facing chart changes.
 
-## 1.6.9 - 2026-06-25
+## [1.6.9](https://helm.releases.hashicorp.com/terraform-enterprise-1.6.9.tgz) (2026-06-25)
 
 **Terraform Enterprise appVersion:** `2.0.4`
 
@@ -71,7 +75,7 @@ corresponding GitHub Release or current `v1.6.9` tag.
 
 No user-facing chart changes.
 
-## 1.6.8 - 2026-05-15
+## [1.6.8](https://helm.releases.hashicorp.com/terraform-enterprise-1.6.8.tgz) (2026-05-15)
 
 **Terraform Enterprise appVersion:** `2.0.2`
 
@@ -91,7 +95,7 @@ tag was moved after this package was published.
 - Improved pre-upgrade validation volume handling and operational guidance based
   on release feedback.
 
-## 1.6.7 - 2026-05-06
+## [1.6.7](https://helm.releases.hashicorp.com/terraform-enterprise-1.6.7.tgz) (2026-05-06)
 
 **Terraform Enterprise appVersion:** `1.2.3`
 
@@ -103,7 +107,7 @@ retains the publication timestamp of an earlier `1.6.7` artifact.
 - Changed the default readiness probe path from `/_health_check` to
   `/api/v1/health/readiness`.
 
-## 1.6.6 - 2025-12-11
+## [1.6.6](https://helm.releases.hashicorp.com/terraform-enterprise-1.6.6.tgz) (2025-12-11)
 
 **Terraform Enterprise appVersion:** `1.1.2`
 
@@ -122,7 +126,7 @@ tag was moved after this package was published.
   `TFE_RUN_PIPELINE_KUBERNETES_OPEN_SHIFT_ENABLED` environment variable while
   retaining `openshift.enabled` for chart-managed security contexts.
 
-## 1.6.5 - 2025-08-13
+## [1.6.5](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.5) (2025-08-13)
 
 **Terraform Enterprise appVersion:** `1.0.0`
 
@@ -131,7 +135,7 @@ tag was moved after this package was published.
 - Added `tfe.adminHttpsPort`, defaulting to `8446`, and exposed the admin HTTPS
   port through the container and Services.
 
-## 1.6.4 - 2025-07-14
+## [1.6.4](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.4) (2025-07-14)
 
 **Terraform Enterprise appVersion:** `v202507-1`
 
@@ -151,25 +155,25 @@ tag was moved after this package was published.
 - Removed the file-based `env.configFilePath` and `env.secretsFilePath`
   options.
 
-## 1.6.3 - 2025-06-16
+## [1.6.3](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.3) (2025-06-16)
 
 **Terraform Enterprise appVersion:** `v202506-1`
 
 No user-facing chart changes.
 
-## 1.6.2 - 2025-05-30
+## [1.6.2](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.2) (2025-05-30)
 
 **Terraform Enterprise appVersion:** `v202505-1`
 
 No user-facing chart changes.
 
-## 1.6.1 - 2025-04-22
+## [1.6.1](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.1) (2025-04-22)
 
 **Terraform Enterprise appVersion:** `v202504-1`
 
 No user-facing chart changes.
 
-## 1.6.0 - 2025-03-19
+## [1.6.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.0) (2025-03-19)
 
 **Terraform Enterprise appVersion:** `v202503-1`
 
@@ -182,7 +186,7 @@ No user-facing chart changes.
 - Added `env.secretKeyRefs` and `env.configMapKeyRefs` for injecting individual
   environment variables from external Secrets and ConfigMaps.
 
-## 1.5.0 - 2025-02-20
+## [1.5.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.5.0) (2025-02-20)
 
 **Terraform Enterprise appVersion:** `v202502-1`
 
@@ -191,7 +195,7 @@ No user-facing chart changes.
 - Added optional PodDisruptionBudget creation through `pdb.enabled`,
   `pdb.replicaCount`, `pdb.annotations`, and `pdb.labels`.
 
-## 1.4.0 - 2025-01-21
+## [1.4.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.4.0) (2025-01-21)
 
 **Terraform Enterprise appVersion:** `v202501-1`
 
@@ -206,7 +210,7 @@ No user-facing chart changes.
 
 - Fixed the RoleBinding subject to use `serviceAccount.name` when configured.
 
-## 1.3.4 - 2024-11-26
+## [1.3.4](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.3.4) (2024-11-26)
 
 **Terraform Enterprise appVersion:** `v202411-1`
 
@@ -232,7 +236,7 @@ No user-facing chart changes.
 - Updated `docs/example/override.yaml` to include `TFE_LICENSE` and place
   `TFE_DATABASE_PASSWORD` and `TFE_ENCRYPTION_PASSWORD` under `env.secrets`.
 
-## 1.3.3 - 2024-10-23
+## [1.3.3](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.3.3) (2024-10-23)
 
 **Terraform Enterprise appVersion:** `v202410-1`
 
@@ -244,7 +248,7 @@ No user-facing chart changes.
 
 - Updated the Deployment to use the configured `serviceAccount.name`.
 
-## 1.3.2 - 2024-09-12
+## [1.3.2](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.3.2) (2024-09-12)
 
 **Terraform Enterprise appVersion:** `v202409-1`
 
@@ -252,7 +256,7 @@ No user-facing chart changes.
 
 - Added `pod.labels` for setting labels on the Deployment pod template.
 
-## 1.3.1 - 2024-08-26
+## [1.3.1](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.3.1) (2024-08-26)
 
 **Terraform Enterprise appVersion:** `v202408-1`
 
@@ -261,7 +265,7 @@ No user-facing chart changes.
 - Added configurable Kubernetes Deployment strategy support through `strategy`.
 - Added `appProtocol: https` to the Service HTTPS port.
 
-## 1.3.0 - 2024-07-29
+## [1.3.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.3.0) (2024-07-29)
 
 **Terraform Enterprise appVersion:** `v202406-1`
 
@@ -280,7 +284,7 @@ No user-facing chart changes.
   `agents.namespace.labels` for controlling agent resources.
 - Added `service.loadBalancerIP` for configuring a LoadBalancer Service IP.
 
-## 1.2.0 - 2024-04-25
+## [1.2.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.2.0) (2024-04-25)
 
 **Terraform Enterprise appVersion:** `1.16.0`
 
@@ -295,7 +299,7 @@ No user-facing chart changes.
 - Fixed `pod.annotations` indentation in the pod template.
 - Fixed the Terraform Enterprise image name in `docs/example/override.yaml`.
 
-## 1.1.1 - 2023-12-05
+## [1.1.1](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.1.1) (2023-12-05)
 
 **Terraform Enterprise appVersion:** `1.16.0`
 
@@ -303,7 +307,7 @@ No user-facing chart changes.
 
 - Added container `securityContext` configuration through chart values.
 
-## 1.1.0 - 2023-11-02
+## [1.1.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.1.0) (2023-11-02)
 
 **Terraform Enterprise appVersion:** `1.16.0`
 
@@ -318,7 +322,7 @@ No user-facing chart changes.
 - Added missing Namespace metadata to the Deployment, Ingress, and Service, and
   corrected the default Terraform Enterprise image name.
 
-## 1.0.0 - 2023-09-18
+## [1.0.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.0.0) (2023-09-18)
 
 **Terraform Enterprise appVersion:** `1.16.0`
 
@@ -340,7 +344,7 @@ the `v0.1.2...v1.0.0` source diff.
 - Updated documentation and examples for the General Availability active-active
   architecture, including the official image registry and Redis prerequisite.
 
-## 0.1.2 - 2023-07-18
+## [0.1.2](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v0.1.2) (2023-07-18)
 
 **Terraform Enterprise appVersion:** `1.16.0`
 
@@ -349,13 +353,13 @@ the `v0.1.2...v1.0.0` source diff.
 - Ensured the built-in ConfigMap and Secret remain in `envFrom` when
   `.Values.env.configMapRefs` or `.Values.env.secretRefs` are supplied.
 
-## 0.1.1 - 2023-07-14
+## [0.1.1](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v0.1.1) (2023-07-14)
 
 **Terraform Enterprise appVersion:** `1.16.0`
 
 This was the first chart version published in the HashiCorp Helm repository.
 
-## 0.1.0 - 2023-07-13
+## [0.1.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v0.1.0) (2023-07-13)
 
 **Terraform Enterprise appVersion:** `1.16.0`
 
