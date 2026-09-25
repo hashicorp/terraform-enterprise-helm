@@ -20,21 +20,33 @@ metadata:
   {{- end }}
 rules:
 - apiGroups:
-  - ""
   - "batch"
-  - "app"
   resources:
   - jobs
+  verbs:
+  - create
+  - delete
+- apiGroups:
+  - ""
+  resources:
   - pods
-  - configmaps
-  - "pods/log"
   verbs:
   - list
-  - watch
-  - create
-  - update
   - get
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
   - delete
+- apiGroups:
+  - ""
+  resources:
+  - "pods/log"
+  verbs:
+  - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
