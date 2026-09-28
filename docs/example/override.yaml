@@ -10,7 +10,6 @@ tls:
 image:
  repository: images.releases.hashicorp.com
  name: hashicorp/terraform-enterprise
- tag: <vYYYYMM-#>
 env:
   variables:
     TFE_HOSTNAME: "terraform-enterprise.terraform-enterprise.svc.cluster.local"
