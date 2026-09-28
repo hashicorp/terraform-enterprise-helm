@@ -60,7 +60,7 @@ No user-facing chart changes.
 
 ## [1.6.7](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.7) (2026-02-11)
 
-**Associated Terraform Enterprise release:** [`1.2.0`](https://developer.hashicorp.com/terraform/enterprise/releases/1.2.x#1-2-0)
+**Terraform Enterprise appVersion:** [`1.2.3`](https://developer.hashicorp.com/terraform/enterprise/releases/1.2.x#1-2-3)
 
 ### Changed
 
@@ -69,7 +69,7 @@ No user-facing chart changes.
 
 ## [1.6.6](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.6) (2025-11-12)
 
-**Associated Terraform Enterprise release:** [`1.1.0`](https://developer.hashicorp.com/terraform/enterprise/releases/1.1.x#1-1-0)
+**Terraform Enterprise appVersion:** [`1.1.2`](https://developer.hashicorp.com/terraform/enterprise/releases/1.1.x#1-1-2)
 
 ### Added
 
