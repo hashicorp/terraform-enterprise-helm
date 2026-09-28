@@ -2,13 +2,13 @@
 
 ## [2.0.8](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.8) (2026-09-23)
 
-**Terraform Enterprise appVersion:** `2.0.8`
+**Terraform Enterprise appVersion:** [`2.0.8`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-8)
 
 No user-facing chart changes.
 
 ## [2.0.7](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.7) (2026-09-15)
 
-**Terraform Enterprise appVersion:** `2.0.7`
+**Terraform Enterprise appVersion:** [`2.0.7`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-7)
 
 No user-facing chart changes.
 
@@ -17,19 +17,19 @@ HashiCorp Helm repository index.
 
 ## [2.0.6](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.6) (2026-08-31)
 
-**Terraform Enterprise appVersion:** `2.0.6`
+**Terraform Enterprise appVersion:** [`2.0.6`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-6)
 
 No user-facing chart changes.
 
 ## [2.0.5](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.5) (2026-08-05)
 
-**Terraform Enterprise appVersion:** `2.0.5`
+**Terraform Enterprise appVersion:** [`2.0.5`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-5)
 
 No user-facing chart changes.
 
 ## [2.0.4](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.4) (2026-07-17)
 
-**Terraform Enterprise appVersion:** `2.0.4`
+**Terraform Enterprise appVersion:** [`2.0.4`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-4)
 
 ### Added
 
@@ -40,7 +40,7 @@ No user-facing chart changes.
 
 ## [1.6.10](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.10) (2026-07-06)
 
-**Terraform Enterprise appVersion:** `1.2.4`
+**Terraform Enterprise appVersion:** [`1.2.4`](https://developer.hashicorp.com/terraform/enterprise/releases/1.2.x#1-2-4)
 
 This package was released from the parallel Terraform Enterprise 1.2.x release
 branch.
@@ -49,7 +49,7 @@ No user-facing chart changes.
 
 ## [1.6.9](https://helm.releases.hashicorp.com/terraform-enterprise-1.6.9.tgz) (2026-06-25)
 
-**Terraform Enterprise appVersion:** `2.0.4`
+**Terraform Enterprise appVersion:** [`2.0.4`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-4)
 
 The date is from the HashiCorp Helm repository. The published package has no
 corresponding GitHub Release or current `v1.6.9` tag.
@@ -58,7 +58,7 @@ No user-facing chart changes.
 
 ## [1.6.8](https://helm.releases.hashicorp.com/terraform-enterprise-1.6.8.tgz) (2026-05-15)
 
-**Terraform Enterprise appVersion:** `2.0.2`
+**Terraform Enterprise appVersion:** [`2.0.2`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-2)
 
 The date is from the HashiCorp Helm repository because the current `v1.6.8`
 tag was moved after this package was published.
@@ -78,7 +78,7 @@ tag was moved after this package was published.
 
 ## [1.6.7](https://helm.releases.hashicorp.com/terraform-enterprise-1.6.7.tgz) (2026-05-06)
 
-**Terraform Enterprise appVersion:** `1.2.3`
+**Terraform Enterprise appVersion:** [`1.2.3`](https://developer.hashicorp.com/terraform/enterprise/releases/1.2.x#1-2-3)
 
 The date is from the HashiCorp Helm repository because the GitHub Release
 retains the publication timestamp of an earlier `1.6.7` artifact.
@@ -90,7 +90,7 @@ retains the publication timestamp of an earlier `1.6.7` artifact.
 
 ## [1.6.6](https://helm.releases.hashicorp.com/terraform-enterprise-1.6.6.tgz) (2025-12-11)
 
-**Terraform Enterprise appVersion:** `1.1.2`
+**Terraform Enterprise appVersion:** [`1.1.2`](https://developer.hashicorp.com/terraform/enterprise/releases/1.1.x#1-1-2)
 
 The date is from the HashiCorp Helm repository because the current `v1.6.6`
 tag was moved after this package was published.
@@ -109,7 +109,7 @@ tag was moved after this package was published.
 
 ## [1.6.5](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.5) (2025-08-13)
 
-**Terraform Enterprise appVersion:** `1.0.0`
+**Terraform Enterprise appVersion:** [`1.0.0`](https://developer.hashicorp.com/terraform/enterprise/releases/1.0.x#1-0-0)
 
 ### Added
 
@@ -118,7 +118,7 @@ tag was moved after this package was published.
 
 ## [1.6.4](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.4) (2025-07-14)
 
-**Terraform Enterprise appVersion:** `v202507-1`
+**Terraform Enterprise appVersion:** [`v202507-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2025/v202507-1)
 
 ### Added
 
@@ -138,25 +138,25 @@ tag was moved after this package was published.
 
 ## [1.6.3](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.3) (2025-06-16)
 
-**Terraform Enterprise appVersion:** `v202506-1`
+**Terraform Enterprise appVersion:** [`v202506-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2025/v202506-1)
 
 No user-facing chart changes.
 
 ## [1.6.2](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.2) (2025-05-30)
 
-**Terraform Enterprise appVersion:** `v202505-1`
+**Terraform Enterprise appVersion:** [`v202505-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2025/v202505-1)
 
 No user-facing chart changes.
 
 ## [1.6.1](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.1) (2025-04-22)
 
-**Terraform Enterprise appVersion:** `v202504-1`
+**Terraform Enterprise appVersion:** [`v202504-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2025/v202504-1)
 
 No user-facing chart changes.
 
 ## [1.6.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.0) (2025-03-19)
 
-**Terraform Enterprise appVersion:** `v202503-1`
+**Terraform Enterprise appVersion:** [`v202503-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2025/v202503-1)
 
 ### Added
 
@@ -169,7 +169,7 @@ No user-facing chart changes.
 
 ## [1.5.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.5.0) (2025-02-20)
 
-**Terraform Enterprise appVersion:** `v202502-1`
+**Terraform Enterprise appVersion:** [`v202502-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2025/v202502-1)
 
 ### Added
 
@@ -178,7 +178,7 @@ No user-facing chart changes.
 
 ## [1.4.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.4.0) (2025-01-21)
 
-**Terraform Enterprise appVersion:** `v202501-1`
+**Terraform Enterprise appVersion:** [`v202501-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2025/v202501-1)
 
 ### Added
 
@@ -193,7 +193,7 @@ No user-facing chart changes.
 
 ## [1.3.4](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.3.4) (2024-11-26)
 
-**Terraform Enterprise appVersion:** `v202411-1`
+**Terraform Enterprise appVersion:** [`v202411-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2024/v202411-1)
 
 ### Added
 
@@ -219,7 +219,7 @@ No user-facing chart changes.
 
 ## [1.3.3](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.3.3) (2024-10-23)
 
-**Terraform Enterprise appVersion:** `v202410-1`
+**Terraform Enterprise appVersion:** [`v202410-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2024/v202410-1)
 
 ### Added
 
@@ -231,7 +231,7 @@ No user-facing chart changes.
 
 ## [1.3.2](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.3.2) (2024-09-12)
 
-**Terraform Enterprise appVersion:** `v202409-1`
+**Terraform Enterprise appVersion:** [`v202409-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2024/v202409-1)
 
 ### Added
 
@@ -239,7 +239,7 @@ No user-facing chart changes.
 
 ## [1.3.1](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.3.1) (2024-08-26)
 
-**Terraform Enterprise appVersion:** `v202408-1`
+**Terraform Enterprise appVersion:** [`v202408-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2024/v202408-1)
 
 ### Added
 
@@ -248,7 +248,7 @@ No user-facing chart changes.
 
 ## [1.3.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.3.0) (2024-07-29)
 
-**Terraform Enterprise appVersion:** `v202406-1`
+**Terraform Enterprise appVersion:** [`v202406-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2024/v202406-1)
 
 ### Added
 
