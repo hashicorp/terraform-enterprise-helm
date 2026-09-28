@@ -56,7 +56,7 @@ corresponding GitHub Release or current `v1.6.9` tag.
 
 No user-facing chart changes.
 
-## [1.6.8](https://helm.releases.hashicorp.com/terraform-enterprise-1.6.8.tgz) (2026-05-15)
+## [1.6.8](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.8) (2026-05-15)
 
 **Terraform Enterprise appVersion:** [`2.0.2`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-2)
 
@@ -76,7 +76,7 @@ tag was moved after this package was published.
 - Improved pre-upgrade validation volume handling and operational guidance based
   on release feedback.
 
-## [1.6.7](https://helm.releases.hashicorp.com/terraform-enterprise-1.6.7.tgz) (2026-05-06)
+## [1.6.7](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.7) (2026-05-06)
 
 **Terraform Enterprise appVersion:** [`1.2.3`](https://developer.hashicorp.com/terraform/enterprise/releases/1.2.x#1-2-3)
 
@@ -88,7 +88,7 @@ retains the publication timestamp of an earlier `1.6.7` artifact.
 - Changed the default readiness probe path from `/_health_check` to
   `/api/v1/health/readiness`.
 
-## [1.6.6](https://helm.releases.hashicorp.com/terraform-enterprise-1.6.6.tgz) (2025-12-11)
+## [1.6.6](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.6) (2025-12-11)
 
 **Terraform Enterprise appVersion:** [`1.1.2`](https://developer.hashicorp.com/terraform/enterprise/releases/1.1.x#1-1-2)
 
