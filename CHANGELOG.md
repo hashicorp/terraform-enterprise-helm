@@ -267,7 +267,7 @@ No user-facing chart changes.
 
 ## [1.2.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.2.0) (2024-04-25)
 
-**Terraform Enterprise appVersion:** `1.16.0`
+**Associated Terraform Enterprise release:** [`v202404-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2024/v202404-1)
 
 ### Added
 
@@ -282,7 +282,7 @@ No user-facing chart changes.
 
 ## [1.1.1](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.1.1) (2023-12-05)
 
-**Terraform Enterprise appVersion:** `1.16.0`
+**Associated Terraform Enterprise release:** [`v202312-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2023/v202312-1)
 
 ### Added
 
@@ -290,7 +290,7 @@ No user-facing chart changes.
 
 ## [1.1.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.1.0) (2023-11-02)
 
-**Terraform Enterprise appVersion:** `1.16.0`
+**Associated Terraform Enterprise release:** [`v202311-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2023/v202311-1)
 
 ### Added
 
@@ -305,7 +305,7 @@ No user-facing chart changes.
 
 ## [1.0.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.0.0) (2023-09-18)
 
-**Terraform Enterprise appVersion:** `1.16.0`
+**Associated Terraform Enterprise release:** [`v202309-1`](https://developer.hashicorp.com/terraform/enterprise/releases/2023/v202309-1)
 
 This release marked General Availability for Terraform Enterprise Flexible
 Deployment Options. The entries below summarize notable changes accumulated in
@@ -327,7 +327,7 @@ the `v0.1.2...v1.0.0` source diff.
 
 ## [0.1.2](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v0.1.2) (2023-07-18)
 
-**Terraform Enterprise appVersion:** `1.16.0`
+**Terraform Enterprise image tag:** `beta-1`
 
 ### Fixed
 
@@ -336,13 +336,13 @@ the `v0.1.2...v1.0.0` source diff.
 
 ## [0.1.1](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v0.1.1) (2023-07-14)
 
-**Terraform Enterprise appVersion:** `1.16.0`
+**Terraform Enterprise image tag:** `beta-1`
 
 This was the first chart version published in the HashiCorp Helm repository.
 
 ## [0.1.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v0.1.0) (2023-07-13)
 
-**Terraform Enterprise appVersion:** `1.16.0`
+**Terraform Enterprise image tag:** `beta-1`
 
 This was the initial tagged development release. No `0.1.0` package is present
 in the HashiCorp Helm repository.
