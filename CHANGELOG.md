@@ -41,9 +41,17 @@ No user-facing chart changes.
 
 No user-facing chart changes.
 
+> **Historical release note:** The GitHub tags or release metadata for chart
+> versions `1.6.6` through `1.6.8` no longer consistently identify the artifacts
+> originally published in the HashiCorp Helm repository. For these entries, the
+> date and `appVersion` reflect the published Helm artifact. Refer to the linked
+> TFE compatibility table for all supported TFE releases.
+
 ## [1.6.8](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.8) (2026-05-15)
 
-**Terraform Enterprise appVersion:** [`2.0.2`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-2)
+**Published chart `appVersion`:** [`2.0.2`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-2)
+
+**Compatibility:** [Terraform Enterprise 2.0.x](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x)
 
 ### Added
 
@@ -58,18 +66,22 @@ No user-facing chart changes.
 - Improved pre-upgrade validation volume handling and operational guidance based
   on release feedback.
 
-## [1.6.7](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.7) (2026-02-11)
+## [1.6.7](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.7) (2026-05-06)
 
-**Terraform Enterprise appVersion:** [`1.2.3`](https://developer.hashicorp.com/terraform/enterprise/releases/1.2.x#1-2-3)
+**Published chart `appVersion`:** [`1.2.3`](https://developer.hashicorp.com/terraform/enterprise/releases/1.2.x#1-2-3)
+
+**Compatibility:** [Terraform Enterprise 1.2.x](https://developer.hashicorp.com/terraform/enterprise/releases/1.2.x)
 
 ### Changed
 
 - Changed the default readiness probe path from `/_health_check` to
   `/api/v1/health/readiness`.
 
-## [1.6.6](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.6) (2025-11-12)
+## [1.6.6](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v1.6.6) (2025-12-11)
 
-**Terraform Enterprise appVersion:** [`1.1.4`](https://developer.hashicorp.com/terraform/enterprise/releases/1.1.x#1-1-4)
+**Published chart `appVersion`:** [`1.1.2`](https://developer.hashicorp.com/terraform/enterprise/releases/1.1.x#1-1-2)
+
+**Compatibility:** [Terraform Enterprise 1.1.x](https://developer.hashicorp.com/terraform/enterprise/releases/1.1.x)
 
 ### Added
 
