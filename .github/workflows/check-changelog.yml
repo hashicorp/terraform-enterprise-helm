@@ -88,7 +88,7 @@ jobs:
           extract_entries "$RUNNER_TEMP/changelog-base.md" > "$RUNNER_TEMP/changelog-base-entries.txt"
           extract_entries "$RUNNER_TEMP/changelog-head.md" > "$RUNNER_TEMP/changelog-head-entries.txt"
 
-          if comm -13 "$RUNNER_TEMP/changelog-base-entries.txt" "$RUNNER_TEMP/changelog-head-entries.txt" | grep -q .; then
+          if [[ -n "$(comm -13 "$RUNNER_TEMP/changelog-base-entries.txt" "$RUNNER_TEMP/changelog-head-entries.txt")" ]]; then
             echo "CHANGELOG.md contains a new or updated Unreleased entry."
             exit 0
           fi
