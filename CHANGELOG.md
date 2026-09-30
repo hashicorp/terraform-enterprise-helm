@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Added support for `b64:`-prefixed pre-encoded `env.secrets` values.
+- Added structured post-install notes with configuration status and useful
+  operational commands.
+- Added configurable Admin Console access modes for dedicated-port,
+  path-based, combined, or disabled access.
+
+### Fixed
+
+- Corrected the agent worker Role API groups and reduced its permissions for
+  hardened OpenShift deployments.
+- Updated readiness endpoint examples in chart values and the quickstart guide
+  to use `/api/v1/health/readiness`.
+
 ## [2.0.8](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.8) (2026-09-23)
 
 **Terraform Enterprise appVersion:** [`2.0.8`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-8)
