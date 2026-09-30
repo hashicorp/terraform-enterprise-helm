@@ -1,6 +1,6 @@
 ## Changelog
 
-<!--
+<!-- Choose exactly one option below.
 Add a customer-facing entry to the Unreleased section of CHANGELOG.md using
 the appropriate Keep a Changelog category: Added, Changed, Deprecated, Removed,
 Fixed, or Security.
@@ -10,7 +10,8 @@ If this PR has no customer-facing chart impact, apply the
 -->
 
 - [ ] I added or updated the appropriate `Unreleased` entry in `CHANGELOG.md`.
-- [ ] This PR has no user-facing chart impact and has the `no-user-facing-impact` label.
+- [ ] This PR has no user-facing chart impact and has the
+  `no-user-facing-impact` label.
 
 ## Summary
 

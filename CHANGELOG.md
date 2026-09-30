@@ -12,8 +12,10 @@
 
 ### Fixed
 
-- Corrected the agent validation Role API groups and reduced its permissions for
+- Corrected the agent worker Role API groups and reduced its permissions for
   hardened OpenShift deployments.
+- Updated readiness endpoint examples in chart values and the quickstart guide
+  to use `/api/v1/health/readiness`.
 
 ## [2.0.8](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.8) (2026-09-23)
 

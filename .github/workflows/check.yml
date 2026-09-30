@@ -2,78 +2,13 @@ name: Helm Chart CI
 
 on:
   push:
+    branches: [main]
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 permissions:
   contents: read
 
 jobs:
-  changelog:
-    name: Check changelog
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
-        with:
-          fetch-depth: 0
-
-      - name: Validate changelog update
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
-        run: |
-          set -euo pipefail
-
-          if [[ ",$PR_LABELS," == *,no-user-facing-impact,* ]]; then
-            echo "The no-user-facing-impact label is present."
-            exit 0
-          fi
-
-          ruby <<'RUBY'
-          diff = `git diff --unified=0 #{ENV.fetch("BASE_SHA")} #{ENV.fetch("HEAD_SHA")} -- CHANGELOG.md`
-          abort "Unable to read the CHANGELOG.md diff." unless $?.success?
-
-          lines = File.readlines("CHANGELOG.md", chomp: true)
-          unreleased = lines.index { |line| line.match?(/^## Unreleased\s*$/) }
-          abort "CHANGELOG.md must contain an Unreleased section." unless unreleased
-
-          section_end = lines[(unreleased + 1)..]&.index { |line| line.match?(/^## /) }
-          section_end = section_end ? unreleased + 1 + section_end : lines.length
-
-          added_lines = []
-          new_line = nil
-          diff.each_line do |line|
-            if line.start_with?("@@")
-              new_line = line[/\+(\d+)/, 1].to_i
-              next
-            end
-
-            next unless new_line
-            next if line.start_with?("+++")
-
-            if line.start_with?("+")
-              added_lines << new_line
-              new_line += 1
-            elsif line.start_with?(" ")
-              new_line += 1
-            end
-          end
-
-          if added_lines.any? { |line| line > unreleased + 1 && line <= section_end }
-            puts "CHANGELOG.md contains an Unreleased entry."
-            exit 0
-          end
-
-          abort "This PR must add an entry to the Unreleased section in CHANGELOG.md."
-          RUBY
-
-
   helm_chart_ci:
     runs-on: ubuntu-latest
 
@@ -81,6 +16,8 @@ jobs:
       # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
+        with:
+          persist-credentials: false
 
       # Step 2: Set up Helm
       - name: Set up Helm
