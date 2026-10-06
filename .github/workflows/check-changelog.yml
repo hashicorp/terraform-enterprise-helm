@@ -2,7 +2,7 @@ name: Changelog Policy
 
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
 
 concurrency:
   group: changelog-${{ github.event.pull_request.number }}
@@ -24,6 +24,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # Never check out or execute pull request code in this trusted workflow.
+      # The pull request ref is fetched only so the policy can read files via git show.
+
       - name: Fetch pull request
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -34,4 +37,18 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
-        run: bash .github/scripts/check-changelog.sh
+        run: |
+          set -euo pipefail
+
+          if jq -e 'index("no-user-facing-impact") != null' <<< "$PR_LABELS" > /dev/null; then
+            echo "The no-user-facing-impact label is present."
+            exit 0
+          fi
+
+          merge_base=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
+          if git diff --quiet "$merge_base" "$HEAD_SHA" -- CHANGELOG.md; then
+            echo "Update CHANGELOG.md or apply the no-user-facing-impact label." >&2
+            exit 1
+          fi
+
+          echo "CHANGELOG.md was updated."

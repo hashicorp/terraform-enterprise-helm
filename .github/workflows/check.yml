@@ -15,31 +15,26 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      # Step 2: Set up Helm
       - name: Set up Helm
         uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3.5
         with:
           version: v3.19.0
 
-      # Step 3: Lint the Helm chart
       - name: Lint Helm chart
         run: |
           helm lint .
 
-      # Step 4: Install kubeconform
       - name: Install kubeconform
         run: |
           curl -fLO https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz
           echo "9bc2bffbf71f261128533edaf912153948b7ff238f9a531ae6d34466ec287883  kubeconform-linux-amd64.tar.gz" | sha256sum --check
           tar -xzf kubeconform-linux-amd64.tar.gz
 
-      # Step 5: Render and validate Helm templates
       - name: Validate rendered Helm templates
         run: |
           helm template . | ./kubeconform --strict
