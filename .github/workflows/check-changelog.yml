@@ -39,6 +39,7 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Require exactly one path: update the changelog or use the exemption label.
           merge_base=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
           if jq -e 'index("no-user-facing-impact") != null' <<< "$PR_LABELS" > /dev/null; then
             if git diff --quiet "$merge_base" "$HEAD_SHA" -- CHANGELOG.md; then
