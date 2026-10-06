@@ -39,12 +39,17 @@ jobs:
         run: |
           set -euo pipefail
 
+          merge_base=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
           if jq -e 'index("no-user-facing-impact") != null' <<< "$PR_LABELS" > /dev/null; then
-            echo "The no-user-facing-impact label is present."
-            exit 0
+            if git diff --quiet "$merge_base" "$HEAD_SHA" -- CHANGELOG.md; then
+              echo "The no-user-facing-impact label is present and CHANGELOG.md is unchanged."
+              exit 0
+            fi
+
+            echo "Remove the no-user-facing-impact label when changing CHANGELOG.md." >&2
+            exit 1
           fi
 
-          merge_base=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
           if git diff --quiet "$merge_base" "$HEAD_SHA" -- CHANGELOG.md; then
             echo "Update CHANGELOG.md or apply the no-user-facing-impact label." >&2
             exit 1
