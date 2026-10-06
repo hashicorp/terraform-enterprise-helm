@@ -7,11 +7,16 @@ Fixed, or Security.
 
 If this PR has no customer-facing chart impact, apply the
 `no-user-facing-impact` label instead.
+
+For a release PR, move every `Unreleased` entry into the new version section
+and update the chart version in `Chart.yaml`.
 -->
 
 - [ ] I added or updated the appropriate `Unreleased` entry in `CHANGELOG.md`.
 - [ ] This PR has no user-facing chart impact and has the
   `no-user-facing-impact` label.
+- [ ] This is a release PR that moves all `Unreleased` entries into the new
+  version section.
 
 ## Summary
 

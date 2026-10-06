@@ -2,7 +2,11 @@ name: Changelog Policy
 
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+concurrency:
+  group: changelog-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -11,10 +15,11 @@ jobs:
   changelog:
     name: Check changelog
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Checkout trusted policy
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -29,69 +34,4 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
-        run: |
-          set -euo pipefail
-
-          if jq -e 'index("no-user-facing-impact") != null' <<< "$PR_LABELS" > /dev/null; then
-            echo "The no-user-facing-impact label is present."
-            exit 0
-          fi
-
-          merge_base=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
-          git show "$merge_base:CHANGELOG.md" > "$RUNNER_TEMP/changelog-base.md"
-          git show "$HEAD_SHA:CHANGELOG.md" > "$RUNNER_TEMP/changelog-head.md"
-
-          base_version=$(git show "$merge_base:Chart.yaml" | awk '$1 == "version:" { print $2; exit }' | tr -d "\"'")
-          head_version=$(git show "$HEAD_SHA:Chart.yaml" | awk '$1 == "version:" { print $2; exit }' | tr -d "\"'")
-
-          if [[ -n "$head_version" && "$base_version" != "$head_version" ]] \
-            && ! grep -Fq "## [$head_version](" "$RUNNER_TEMP/changelog-base.md" \
-            && grep -Fq "## [$head_version](" "$RUNNER_TEMP/changelog-head.md"; then
-            echo "CHANGELOG.md contains the new chart release section."
-            exit 0
-          fi
-
-          extract_entries() {
-            awk '
-              function emit() {
-                if (entry != "") print category "\t" entry
-                entry = ""
-              }
-              /^[[:space:]]*<!--/ { comment = 1 }
-              comment {
-                if ($0 ~ /-->/) comment = 0
-                next
-              }
-              /^[[:space:]]*(```|~~~)/ { fenced = !fenced; next }
-              fenced { next }
-              /^## Unreleased[[:space:]]*$/ { unreleased = 1; next }
-              unreleased && /^## / { emit(); unreleased = 0; valid = 0; exit }
-              unreleased && /^### / {
-                emit()
-                category = substr($0, 5)
-                valid = category ~ /^(Added|Changed|Deprecated|Removed|Fixed|Security)$/
-                next
-              }
-              unreleased && valid && /^- [^[:space:]]/ {
-                emit()
-                entry = substr($0, 3)
-                next
-              }
-              unreleased && entry != "" && /^  [^[:space:]]/ {
-                entry = entry " " substr($0, 3)
-                next
-              }
-              END { emit() }
-            ' "$1" | sort -u
-          }
-
-          extract_entries "$RUNNER_TEMP/changelog-base.md" > "$RUNNER_TEMP/changelog-base-entries.txt"
-          extract_entries "$RUNNER_TEMP/changelog-head.md" > "$RUNNER_TEMP/changelog-head-entries.txt"
-
-          if [[ -n "$(comm -13 "$RUNNER_TEMP/changelog-base-entries.txt" "$RUNNER_TEMP/changelog-head-entries.txt")" ]]; then
-            echo "CHANGELOG.md contains a new or updated Unreleased entry."
-            exit 0
-          fi
-
-          echo "Add an entry under an allowed category in CHANGELOG.md's Unreleased section or apply the no-user-facing-impact label." >&2
-          exit 1
+        run: bash .github/scripts/check-changelog.sh
