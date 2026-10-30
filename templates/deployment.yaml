@@ -59,9 +59,11 @@ spec:
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
       volumes:
+        {{- if ne .Values.tls.enabled false }}
         - name: certificates
           secret:
             secretName: {{ .Values.tls.certificateSecret }}
+        {{- end }}
         {{- if or (and .Values.tlsSecondary.certData .Values.tlsSecondary.keyData) .Values.tlsSecondary.certificateSecret }}
         - name: certificates-secondary
           secret:
@@ -170,13 +172,15 @@ spec:
           - name: certificates-secondary
             mountPath: {{ .Values.tlsSecondary.keyMountPath }}
             subPath: tls.key        
-          {{- end }}  
+          {{- end }}
+          {{- if ne .Values.tls.enabled false }}
           - name: certificates
             mountPath: {{ .Values.tls.certMountPath }}
             subPath: tls.crt
           - name: certificates
             mountPath: {{ .Values.tls.keyMountPath }}
             subPath: tls.key
+          {{- end }}
           {{- if .Values.tls.caCertData }}
           - name: ca-certificates
             mountPath: {{ include "cacert.path" . }}
