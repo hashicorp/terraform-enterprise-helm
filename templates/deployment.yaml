@@ -181,10 +181,33 @@ spec:
                 - |
                   set -e
                   sleep 30
-                  tfectl node drain
-                  until tasks="$(tfectl node tasks --json)" &&
-                    printf '%s\n' "$tasks" | jq -e '.is_safe_to_terminate == true' > /dev/null; do
-                    echo "Waiting for node to be safe to terminate; retrying in 5 seconds." >&2
+                  attempt=1
+                  while ! tfectl node drain; do
+                    if [ "$attempt" -eq 10 ]; then
+                      echo "Failed to drain node after 10 attempts; exiting." >&2
+                      exit 1
+                    fi
+                    echo "Failed to drain node; retrying in 3 seconds." >&2
+                    sleep 3
+                    attempt=$((attempt + 1))
+                  done
+                  failures=0
+                  while true; do
+                    if tasks="$(tfectl node tasks --json)" &&
+                      safe="$(printf '%s\n' "$tasks" | jq -c '.is_safe_to_terminate')"; then
+                      case "$safe" in
+                        true) break ;;
+                        false)
+                          failures=0
+                          echo "Waiting for node to be safe to terminate; retrying in 5 seconds." >&2
+                          sleep 5
+                          continue
+                          ;;
+                      esac
+                    fi
+                    failures=$((failures + 1))
+                    echo "Failed to check node tasks ($failures/10)." >&2
+                    [ "$failures" -lt 10 ] || exit 1
                     sleep 5
                   done
         {{- end }}

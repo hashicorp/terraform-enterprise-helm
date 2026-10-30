@@ -15,9 +15,12 @@ waitForDrain:
 When a pod terminates, its `preStop` hook:
 
 1. Waits 30 seconds so the load balancers has time to deregister the pod.
-2. Runs `tfectl node drain`.
+2. Runs `tfectl node drain` up to 10 times with a 3-second delay
+   between attempts. The hook exits if all 10 attempts fail.
 3. Polls `tfectl node tasks --json` every 5 seconds until
-   `is_safe_to_terminate` is `true`.
+   `is_safe_to_terminate` is `true`. The hook exits after 10 consecutive
+   failed checks (command failures, invalid JSON, or unexpected field values).
+   A valid boolean response resets the failure counter; `false` keeps polling.
 
 ### Termination Grace Period
 
