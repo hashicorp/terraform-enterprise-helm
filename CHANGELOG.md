@@ -8,6 +8,8 @@
 
 ### Added
 
+- Added opt-in graceful pod draining with `waitForDrain` and configurable
+  `minReadySeconds` and `terminationGracePeriodSeconds` for rolling updates.
 - Added support for `b64:`-prefixed pre-encoded `env.secrets` values.
 - Added structured post-install notes with configuration status and useful
   operational commands.
