@@ -56,6 +56,9 @@ spec:
       {{- end }}
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- if and .Values.preStop.enabled .Values.preStop.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.preStop.terminationGracePeriodSeconds }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
       volumes:
@@ -160,6 +163,19 @@ spec:
           {{- if .Values.tfe.readinessProbeTimeoutSeconds }}
           timeoutSeconds: {{ .Values.tfe.readinessProbeTimeoutSeconds }}
           {{- end }}
+        {{- if .Values.preStop.enabled }}
+        lifecycle:
+          preStop:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  tfectl node drain
+                  until [ "$(tfectl node tasks --json | jq -r .is_safe_to_terminate)" = "true" ]; do
+                    sleep 5
+                  done
+        {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:
