@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## [2.1.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.1.0) (2026-10-21)
+
+**Terraform Enterprise appVersion:** [`2.1.0`](https://developer.hashicorp.com/terraform/enterprise/releases/2.1.x#2-1-0)
+
 ### Added
 
 - Added support for `b64:`-prefixed pre-encoded `env.secrets` values.
