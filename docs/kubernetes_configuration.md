@@ -30,7 +30,7 @@ Pods exit as soon as that work finishes; they do not wait the full 24 hours.
 You can override `terminationGracePeriodSeconds` whether draining is enabled or
 not. The minimum allowed value is `600` (10 minutes).
 
-**Warning:** Task worker can take up to 24 hours to drain. A shorter grace period may cause Kubernetes to terminate TFE while runs are still active.:
+**Warning:** Task worker can take up to 24 hours to drain. A shorter grace period may cause Kubernetes to terminate TFE while runs are still active.
 
 ## Custom Ingress
 This Helm chart supports an optional ingress resource with your Ingress controller. To enable this, update the values in the `ingress` section on the values file, also setting `ingress.enabled` to `true`.
