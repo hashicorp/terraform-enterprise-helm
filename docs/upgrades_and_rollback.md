@@ -202,6 +202,8 @@ Keep `waitForDrain.enabled: true` in your values file for future upgrades.
 When using `--wait` or `--atomic`, allow enough time for draining in Helm's
 `--timeout`. This timeout is separate from the pod's termination grace period.
 
+This is a requirement to conduct a zero downtime upgrade safely
+
 ## Helm rollback to previous release
 
 The first rollback argument is the release name. The optional second argument is the revision. If you omit the revision, Helm rolls back to the previous release.
