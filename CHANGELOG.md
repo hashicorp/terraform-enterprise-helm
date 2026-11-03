@@ -2,10 +2,12 @@
 
 ## Unreleased
 
-### Changed
 
-- Updated the chart version and Terraform Enterprise appVersion to `2.1.1`.
-  This release contains no Kubernetes template or chart default changes.
+## [2.1.1](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.1.1) (2026-11-03)
+
+**Terraform Enterprise appVersion:** [`2.1.1`](https://developer.hashicorp.com/terraform/enterprise/releases/2.1.x#2-1-1)
+
+No user-facing chart changes.
 
 ## [2.1.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.1.0) (2026-10-21)
 
