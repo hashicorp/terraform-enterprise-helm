@@ -12,7 +12,7 @@ SPDX-License-Identifier: MPL-2.0
   Namespace       : {{ .Release.Namespace }}
   Chart           : {{ .Chart.Name }}-{{ .Chart.Version }}
   App version     : {{ .Chart.AppVersion }}
-  Image           : {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
+  Image           : {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ include "helpers.image-tag" . }}
   Replicas        : {{ .Values.replicaCount }}
   Service account : {{ if .Values.serviceAccount.name }}{{ .Values.serviceAccount.name }}{{ else }}{{ .Release.Namespace }}{{ end }}
 

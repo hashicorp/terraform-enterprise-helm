@@ -176,3 +176,10 @@ terraform-enterprise-preupgrade-check
 {{- define "helpers.preupgrade-overrides-secret-name" -}}
 {{- printf "%s-overrides" (include "helpers.preupgrade-job-name" .) | trunc 63 | trimSuffix "-" -}}
 {{- end }}
+
+{{/*
+Returns the image tag to use, defaulting to Chart.AppVersion if not provided in values.
+*/}}
+{{- define "helpers.image-tag" -}}
+{{- .Values.image.tag | default .Chart.AppVersion -}}
+{{- end }}
