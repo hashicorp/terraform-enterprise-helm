@@ -191,6 +191,19 @@ helm upgrade terraform-enterprise hashicorp/terraform-enterprise \
   --atomic
 ```
 
+### Upgrading with Graceful Draining
+
+Enable [graceful shutdown](kubernetes_configuration.md#graceful-shutdown) before
+upgrading the TFE image. Wait for that rollout to finish so all running pods have
+the `preStop` hook. Adding the hook during an image upgrade does not protect the
+old pods.
+
+Keep `waitForDrain.enabled: true` in your values file for future upgrades.
+When using `--wait` or `--atomic`, allow enough time for draining in Helm's
+`--timeout`. This timeout is separate from the pod's termination grace period.
+
+This is a requirement to conduct a zero downtime upgrade safely
+
 ## Helm rollback to previous release
 
 The first rollback argument is the release name. The optional second argument is the revision. If you omit the revision, Helm rolls back to the previous release.

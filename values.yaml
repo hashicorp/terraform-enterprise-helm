@@ -44,6 +44,12 @@ container:
 #     maxSurge: 1
 #     maxUnavailable: 0
 
+# minReadySeconds specifies the minimum number of seconds a newly created pod must be ready
+# (without any containers crashing) before it is considered available. This gives in-process
+# components such as Sidekiq workers time to fully initialize before Kubernetes removes the
+# next old pod during a rolling update. Not set by default (Kubernetes default is 0).
+# minReadySeconds: 30
+
 # Resource limits are not set by default, to give the user the ability to set specific resource limits.
 # If you do want to specify resource limits, uncomment the following lines and adjust them as necessary.
 resources:
@@ -198,6 +204,21 @@ securityContext: {}
     # runAsUser: 1000
     # runAsGroup: 3000
     # fsGroup: 2000
+
+# waitForDrain enables a 24-hour termination grace period and a preStop lifecycle
+# hook that runs `tfectl node drain` and polls `tfectl node tasks --json` until
+# the local node reports that it is safe to terminate.
+waitForDrain:
+  enabled: false
+
+# terminationGracePeriodSeconds overrides the pod termination grace period.
+# When unset, it defaults to 86400 (24 hours) if waitForDrain is enabled,
+# otherwise the Kubernetes default applies. If set, it must be at least 600 (10 minutes).
+# WARNING: Overriding this with a value shorter than 86400 is risky. The maximum
+# time a task worker can take to drain is 24 hours, so a shorter grace period may
+# cause Kubernetes to kill the pod while runs are in flight, and Terraform applies
+# could exit prematurely.
+terminationGracePeriodSeconds: null
 
 # InitContainers is a list of init containers. Specified as a YAML list.
 # This is useful if you need to run a script to provision TLS certificates or
