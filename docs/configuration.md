@@ -77,6 +77,64 @@ items:
 ...
 ```
 
+### Metrics Service
+
+By default, the Helm chart does not create a Kubernetes Service for metrics.
+To enable a dedicated metrics Service, configure both `tfe.metrics.enable`
+and `serviceMetrics.enabled` in your values file:
+
+```yaml
+tfe:
+  metrics:
+    enable: true
+
+serviceMetrics:
+  enabled: true
+```
+
+This creates a Service named `terraform-enterprise-metrics` with the following
+ports:
+
+- `metrics-http`: HTTP metrics endpoint (default: 9090).
+- `metrics-https`: HTTPS metrics endpoint (default: 9091).
+
+The Service ports follow the values configured in `tfe.metrics.httpPort`
+and `tfe.metrics.httpsPort`.
+
+The `serviceMetrics` section supports the following configuration options:
+
+| Parameter | Description | Default |
+| --- | --- | --- |
+| `enabled` | Create a dedicated metrics Service. Requires `tfe.metrics.enable`. | `false` |
+| `annotations` | Custom Service annotations. | `{}` |
+| `labels` | Custom Service labels. | `{}` |
+| `type` | Kubernetes Service type: `ClusterIP`, `NodePort`, or `LoadBalancer`. | `ClusterIP` |
+| `httpNodePort` | Optional static NodePort for HTTP metrics. | `null` |
+| `httpsNodePort` | Optional static NodePort for HTTPS metrics. | `null` |
+| `loadBalancerIP` | Optional static IP for LoadBalancer services, where supported. | `null` |
+
+With the default configuration, metrics can be accessed from within the
+Kubernetes cluster using the following endpoint:
+
+```
+http://terraform-enterprise-metrics:9090/metrics?format=prometheus
+```
+
+For monitoring systems outside the cluster, administrators can configure an
+Ingress or another platform-specific networking resource to expose the
+metrics Service.
+
+**Note:** Enabling the metrics Service does not automatically create an
+Ingress or modify the existing Terraform Enterprise Services.
+
+**Security considerations:** The metrics Service exposes both HTTP and HTTPS
+endpoints. Restrict access to authorized monitoring systems using appropriate
+network policies and access controls. When exposing metrics externally, use
+HTTPS with proper TLS certificate validation.
+
+For deployments with multiple Terraform Enterprise replicas, use pod-level
+discovery when individual replica metrics are required.
+
 ## Custom agent worker pod template
 
 Terraform Enterprise now supports the inclusion of a custom pod template via `agentWorkerPodTemplate` in the Values file.

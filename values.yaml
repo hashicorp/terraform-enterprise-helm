@@ -325,6 +325,19 @@ serviceSecondary:
   loadBalancerIP: null # If service.type is LoadBalancer, you can optionally set a specific external IP.
                        # Useful for static IP requirements or pre-existing IP reservations.
 
+serviceMetrics:
+  enabled: false    # Create a dedicated Service for Terraform Enterprise metrics.
+                    # Requires tfe.metrics.enable to be set to true.
+
+  annotations: {}
+  labels: {}
+
+  type: ClusterIP    # Options: LoadBalancer, ClusterIP, NodePort.
+
+  httpNodePort: null  # Optional static NodePort for HTTP metrics.
+  httpsNodePort: null # Optional static NodePort for HTTPS metrics.
+
+  loadBalancerIP: null # Optional static IP for LoadBalancer services.
 
 # Custom pod template to define your own specifications for the creation of the agent worker pods.
 # This should be YAML representing a valid corev1.PodTemplateSpec. This format is documented
