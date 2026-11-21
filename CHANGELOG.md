@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Added
+
+- Added an opt-in Kubernetes Service for Terraform Enterprise metrics through
+  `serviceMetrics.enabled`, supporting configurable service types, labels,
+  annotations, and external access through independently configured ingress
+  resources.
+
 ## [2.1.0](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.1.0) (2026-10-21)
 
 **Terraform Enterprise appVersion:** [`2.1.0`](https://developer.hashicorp.com/terraform/enterprise/releases/2.1.x#2-1-0)

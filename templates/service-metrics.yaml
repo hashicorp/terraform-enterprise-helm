@@ -1,0 +1,41 @@
+{{/*
+SPDX-License-Identifier: MPL-2.0
+*/}}
+{{- $serviceMetrics := .Values.serviceMetrics | default dict }}
+{{- if and (not .Values.preupgradeCheck.enabled) .Values.tfe.metrics.enable $serviceMetrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: terraform-enterprise-metrics
+  namespace: {{ .Release.Namespace }}
+  {{- with $serviceMetrics.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $serviceMetrics.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $serviceMetrics.type | default "ClusterIP" }}
+  {{- if and (eq $serviceMetrics.type "LoadBalancer") $serviceMetrics.loadBalancerIP }}
+  loadBalancerIP: {{ $serviceMetrics.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: metrics-http
+      port: {{ .Values.tfe.metrics.httpPort }}
+      targetPort: {{ .Values.tfe.metrics.httpPort }}
+      protocol: TCP
+      {{- if and (eq $serviceMetrics.type "NodePort") $serviceMetrics.httpNodePort }}
+      nodePort: {{ $serviceMetrics.httpNodePort }}
+      {{- end }}
+    - name: metrics-https
+      port: {{ .Values.tfe.metrics.httpsPort }}
+      targetPort: {{ .Values.tfe.metrics.httpsPort }}
+      protocol: TCP
+      {{- if and (eq $serviceMetrics.type "NodePort") $serviceMetrics.httpsNodePort }}
+      nodePort: {{ $serviceMetrics.httpsNodePort }}
+      {{- end }}
+  selector:
+    app: terraform-enterprise
+{{- end }}
