@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.10](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.10) (TBD)
+
+**Terraform Enterprise appVersion:** [`2.0.10`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-10)
+
+No user-facing chart changes.
+
 ## [2.0.9](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.0.9) (2026-10-29)
 
 **Terraform Enterprise appVersion:** [`2.0.9`](https://developer.hashicorp.com/terraform/enterprise/releases/2.0.x#2-0-9)
