@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## [2.1.2](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.1.2) (TBD)
+
+**Terraform Enterprise appVersion:** [`2.1.2`](https://developer.hashicorp.com/terraform/enterprise/releases/2.1.x#2-1-2)
+
+No user-facing chart changes.
+
 ## [2.1.1](https://github.com/hashicorp/terraform-enterprise-helm/releases/tag/v2.1.1) (2026-11-03)
 
 **Terraform Enterprise appVersion:** [`2.1.1`](https://developer.hashicorp.com/terraform/enterprise/releases/2.1.x#2-1-1)
