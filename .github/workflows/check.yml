@@ -2,6 +2,11 @@ name: Helm Chart CI
 
 on:
   push:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to validate'
+        required: true
 
 permissions:
   contents: read
@@ -14,6 +19,8 @@ jobs:
       # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.sha }}
 
       # Step 2: Set up Helm
       - name: Set up Helm
