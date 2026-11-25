@@ -81,14 +81,6 @@ jobs:
           else
             echo "Tag $TAG successfully verified to point to SHA $created_tag_sha."
           fi
-      - name: Dispatch Tag Workflows
-        env:
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-        run: |
-          gh workflow run check.yml --ref "$DEFAULT_BRANCH" -f "tag=$TAG"
-          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+[^/]*$ ]]; then
-            gh workflow run update-helm-charts-index.yml --ref "$DEFAULT_BRANCH" -f "tag=$TAG"
-          fi
       - name: Create or Update Release Notes
         env:
           TAG_NEW_SHA: ${{ steps.get_sha.outputs.tag_new_sha }}
@@ -105,4 +97,12 @@ jobs:
           else
             echo "Creating new release for tag $TAG"
             gh release create "$TAG" --generate-notes
+          fi
+      - name: Dispatch Tag Workflows
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          gh workflow run check.yml --ref "$DEFAULT_BRANCH" -f "tag=$TAG"
+          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+[^/]*$ ]]; then
+            gh workflow run update-helm-charts-index.yml --ref "$DEFAULT_BRANCH" -f "tag=$TAG"
           fi
